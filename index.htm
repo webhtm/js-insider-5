@@ -1,0 +1,2372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JS Insider 5.0</title>
+  <style>
+   /* ALLAH IS THE GREATEST */
+   input { font-family: Heebo;}
+   /* Style for file items */
+   #file-list .file-item.selected {
+      background-color: rgb(0, 183, 255); /* Highlight color for the selected file */
+      color: #333;
+    }
+#settings-search {
+  margin-top: 10px;
+  margin-right: 5px;
+  border: none;
+}
+#input {
+  border: none;
+}
+    /* Style for saved files */
+    #file-list .file-item.saved {
+      color: #27ae60; /* Changed to green for better visibility */
+      font-weight: bold;
+    }
+    #file-list .file-item.saved:hover {
+      background-color: #27ae6026; 
+      color: white;/* Green color for saved files */
+      font-weight: bold;
+    }
+    #file-list .file-item.saved.selected {
+      background-color: #27ae60; /* Darker green for selected saved files */
+      color: rgb(255, 255, 255);
+    }
+
+    /* Auto-save indicator */
+    .autosave-indicator {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #27AE60;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 1000;
+    }
+
+    .autosave-indicator.show {
+      opacity: 1;
+    }
+
+    .autosave-indicator.saving {
+      background-color: #F39C12;
+    }
+
+    .autosave-indicator.error {
+      background-color: #E74C3C;
+    }
+
+    /* Settings panel styles */
+    .settings-panel {
+      background-color: #34495e;
+      color: white;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 10px 0;
+      max-width: 400px; /* Less wide */
+    }
+
+    .settings-toggle {
+      display: flex;
+      align-items: center;
+      margin: 10px 0;
+    }
+
+    .settings-toggle input[type="checkbox"] {
+      margin-right: 10px;
+      transform: scale(1.2);
+    }
+
+    .settings-toggle label {
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .save-to-db-btn {
+      background-color: #27AE60;
+      color: white;
+      border: none;
+      padding: 8px;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 5px;
+      font-family: trebuchet ms;
+    }
+
+    .save-to-db-btn:hover {
+      background-color: #219A52;
+    }
+
+    .save-to-db-btn:disabled {
+      background-color: #95A5A6;
+      cursor: not-allowed;
+    }
+
+    .remove-from-db-btn {
+      background-color: #E67E22;
+      color: white;
+      border: none;
+      padding: 8px;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 5px;
+      font-family: trebuchet ms;
+    }
+
+    .remove-from-db-btn:hover {
+      background-color: #D35400;
+    }
+
+    body {
+      font-family: trebuchet ms;
+      margin: 0;
+      padding: 0;
+      background-color: #f0f0f0;
+    }
+
+    h1 {
+      background-color: #0b487e;
+      color: white;
+      padding: 10px;
+      margin: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10000;
+      
+    }
+
+    #hide-sidebar-btn {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 24px;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #coder-ai {
+      flex: 1;
+      display: flex;
+      height: 100%;
+    }
+
+    #editor-container {
+      flex: 1;
+      display: flex;
+      position: relative;
+    }
+
+    #editor-container {
+      display: flex;
+      flex: 3;
+      background-color: #2c3e50;
+    }
+
+    #file-explorer {
+      width: 200px;
+      background-color: #262626;
+      color: white;
+      padding: 7px;
+      transition: width 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      max-height: 100%;
+      overflow: hidden;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.2); /* Added shadow for better depth */
+    }
+
+    #file-explorer.hidden {
+      width: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    /* Make file explorer content scrollable */
+    #file-explorer-content {
+      flex: 1;
+      overflow-y: scroll;
+      overflow-x: hidden;
+      padding-right: 5px;
+    }
+body {overflow-y: hidden;}
+
+    /* Custom scrollbar for file explorer */
+    #file-explorer-content::-webkit-scrollbar {
+      width: 8px;
+      height: 100px;
+    }
+
+    #file-explorer-content::-webkit-scrollbar-track {
+      background: #1a1a1a00;
+      border-radius: 2px;
+    }
+
+    #file-explorer-content::-webkit-scrollbar-thumb {
+      background: #1d68ad;
+      border-radius: 4px;
+      
+    }
+
+    #file-explorer-content::-webkit-scrollbar-thumb:hover {
+      background: #5a7288;
+    }
+
+    #file-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    #file-list li {
+      cursor: pointer;
+      padding: 8px 5px;
+      border-radius: 3px;
+      margin: 2px 0;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    #file-list li:hover {
+      background-color: #4a6278;
+    }
+
+    #new-file-btn, #rename-file-btn, #delete-file-btn, #download-file-btn, #preview-code-btn, #change-language-btn, #open-file-btn, #db-files-btn {
+      width: 100%;
+      padding: 5px;
+      margin-top: 10px;
+      border: none;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+      font-family: trebuchet ms;
+      padding: 7px;
+      
+    }
+
+    #new-file-btn, #rename-file-btn, #download-file-btn, #preview-code-btn, #change-language-btn, #open-file-btn, #db-files-btn {
+      background-color: #3498db;
+      font-size: medium;
+    }
+
+    .delete-btn {
+      background-color: #e74c3c;
+      font-size: medium;
+    }
+
+    #new-file-btn:hover, #rename-file-btn:hover, #download-file-btn:hover, #preview-code-btn:hover, #change-language-btn:hover, #open-file-btn:hover, .delete-btn:hover, #db-files-btn:hover {
+      background-color: #2980b9;
+      font-size: medium;
+    }
+
+    .delete-btn:hover {
+      background-color: #c0392b;
+    }
+
+    #code-editor {
+      flex: 1;
+      font-size: 14px;
+    }
+
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(60, 60, 60, 0.608);
+      z-index: 100000;
+
+    }
+
+    .modal-content {
+      background-color: #2c3e50;
+      margin: 20px auto;
+      padding: 0;
+      border: 1px solid #888;
+      border-radius: 8px;
+      width: 95%;
+      max-width: 1200px;
+      height: 90vh;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    .modal-header {
+      background-color: #363636;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px 8px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #444;
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .modal-body {
+      flex: 1;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .modal-content h3 {
+      color: white;
+      border-radius: 5px;
+      margin: 20px;
+    }
+
+    .close-btn {
+      color: rgb(231, 76, 60);
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      background-color: transparent;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .close-btn:hover, .close-btn:focus {
+      color: rgb(135, 24, 24);
+      background-color: rgba(231, 76, 60, 0.1);
+      text-decoration: none;
+    }
+
+    .language-option {
+      width: calc(100% - 40px);
+      padding: 10px;
+      margin: 5px 20px;
+      border: none;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+      background-color: #2980b9;
+      font-family: trebuchet ms;
+    }
+
+    .language-option:hover {
+      background-color: #236590;
+    }
+
+    #code-preview {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background-color: white;
+    }
+
+    /* Language modal specific styles */
+    .language-modal-content {
+      height: auto;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    /* Additional settings styles */
+    .settings-section {
+      margin: 10px 0;
+    }
+
+    .settings-section label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+
+    .settings-section select,
+    .settings-section input[type="color"],
+    .settings-section input[type="number"] {
+      width: 100%;
+      padding: 5px;
+      background-color: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+
+    input[type="color"] {
+      height: 50px; /* Larger height for color picker */
+    }
+
+    /* DB Files Modal */
+    #db-files-modal .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    #db-search-input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      background-color: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+
+    #db-file-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    #db-file-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px;
+      border-bottom: 1px solid #444;
+      cursor: pointer;
+    }
+
+    #db-file-list li:hover {
+      background-color: #34495e;
+    }
+
+    #db-file-list .file-actions button {
+      margin-left: 5px;
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+
+    .db-download-btn {
+      background-color: #3498db;
+    }
+
+    .db-delete-btn {
+      background-color: #e74c3c;
+    }
+
+    /* Header icons */
+    .header-icons {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .header-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: white;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .header-btn svg {
+      width: 30px;
+      height: 30px;
+      fill: white;
+    }
+
+    .header-btn:hover svg {
+      fill: #ddd;
+    }
+
+    /* Header left */
+    .header-left {
+      display: flex;
+      align-items: center;
+    }
+
+    /* Search container */
+    .search-container {
+      display: none;
+      flex: 1;
+      position: relative;
+    }
+
+    #top-search-input {
+      padding: 5px 10px;
+      border-radius: 4px;
+      border: none;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      display: block;
+    }
+
+    /* Search results */
+    .search-results {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      max-width: calc(100vw - 20px);
+      background: #262626;
+      color: white;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 200px;
+      overflow-y: auto;
+      display: none;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      border-radius: 0 0 4px 4px;
+    }
+
+    .search-results li {
+      padding: 8px;
+      cursor: pointer;
+    }
+
+    .search-results li:hover {
+      background: #4a6278;
+    }
+
+    #top-bar.search-active .search-container {
+      display: block;
+    }
+
+    /* Hide back button on desktop */
+    @media (min-width: 769px) {
+      #search-back-btn {
+        display: none !important;
+      }
+    }
+
+    /* Mobile specific */
+    @media (max-width: 768px) {
+      #search-back-btn {
+        display: none;
+      }
+
+      #top-bar.search-active #search-back-btn {
+        display: flex;
+      }
+
+      #top-bar.search-active .header-icons {
+        display: none;
+      }
+
+      #top-bar.search-active #hide-sidebar-btn {
+        display: none;
+      }
+
+      #top-bar.search-active .search-container {
+        margin: 0 10px;
+      }
+
+      #top-search-input {
+        max-width: 300px;
+      }
+
+      .search-results {
+        left: 0;
+        transform: none;
+        width: 100%;
+      }
+
+      
+    }
+
+    /* Settings modal */
+    #settings-modal .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    #settings-modal .settings-panel {
+      background-color: transparent;
+      padding: 0;
+      margin: 0 auto;
+      max-width: 400px; /* Less wide */
+    }
+
+    #settings-search {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      background-color: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+    input:focus {
+     outline: none;
+    }
+    #nomi {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="top-bar">
+    <div class="header-left">
+      <button id="search-back-btn" class="header-btn" title="Back">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="30" height="30">
+          <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+        </svg>
+      </button>
+      <div class="header-icons">
+        <button id="new-file-header-btn" class="header-btn" title="New File">
+          <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 30 30">
+            <path d="M15,3C8.373,3,3,8.373,3,15c0,6.627,5.373,12,12,12s12-5.373,12-12C27,8.373,21.627,3,15,3z M21,16h-5v5 c0,0.553-0.448,1-1,1s-1-0.447-1-1v-5H9c-0.552,0-1-0.447-1-1s0.448-1,1-1h5V9c0-0.553,0.448-1,1-1s1,0.447,1,1v5h5 c0.552,0,1,0.447,1,1S21.552,16,21,16z"></path>
+          </svg>
+        </button>
+        <button id="search-project-header-btn" class="header-btn" title="Search Project Files">
+          <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 50 50">
+            <path d="M 21 3 C 11.621094 3 4 10.621094 4 20 C 4 29.378906 11.621094 37 21 37 C 24.710938 37 28.140625 35.804688 30.9375 33.78125 L 44.09375 46.90625 L 46.90625 44.09375 L 33.90625 31.0625 C 36.460938 28.085938 38 24.222656 38 20 C 38 10.621094 30.378906 3 21 3 Z M 21 5 C 29.296875 5 36 11.703125 36 20 C 36 28.296875 29.296875 35 21 35 C 12.703125 35 6 28.296875 6 20 C 6 11.703125 12.703125 5 21 5 Z"></path>
+          </svg>
+        </button>
+        <button id="download-header-btn" class="header-btn" title="Download Current File">
+          <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 50 50">
+            <path d="M25 42c-9.4 0-17-7.6-17-17S15.6 8 25 8s17 7.6 17 17-7.6 17-17 17zm0-32c-8.3 0-15 6.7-15 15s6.7 15 15 15 15-6.7 15-15-6.7-15-15-15z"></path>
+            <path d="M25.3 34.3L12.4 21.5l2.1-2.1 10 10V16h3v13.4l10-10 2.1 2.1-12.9 12.8z"></path>
+          </svg>
+        </button>
+        <button id="settings-header-btn" class="header-btn" title="Settings">
+          <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 50 50">
+    <path d="M47.16,21.221l-5.91-0.966c-0.346-1.186-0.819-2.326-1.411-3.405l3.45-4.917c0.279-0.397,0.231-0.938-0.112-1.282 l-3.889-3.887c-0.347-0.346-0.893-0.391-1.291-0.104l-4.843,3.481c-1.089-0.602-2.239-1.08-3.432-1.427l-1.031-5.886 C28.607,2.35,28.192,2,27.706,2h-5.5c-0.49,0-0.908,0.355-0.987,0.839l-0.956,5.854c-1.2,0.345-2.352,0.818-3.437,1.412l-4.83-3.45 c-0.399-0.285-0.942-0.239-1.289,0.106L6.82,10.648c-0.343,0.343-0.391,0.883-0.112,1.28l3.399,4.863 c-0.605,1.095-1.087,2.254-1.438,3.46l-5.831,0.971c-0.482,0.08-0.836,0.498-0.836,0.986v5.5c0,0.485,0.348,0.9,0.825,0.985 l5.831,1.034c0.349,1.203,0.831,2.362,1.438,3.46l-3.441,4.813c-0.284,0.397-0.239,0.942,0.106,1.289l3.888,3.891 c0.343,0.343,0.884,0.391,1.281,0.112l4.87-3.411c1.093,0.601,2.248,1.078,3.445,1.424l0.976,5.861C21.3,47.647,21.717,48,22.206,48 h5.5c0.485,0,0.9-0.348,0.984-0.825l1.045-5.89c1.199-0.353,2.348-0.833,3.43-1.435l4.905,3.441 c0.398,0.281,0.938,0.232,1.282-0.111l3.888-3.891c0.346-0.347,0.391-0.894,0.104-1.292l-3.498-4.857 c0.593-1.08,1.064-2.222,1.407-3.408l5.918-1.039c0.479-0.084,0.827-0.5,0.827-0.985v-5.5C47.999,21.718,47.644,21.3,47.16,21.221z M25,32c-3.866,0-7-3.134-7-7c0-3.866,3.134-7,7-7s7,3.134,7,7C32,28.866,28.866,32,25,32z"></path>
+</svg>
+        </button>
+      </div>
+    </div>
+    <div class="search-container">
+      <input type="text" id="top-search-input" placeholder="Search project files...">
+      <ul id="search-results" class="search-results"></ul>
+    </div>
+    <button id="hide-sidebar-btn" title="Toggle Sidebar">&#9776;</button>
+  </h1>
+
+  <div id="coder-ai">
+    <div id="editor-container">
+      <div id="file-explorer">
+        <div id="file-explorer-content">
+          <h2 id="pj">Project Files</h2>
+          <ul id="file-list"></ul>
+          <button id="new-file-btn">New File</button>
+          <button id="rename-file-btn">Rename File</button>
+          <button id="delete-file-btn" class="delete-btn">Delete File</button>
+          
+          <button id="open-file-btn">Open File</button>
+          <button id="download-file-btn">Download File</button>
+          <input type="file" id="file-input" style="display:none;" accept=".js,.jsx,.html,.htm,.css,.json,.xml,.txt,.md,.py,.java,.c,.cpp,.php,.rb,.go,.rs,.ts,.tsx,.sql,.sh,.bash,.yaml,.yml" />
+          
+          <!-- Settings Panel -->
+          <div class="settings-panel">
+            <h3 style="margin: 0 0 10px 0; font-size: 14px;">Storage Settings</h3>
+            <div class="settings-toggle">
+              <input type="checkbox" id="enable-indexeddb" />
+              <label for="enable-indexeddb">Enable Auto-save to DB</label>
+            </div>
+            <button id="save-to-db-btn" class="save-to-db-btn" disabled>Save Current File to DB</button>
+            <button id="remove-from-db-btn" class="remove-from-db-btn" style="display: none;">Remove from DB</button>
+            <button id="db-files-btn">View DB Files</button>
+          </div>
+          
+          <div name="tools">
+            
+            <button id="preview-code-btn">Preview Code</button>
+            <button id="change-language-btn">Change Language</button>
+            <br>
+          </div>
+        </div>
+      </div>
+      
+      <div id="code-editor"></div>
+      <div class="autosave-indicator" id="autosave-indicator">Auto-saved</div>
+    </div>
+  </div>
+
+  <!-- Modal Dialog for Preview Code -->
+  <div id="preview-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Code Preview - <span id="preview-filename"></span></h3>
+        <button id="close-preview-modal" class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <iframe id="code-preview"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Dialog for Changing Language -->
+  <div id="language-modal" class="modal">
+    <div class="modal-content language-modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Change Language</h3>
+        <button id="close-language-modal" class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <button class="language-option" data-lang="javascript">JavaScript</button>
+        <button class="language-option" data-lang="typescript">TypeScript</button>
+        <button class="language-option" data-lang="html">HTML</button>
+        <button class="language-option" data-lang="css">CSS</button>
+        <button class="language-option" data-lang="json">JSON</button>
+        <button class="language-option" data-lang="xml">XML</button>
+        <button class="language-option" data-lang="markdown">Markdown</button>
+        <button class="language-option" data-lang="python">Python</button>
+        <button class="language-option" data-lang="java">Java</button>
+        <button class="language-option" data-lang="c_cpp">C/C++</button>
+        <button class="language-option" data-lang="php">PHP</button>
+        <button class="language-option" data-lang="ruby">Ruby</button>
+        <button class="language-option" data-lang="golang">Go</button>
+        <button class="language-option" data-lang="rust">Rust</button>
+        <button class="language-option" data-lang="sql">SQL</button>
+        <button class="language-option" data-lang="sh">Shell/Bash</button>
+        <button class="language-option" data-lang="yaml">YAML</button>
+        <button class="language-option" data-lang="text">Plain Text</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for DB Files -->
+  <div id="db-files-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">IndexedDB Files</h3>
+        <button id="close-db-modal" class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="db-search-input" placeholder="Search files...">
+        <ul id="db-file-list"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Customization Settings -->
+  <div id="settings-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Customization Settings</h3>
+        <button id="close-settings-modal" class="close-btn">&times;</button>
+
+      </div>
+
+      <div class="modal-body">
+        
+<br>
+        <input type="text" id="settings-search" placeholder="Search settings...">
+        <div class="settings-panel">
+          <div class="settings-section">
+            <label for="top-bar-color">Top Bar Color:</label>
+            <input type="color" id="top-bar-color" value="#252526">
+          </div>
+          <div class="settings-section">
+            <label for="editor-theme">Editor Theme:</label>
+            <select id="editor-theme">
+              <option value="monokai">Monokai</option>
+              <option value="github">GitHub</option>
+              <option value="tomorrow">Tomorrow</option>
+              <option value="kuroir">Kuroir</option>
+              <option value="twilight">Twilight</option>
+              <option value="xcode">XCode</option>
+              <option value="textmate">TextMate</option>
+              <option value="solarized_dark">Solarized Dark</option>
+              <option value="solarized_light">Solarized Light</option>
+              <option value="terminal">Terminal</option>
+            </select>
+          </div>
+          <div class="settings-section">
+            <label for="editor-font-size">Editor Font Size:</label>
+            <input type="number" id="editor-font-size" value="14" min="8" max="30">
+          </div>
+          <div class="settings-section">
+            <label for="editor-font-family">Editor Font Family:</label>
+            <select id="editor-font-family">
+              <option value="monospace">Monospace</option>
+              <option value="Courier New">Courier New</option>
+              <option value="Consolas">Consolas</option>
+              <option value="Source Code Pro">Source Code Pro</option>
+            </select>
+          </div>
+          <div class="settings-section">
+            <label for="word-wrap">Word Wrap:</label>
+            <select id="word-wrap">
+              <option value="off">Off</option>
+              <option value="on">On</option>
+              <option value="wordWrapColumn">Word Wrap Column</option>
+              <option value="bounded">Bounded</option>
+            </select>
+          </div>
+          <div class="settings-section">
+            <label for="tab-size">Tab Size:</label>
+            <input type="number" id="tab-size" value="4" min="1" max="8">
+          </div>
+          <div class="settings-section">
+            <label for="auto-save-interval">Auto-save Interval (ms):</label>
+            <input type="number" id="auto-save-interval" value="2000" min="500" step="500">
+          </div>
+          <div class="settings-section">
+            <div class="settings-toggle">
+              <input type="checkbox" id="show-line-numbers" checked />
+              <label for="show-line-numbers">Show Line Numbers</label>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-toggle">
+              <input type="checkbox" id="enable-autocomplete" checked />
+              <label for="enable-autocomplete">Enable Autocomplete</label>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-toggle">
+              <input type="checkbox" id="use-soft-tabs" checked />
+              <label for="use-soft-tabs">Use Soft Tabs</label>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-toggle">
+              <input type="checkbox" id="show-print-margin" />
+              <label for="show-print-margin">Show Print Margin</label>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-toggle">
+              <input type="checkbox" id="highlight-active-line" checked />
+              <label for="highlight-active-line">Highlight Active Line</label>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-toggle">
+              <input type="checkbox" id="highlight-selected-word" checked />
+              <label for="highlight-selected-word">Highlight Selected Word</label>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-toggle">
+              <input type="checkbox" id="show-invisibles" />
+              <label for="show-invisibles">Show Invisibles</label>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-toggle">
+              <input type="checkbox" id="show-fold-widgets" checked />
+              <label for="show-fold-widgets">Show Fold Widgets</label>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-toggle">
+              <input type="checkbox" id="fade-fold-widgets" />
+              <label for="fade-fold-widgets">Fade Fold Widgets</label>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-toggle">
+              <input type="checkbox" id="highlight-gutter-line" checked />
+              <label for="highlight-gutter-line">Highlight Gutter Line</label>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-toggle">
+              <input type="checkbox" id="indented-soft-wrap" checked />
+              <label for="indented-soft-wrap">Indented Soft Wrap</label>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-toggle">
+              <input type="checkbox" id="navigate-within-soft-tabs" />
+              <label for="navigate-within-soft-tabs">Navigate Within Soft Tabs</label>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-toggle">
+              <input type="checkbox" id="enable-multiselect" checked />
+              <label for="enable-multiselect">Enable Multiselect</label>
+            </div>
+          </div>
+          <div class="settings-section">
+            <label for="scroll-past-end">Scroll Past End (0-1):</label>
+            <input type="number" id="scroll-past-end" value="0.5" min="0" max="1" step="0.1">
+          </div>
+          <div class="settings-section">
+            <div class="settings-toggle">
+              <input type="checkbox" id="fixed-width-gutter" />
+              <label for="fixed-width-gutter">Fixed Width Gutter</label>
+            </div>
+          </div>
+          <div class="settings-section">
+            <label for="print-margin-column">Print Margin Column:</label>
+            <input type="number" id="print-margin-column" value="80" min="0">
+          </div>
+          <div class="settings-section">
+            <label for="new-line-mode">New Line Mode:</label>
+            <select id="new-line-mode">
+              <option value="auto">Auto</option>
+              <option value="unix">Unix</option>
+              <option value="windows">Windows</option>
+            </select>
+          </div>
+          <div class="settings-section">
+            <div class="settings-toggle">
+              <input type="checkbox" id="use-worker" checked />
+              <label for="use-worker">Use Worker</label>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-toggle">
+              <input type="checkbox" id="enable-emmet" />
+              <label for="enable-emmet">Enable Emmet</label>
+            </div>
+          </div>
+          <div class="settings-section">
+            <label for="keyboard-handler">Keyboard Handler:</label>
+            <select id="keyboard-handler">
+              <option value="">Default</option>
+              <option value="ace/keyboard/vim">Vim</option>
+              <option value="ace/keyboard/emacs">Emacs</option>
+              <option value="ace/keyboard/sublime">Sublime</option>
+              <option value="ace/keyboard/vscode">VSCode</option>
+            </select>
+          </div>
+          <div class="settings-section">
+            <label for="max-lines">Max Lines:</label>
+            <input type="number" id="max-lines" min="0">
+          </div>
+          <div class="settings-section">
+            <label for="min-lines">Min Lines:</label>
+            <input type="number" id="min-lines" min="0">
+          </div>
+          <div class="settings-section">
+            <div class="settings-toggle">
+              <input type="checkbox" id="overwrite" />
+              <label for="overwrite">Overwrite Mode</label>
+            </div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-toggle">
+              <input type="checkbox" id="read-only" />
+              <label for="read-only">Read Only</label>
+            </div>
+          </div>
+          <div class="settings-section">
+            <label for="sidebar-width">Sidebar Width (px):</label>
+            <input type="number" id="sidebar-width" value="250" min="150" max="500">
+          </div>
+          <div class="settings-section">
+            <label for="default-language">Default Language:</label>
+            <select id="default-language">
+              <option value="javascript">JavaScript</option>
+              <option value="html">HTML</option>
+              <option value="css">CSS</option>
+              <option value="python">Python</option>
+              <option value="text">Plain Text</option>
+            </select>
+          </div>
+          <div class="settings-section">
+            <div class="settings-toggle">
+              <input type="checkbox" id="auto-pair-brackets" checked />
+              <label for="auto-pair-brackets">Auto Pair Brackets</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.5.1/axios.min.js"></script>
+
+  <script>
+    const editor = ace.edit("code-editor");
+    editor.setTheme("ace/theme/monokai");
+
+    let currentFile = null;
+    const files = {};
+    
+    // IndexedDB management
+    let db;
+    const autoSaveFiles = new Set();
+    const savedFiles = new Set();
+    let autoSaveTimeout;
+    let lastSaveContent = {};
+    let autoSaveDelay = 2000;
+
+    // Auto-save indicator
+    const autosaveIndicator = document.getElementById('autosave-indicator');
+
+    function showAutosaveIndicator(message, type = 'success') {
+      autosaveIndicator.textContent = message;
+      autosaveIndicator.className = 'autosave-indicator show';
+      
+      if (type === 'saving') {
+        autosaveIndicator.classList.add('saving');
+      } else if (type === 'error') {
+        autosaveIndicator.classList.add('error');
+      }
+      
+      setTimeout(() => {
+        autosaveIndicator.classList.remove('show');
+      }, 2000);
+    }
+
+    // Initialize IndexedDB
+    function initIndexedDB() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open('JSInsiderDB', 2);
+        
+        request.onerror = () => {
+          console.error('IndexedDB error:', request.error);
+          reject(request.error);
+        };
+        
+        request.onsuccess = () => {
+          db = request.result;
+          console.log('IndexedDB initialized successfully');
+          loadSavedFilesList();
+          loadAllFilesFromDB();
+          loadSettingsFromDB();
+          resolve(db);
+        };
+        
+        request.onupgradeneeded = (event) => {
+          db = event.target.result;
+          if (!db.objectStoreNames.contains('files')) {
+            const objectStore = db.createObjectStore('files', { keyPath: 'filename' });
+            objectStore.createIndex('filename', 'filename', { unique: true });
+          }
+          if (!db.objectStoreNames.contains('settings')) {
+            db.createObjectStore('settings', { keyPath: 'key' });
+          }
+        };
+      });
+    }
+
+    // Load settings from IndexedDB
+    async function loadSettingsFromDB() {
+      if (!db) return;
+      
+      const transaction = db.transaction(['settings'], 'readonly');
+      const objectStore = transaction.objectStore('settings');
+      
+      const keys = [
+        'topBarColor', 'editorTheme', 'editorFontSize', 'editorFontFamily',
+        'wordWrap', 'tabSize', 'autoSaveInterval', 'showLineNumbers',
+        'enableAutocomplete', 'useSoftTabs', 'showPrintMargin', 'highlightActiveLine',
+        'highlightSelectedWord', 'showInvisibles', 'showFoldWidgets', 'fadeFoldWidgets',
+        'highlightGutterLine', 'indentedSoftWrap', 'navigateWithinSoftTabs', 'enableMultiselect',
+        'scrollPastEnd', 'fixedWidthGutter', 'printMarginColumn', 'newLineMode',
+        'useWorker', 'enableEmmet', 'keyboardHandler', 'maxLines',
+        'minLines', 'overwrite', 'readOnly', 'sidebarWidth',
+        'defaultLanguage', 'autoPairBrackets'
+      ];
+      
+      const requests = keys.map(key => objectStore.get(key));
+      
+      Promise.all(requests.map(req => new Promise((res) => { req.onsuccess = () => res(req.result?.value); })))
+        .then(values => {
+          const settings = {};
+          keys.forEach((key, index) => {
+            settings[key] = values[index] !== undefined ? values[index] : getDefaultSetting(key);
+          });
+          applySettings(settings);
+        });
+    }
+
+    function getDefaultSetting(key) {
+      const defaults = {
+        topBarColor: '#252526',
+        editorTheme: 'monokai',
+        editorFontSize: 14,
+        editorFontFamily: 'monospace',
+        wordWrap: 'off',
+        tabSize: 4,
+        autoSaveInterval: 2000,
+        showLineNumbers: true,
+        enableAutocomplete: true,
+        useSoftTabs: true,
+        showPrintMargin: false,
+        highlightActiveLine: true,
+        highlightSelectedWord: true,
+        showInvisibles: false,
+        showFoldWidgets: true,
+        fadeFoldWidgets: false,
+        highlightGutterLine: true,
+        indentedSoftWrap: true,
+        navigateWithinSoftTabs: false,
+        enableMultiselect: true,
+        scrollPastEnd: 0.5,
+        fixedWidthGutter: false,
+        printMarginColumn: 80,
+        newLineMode: 'auto',
+        useWorker: true,
+        enableEmmet: false,
+        keyboardHandler: '',
+        maxLines: 0,
+        minLines: 0,
+        overwrite: false,
+        readOnly: false,
+        sidebarWidth: 250,
+        defaultLanguage: 'javascript',
+        autoPairBrackets: true
+      };
+      return defaults[key];
+    }
+
+    // Save setting to IndexedDB
+    function saveSetting(key, value) {
+      if (!db) return;
+      
+      const transaction = db.transaction(['settings'], 'readwrite');
+      const objectStore = transaction.objectStore('settings');
+      objectStore.put({ key, value });
+    }
+
+    // Apply settings to UI and editor
+    function applySettings(settings) {
+      document.getElementById('top-bar-color').value = settings.topBarColor;
+      document.getElementById('top-bar').style.backgroundColor = settings.topBarColor;
+      
+      document.getElementById('editor-theme').value = settings.editorTheme;
+      editor.setTheme(`ace/theme/${settings.editorTheme}`);
+      
+      document.getElementById('editor-font-size').value = settings.editorFontSize;
+      editor.setFontSize(`${settings.editorFontSize}px`);
+      
+      document.getElementById('editor-font-family').value = settings.editorFontFamily;
+      document.getElementById('code-editor').style.fontFamily = settings.editorFontFamily;
+      
+      document.getElementById('word-wrap').value = settings.wordWrap;
+      editor.session.setUseWrapMode(settings.wordWrap !== 'off');
+      editor.session.setWrapLimitRange(settings.wordWrap === 'wordWrapColumn' ? 80 : null);
+      
+      document.getElementById('tab-size').value = settings.tabSize;
+      editor.session.setTabSize(settings.tabSize);
+      
+      document.getElementById('auto-save-interval').value = settings.autoSaveInterval;
+      autoSaveDelay = settings.autoSaveInterval;
+      
+      document.getElementById('show-line-numbers').checked = settings.showLineNumbers;
+      editor.renderer.setShowGutter(settings.showLineNumbers);
+      
+      document.getElementById('enable-autocomplete').checked = settings.enableAutocomplete;
+      editor.setOptions({
+        enableBasicAutocompletion: settings.enableAutocomplete,
+        enableSnippets: settings.enableAutocomplete,
+        enableLiveAutocompletion: settings.enableAutocomplete
+      });
+      
+      document.getElementById('use-soft-tabs').checked = settings.useSoftTabs;
+      editor.session.setUseSoftTabs(settings.useSoftTabs);
+      
+      document.getElementById('show-print-margin').checked = settings.showPrintMargin;
+      editor.setShowPrintMargin(settings.showPrintMargin);
+      
+      document.getElementById('highlight-active-line').checked = settings.highlightActiveLine;
+      editor.setHighlightActiveLine(settings.highlightActiveLine);
+      
+      document.getElementById('highlight-selected-word').checked = settings.highlightSelectedWord;
+      editor.setHighlightSelectedWord(settings.highlightSelectedWord);
+      
+      document.getElementById('show-invisibles').checked = settings.showInvisibles;
+      editor.setShowInvisibles(settings.showInvisibles);
+      
+      document.getElementById('show-fold-widgets').checked = settings.showFoldWidgets;
+      editor.renderer.setShowFoldWidgets(settings.showFoldWidgets);
+      
+      document.getElementById('fade-fold-widgets').checked = settings.fadeFoldWidgets;
+      editor.setFadeFoldWidgets(settings.fadeFoldWidgets);
+      
+      document.getElementById('highlight-gutter-line').checked = settings.highlightGutterLine;
+      editor.setHighlightGutterLine(settings.highlightGutterLine);
+      
+      document.getElementById('indented-soft-wrap').checked = settings.indentedSoftWrap;
+      editor.renderer.setOption('indentedSoftWrap', settings.indentedSoftWrap);
+      
+      document.getElementById('navigate-within-soft-tabs').checked = settings.navigateWithinSoftTabs;
+      editor.session.setNavigateWithinSoftTabs(settings.navigateWithinSoftTabs);
+      
+      document.getElementById('enable-multiselect').checked = settings.enableMultiselect;
+      editor.setOption('enableMultiselect', settings.enableMultiselect);
+      
+      document.getElementById('scroll-past-end').value = settings.scrollPastEnd;
+      editor.setOption('scrollPastEnd', settings.scrollPastEnd);
+      
+      document.getElementById('fixed-width-gutter').checked = settings.fixedWidthGutter;
+      editor.renderer.setOption('fixedWidthGutter', settings.fixedWidthGutter);
+      
+      document.getElementById('print-margin-column').value = settings.printMarginColumn;
+      editor.setOption('printMarginColumn', settings.printMarginColumn);
+      
+      document.getElementById('new-line-mode').value = settings.newLineMode;
+      editor.session.setNewLineMode(settings.newLineMode);
+      
+      document.getElementById('use-worker').checked = settings.useWorker;
+      editor.session.setUseWorker(settings.useWorker);
+      
+      document.getElementById('enable-emmet').checked = settings.enableEmmet;
+      editor.setOption('enableEmmet', settings.enableEmmet);
+      
+      document.getElementById('keyboard-handler').value = settings.keyboardHandler;
+      editor.setKeyboardHandler(settings.keyboardHandler);
+      
+      document.getElementById('max-lines').value = settings.maxLines || '';
+      editor.setOption('maxLines', settings.maxLines || Infinity);
+      
+      document.getElementById('min-lines').value = settings.minLines || '';
+      editor.setOption('minLines', settings.minLines || 0);
+      
+      document.getElementById('overwrite').checked = settings.overwrite;
+      editor.session.setOverwrite(settings.overwrite);
+      
+      document.getElementById('read-only').checked = settings.readOnly;
+      editor.setReadOnly(settings.readOnly);
+      
+      document.getElementById('sidebar-width').value = settings.sidebarWidth;
+      document.getElementById('file-explorer').style.width = `${settings.sidebarWidth}px`;
+      
+      document.getElementById('default-language').value = settings.defaultLanguage;
+      // For new files, set mode to defaultLanguage
+      
+      document.getElementById('auto-pair-brackets').checked = settings.autoPairBrackets;
+      editor.setBehavioursEnabled(settings.autoPairBrackets);
+    }
+
+    // Load all files from IndexedDB into memory
+    function loadAllFilesFromDB() {
+      if (!db) return;
+      
+      const transaction = db.transaction(['files'], 'readonly');
+      const objectStore = transaction.objectStore('files');
+      const request = objectStore.getAll();
+      
+      request.onsuccess = () => {
+        const dbFiles = request.result;
+        dbFiles.forEach(fileData => {
+          files[fileData.filename] = fileData.content;
+          savedFiles.add(fileData.filename);
+          lastSaveContent[fileData.filename] = fileData.content;
+          
+          if (fileData.autoSave) {
+            autoSaveFiles.add(fileData.filename);
+          }
+        });
+        
+        updateFileExplorer();
+        
+        const fileNames = Object.keys(files);
+        if (fileNames.length > 0) {
+          openFile(fileNames[0]);
+        }
+      };
+    }
+
+    // Load list of saved files from IndexedDB
+    function loadSavedFilesList() {
+      if (!db) return;
+      
+      const transaction = db.transaction(['files'], 'readonly');
+      const objectStore = transaction.objectStore('files');
+      const request = objectStore.getAllKeys();
+      
+      request.onsuccess = () => {
+        savedFiles.clear();
+        request.result.forEach(filename => savedFiles.add(filename));
+        updateFileExplorer();
+      };
+    }
+
+    // Auto-save function
+    function autoSaveFile(filename, content) {
+      if (!db || !autoSaveFiles.has(filename) || !filename) return;
+      
+      if (lastSaveContent[filename] === content) return;
+      
+      showAutosaveIndicator('Saving...', 'saving');
+      
+      saveFileToIndexedDB(filename, content, true)
+        .then(() => {
+          lastSaveContent[filename] = content;
+          showAutosaveIndicator('Auto-saved');
+        })
+        .catch(error => {
+          console.error('Auto-save error:', error);
+          showAutosaveIndicator('Save failed', 'error');
+        });
+    }
+
+    // Save file to IndexedDB
+    function saveFileToIndexedDB(filename, content, isAutoSave = false) {
+      if (!db) return Promise.reject('IndexedDB not available');
+      
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['files'], 'readwrite');
+        const objectStore = transaction.objectStore('files');
+        
+        const fileData = {
+          filename: filename,
+          content: content,
+          autoSave: autoSaveFiles.has(filename),
+          lastModified: new Date().toISOString()
+        };
+        
+        const request = objectStore.put(fileData);
+        
+        request.onsuccess = () => {
+          savedFiles.add(filename);
+          updateFileExplorer();
+          updateSaveButtons();
+          if (!isAutoSave) {
+            console.log(`File ${filename} saved to IndexedDB`);
+          }
+          resolve();
+        };
+        
+        request.onerror = () => {
+          console.error('Error saving file to IndexedDB:', request.error);
+          reject(request.error);
+        };
+      });
+    }
+
+    // Remove file from IndexedDB
+    function removeFileFromIndexedDB(filename) {
+      if (!db) return Promise.reject('IndexedDB not available');
+      
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['files'], 'readwrite');
+        const objectStore = transaction.objectStore('files');
+        const request = objectStore.delete(filename);
+        
+        request.onsuccess = () => {
+          savedFiles.delete(filename);
+          autoSaveFiles.delete(filename);
+          delete lastSaveContent[filename];
+          if (files.hasOwnProperty(filename)) {
+            delete files[filename];
+            if (currentFile === filename) {
+              currentFile = null;
+              editor.setValue("");
+            }
+          }
+          updateFileExplorer();
+          updateSaveButtons();
+          console.log(`File ${filename} removed from IndexedDB`);
+          resolve();
+        };
+        
+        request.onerror = () => {
+          console.error('Error removing file from IndexedDB:', request.error);
+          reject(request.error);
+        };
+      });
+    }
+
+    // Load file from IndexedDB
+    function loadFileFromIndexedDB(filename) {
+      if (!db) return Promise.reject('IndexedDB not available');
+      
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['files'], 'readonly');
+        const objectStore = transaction.objectStore('files');
+        const request = objectStore.get(filename);
+        
+        request.onsuccess = () => {
+          if (request.result) {
+            resolve(request.result);
+          } else {
+            reject('File not found in IndexedDB');
+          }
+        };
+        
+        request.onerror = () => {
+          console.error('Error loading file from IndexedDB:', request.error);
+          reject(request.error);
+        };
+      });
+    }
+
+    // Update save/remove buttons based on current file status
+    function updateSaveButtons() {
+      const saveBtn = document.getElementById('save-to-db-btn');
+      const removeBtn = document.getElementById('remove-from-db-btn');
+      const checkbox = document.getElementById('enable-indexeddb');
+      
+      if (!currentFile) {
+        saveBtn.style.display = 'none';
+        removeBtn.style.display = 'none';
+        checkbox.checked = false;
+        checkbox.disabled = true;
+        return;
+      }
+      
+      checkbox.checked = autoSaveFiles.has(currentFile);
+      checkbox.disabled = false;
+      
+      const isFileSaved = savedFiles.has(currentFile);
+      const hasAutoSave = autoSaveFiles.has(currentFile);
+      
+      if (hasAutoSave) {
+        saveBtn.style.display = 'none';
+      } else {
+        saveBtn.style.display = 'block';
+        saveBtn.disabled = false;
+        saveBtn.textContent = isFileSaved ? 'Update in DB' : 'Save to DB';
+      }
+        
+      removeBtn.style.display = isFileSaved ? 'block' : 'none';
+    }
+
+    // Save current file content before switching
+    function saveCurrentFile() {
+      if (currentFile && files.hasOwnProperty(currentFile)) {
+        const content = editor.getValue();
+        files[currentFile] = content;
+        
+        if (autoSaveFiles.has(currentFile) && autoSaveTimeout) {
+          clearTimeout(autoSaveTimeout);
+        }
+        
+        if (autoSaveFiles.has(currentFile)) {
+          autoSaveTimeout = setTimeout(() => {
+            autoSaveFile(currentFile, content);
+          }, autoSaveDelay);
+        }
+      }
+    }
+
+    // Function to update file explorer
+    function updateFileExplorer() {
+      const fileList = document.getElementById("file-list");
+      fileList.innerHTML = "";
+      Object.keys(files).forEach(file => {
+        const li = document.createElement("li");
+        li.textContent = file;
+        li.className = "file-item";
+        
+        if (savedFiles.has(file)) {
+          li.classList.add("saved");
+        }
+        
+        if (file === currentFile) {
+          li.classList.add("selected");
+        }
+        
+        li.onclick = () => openFile(file);
+        fileList.appendChild(li);
+      });
+      updateSaveButtons();
+    }
+
+    // Function to open a file and highlight the selected one
+    function openFile(filename) {
+      saveCurrentFile();
+      
+      currentFile = filename;
+      
+      if (!files.hasOwnProperty(filename)) {
+        files[filename] = "";
+      }
+      
+      editor.setValue(files[filename]);
+      editor.clearSelection();
+      highlightFile(filename);
+      setEditorMode(filename);
+      updateSaveButtons();
+    }
+
+    // Function to highlight the selected file
+    function highlightFile(filename) {
+      const fileListItems = document.querySelectorAll("#file-list .file-item");
+      fileListItems.forEach(item => {
+        item.classList.remove("selected");
+        if (item.textContent === filename) {
+          item.classList.add("selected");
+        }
+      });
+    }
+
+    // Function to get editor mode based on file extension
+    function getEditorModeFromExtension(filename) {
+      const extension = filename.split('.').pop().toLowerCase();
+      
+      switch (extension) {
+        case 'js':
+        case 'jsx':
+          return "javascript";
+        case 'html':
+        case 'htm':
+          return "html";
+        case 'css':
+          return "css";
+        case 'json':
+          return "json";
+        case 'xml':
+          return "xml";
+        case 'md':
+        case 'markdown':
+          return "markdown";
+        case 'py':
+          return "python";
+        case 'java':
+          return "java";
+        case 'c':
+          return "c_cpp";
+        case 'cpp':
+        case 'cc':
+        case 'cxx':
+          return "c_cpp";
+        case 'php':
+          return "php";
+        case 'rb':
+          return "ruby";
+        case 'go':
+          return "golang";
+        case 'rs':
+          return "rust";
+        case 'ts':
+        case 'tsx':
+          return "typescript";
+        case 'sql':
+          return "sql";
+        case 'sh':
+        case 'bash':
+          return "sh";
+        case 'yaml':
+        case 'yml':
+          return "yaml";
+        case 'txt':
+        default:
+          return "text";
+      }
+    }
+
+    // Function to set the editor mode based on the file extension
+    function setEditorMode(filename) {
+      const mode = getEditorModeFromExtension(filename);
+      editor.session.setMode(`ace/mode/${mode}`);
+    }
+
+    // Event listener for new file button (sidebar)
+    document.getElementById("new-file-btn").onclick = () => {
+      const filename = prompt("Enter new file name:");
+      if (filename && filename.trim()) {
+        const trimmedFilename = filename.trim();
+        if (files.hasOwnProperty(trimmedFilename)) {
+          alert("File already exists!");
+          return;
+        }
+        saveCurrentFile();
+        files[trimmedFilename] = "";
+        updateFileExplorer();
+        openFile(trimmedFilename);
+      }
+    };
+
+    // Event listener for new file header button
+    document.getElementById("new-file-header-btn").onclick = document.getElementById("new-file-btn").onclick;
+
+    // Event listener for rename file button
+    document.getElementById("rename-file-btn").onclick = () => {
+      if (!currentFile) {
+        alert("No file selected!");
+        return;
+      }
+      
+      const newFilename = prompt("Enter new file name:", currentFile);
+      if (newFilename && newFilename.trim() && newFilename.trim() !== currentFile) {
+        const trimmedNewFilename = newFilename.trim();
+        
+        if (files.hasOwnProperty(trimmedNewFilename)) {
+          alert("File already exists!");
+          return;
+        }
+        
+        saveCurrentFile();
+        
+        files[trimmedNewFilename] = files[currentFile];
+        delete files[currentFile];
+        
+        if (savedFiles.has(currentFile)) {
+          removeFileFromIndexedDB(currentFile).then(() => {
+            if (autoSaveFiles.has(trimmedNewFilename)) {
+              autoSaveFile(trimmedNewFilename, files[trimmedNewFilename]);
+            }
+          });
+        }
+        
+        if (autoSaveFiles.has(currentFile)) {
+          autoSaveFiles.delete(currentFile);
+          autoSaveFiles.add(trimmedNewFilename);
+        }
+        
+        currentFile = trimmedNewFilename;
+        
+        updateFileExplorer();
+        highlightFile(trimmedNewFilename);
+        setEditorMode(trimmedNewFilename);
+      }
+    };
+
+    // Event listener for delete file button
+    document.getElementById("delete-file-btn").onclick = () => {
+      if (!currentFile) {
+        alert("No file selected!");
+        return;
+      }
+      
+      if (confirm(`Are you sure you want to delete ${currentFile}?`)) {
+        autoSaveFiles.delete(currentFile);
+        
+        if (savedFiles.has(currentFile)) {
+          removeFileFromIndexedDB(currentFile);
+        }
+        
+        delete files[currentFile];
+        updateFileExplorer();
+        
+        const remainingFiles = Object.keys(files);
+        if (remainingFiles.length > 0) {
+          openFile(remainingFiles[0]);
+        } else {
+          currentFile = null;
+          editor.setValue("");
+          updateSaveButtons();
+        }
+      }
+    };
+
+    // Event listener for download file button
+    document.getElementById("download-file-btn").onclick = () => {
+      if (!currentFile) {
+        alert("No file selected!");
+        return;
+      }
+      
+      saveCurrentFile();
+      const content = files[currentFile];
+      const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.href = url;
+      a.download = currentFile;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    };
+
+    // Header download button
+    document.getElementById("download-header-btn").onclick = () => {
+      document.getElementById("download-file-btn").click();
+    };
+
+    // Event listener for open file button
+    document.getElementById("open-file-btn").onclick = () => {
+      document.getElementById("file-input").click();
+    };
+
+    // Handle file selection
+    document.getElementById("file-input").addEventListener("change", function(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const content = e.target.result;
+          const filename = file.name;
+          
+          saveCurrentFile();
+          
+          files[filename] = content;
+          updateFileExplorer();
+          openFile(filename);
+        };
+        reader.readAsText(file);
+        
+        event.target.value = '';
+      }
+    });
+
+    // Toggle sidebar visibility
+    document.getElementById("hide-sidebar-btn").onclick = () => {
+      const fileExplorer = document.getElementById("file-explorer");
+      fileExplorer.classList.toggle("hidden");
+      const isHidden = fileExplorer.classList.contains("hidden");
+      const isMobile = window.innerWidth <= 768;
+      if (isMobile) {
+        document.body.style.overflow = isHidden ? "auto" : "auto";
+      } 
+    };
+
+    // Auto-save functionality - save current file content when typing
+    editor.on('change', function() {
+      if (currentFile) {
+        files[currentFile] = editor.getValue();
+        
+        if (autoSaveFiles.has(currentFile)) {
+          if (autoSaveTimeout) {
+            clearTimeout(autoSaveTimeout);
+          }
+          
+          autoSaveTimeout = setTimeout(() => {
+            autoSaveFile(currentFile, files[currentFile]);
+          }, autoSaveDelay);
+        }
+      }
+    });
+
+    // Initialize IndexedDB and set up event listeners
+    initIndexedDB().catch(error => {
+      console.error('Failed to initialize IndexedDB:', error);
+    });
+
+    // IndexedDB toggle event listener
+    document.getElementById('enable-indexeddb').addEventListener('change', function(e) {
+      if (!currentFile) return;
+      
+      if (e.target.checked) {
+        autoSaveFiles.add(currentFile);
+        
+        saveCurrentFile();
+        const content = files[currentFile];
+        
+        function enableAutoSave() {
+          autoSaveFile(currentFile, content);
+        }
+        
+        if (!db) {
+          initIndexedDB().then(() => {
+            enableAutoSave();
+          }).catch(error => {
+            console.error('Failed to initialize IndexedDB:', error);
+            e.target.checked = false;
+            autoSaveFiles.delete(currentFile);
+            alert('Failed to initialize IndexedDB. Feature disabled.');
+          });
+        } else {
+          enableAutoSave();
+        }
+      } else {
+        autoSaveFiles.delete(currentFile);
+        if (savedFiles.has(currentFile)) {
+          removeFileFromIndexedDB(currentFile)
+            .then(() => {
+              showAutosaveIndicator('Removed from DB');
+            })
+            .catch(error => {
+              console.error('Error removing from IndexedDB:', error);
+              showAutosaveIndicator('Remove failed', 'error');
+            });
+        }
+      }
+      
+      updateSaveButtons();
+    });
+
+    // Save to IndexedDB button
+    document.getElementById('save-to-db-btn').addEventListener('click', function() {
+      if (!currentFile) return;
+      
+      saveCurrentFile();
+      const content = files[currentFile];
+      
+      function doSave() {
+        saveFileToIndexedDB(currentFile, content)
+          .then(() => {
+            alert(`File "${currentFile}" saved to IndexedDB successfully!`);
+          })
+          .catch(error => {
+            console.error('Error saving to IndexedDB:', error);
+            alert('Error saving file to IndexedDB: ' + error);
+          });
+      }
+      
+      if (!db) {
+        initIndexedDB().then(() => {
+          doSave();
+        }).catch(error => {
+          console.error('Failed to initialize IndexedDB:', error);
+          alert('Failed to initialize IndexedDB: ' + error);
+        });
+      } else {
+        doSave();
+      }
+    });
+
+    // Remove from IndexedDB button
+    document.getElementById('remove-from-db-btn').addEventListener('click', function() {
+      if (!currentFile) return;
+      
+      if (confirm(`Remove "${currentFile}" from IndexedDB?`)) {
+        function doRemove() {
+          removeFileFromIndexedDB(currentFile)
+            .then(() => {
+              alert(`File "${currentFile}" removed from IndexedDB.`);
+            })
+            .catch(error => {
+              console.error('Error removing from IndexedDB:', error);
+              alert('Error removing file from IndexedDB: ' + error);
+            });
+        }
+        
+        if (!db) {
+          initIndexedDB().then(() => {
+            doRemove();
+          }).catch(error => {
+            console.error('Failed to initialize IndexedDB:', error);
+            alert('Failed to initialize IndexedDB: ' + error);
+          });
+        } else {
+          doRemove();
+        }
+      }
+    });
+
+    // View DB Files button
+    document.getElementById('db-files-btn').addEventListener('click', function() {
+      if (!db) {
+        initIndexedDB().then(loadDBFilesModal).catch(error => {
+          console.error('Failed to initialize IndexedDB:', error);
+          alert('Failed to access IndexedDB.');
+        });
+      } else {
+        loadDBFilesModal();
+      }
+    });
+
+    function loadDBFilesModal() {
+      const dbFileList = document.getElementById('db-file-list');
+      dbFileList.innerHTML = '';
+      
+      const transaction = db.transaction(['files'], 'readonly');
+      const objectStore = transaction.objectStore('files');
+      const request = objectStore.getAll();
+
+      request.onsuccess = () => {
+        const dbFiles = request.result;
+        dbFiles.forEach(fileData => {
+          const li = document.createElement('li');
+          li.textContent = `${fileData.filename} (Last modified: ${fileData.lastModified})`;
+          li.dataset.filename = fileData.filename;
+          li.ondblclick = () => {
+            loadAndOpenDBFile(fileData.filename);
+            document.getElementById('db-files-modal').style.display = 'none';
+          };
+
+          const actions = document.createElement('div');
+          actions.className = 'file-actions';
+
+          const downloadBtn = document.createElement('button');
+          downloadBtn.textContent = 'Download';
+          downloadBtn.className = 'db-download-btn';
+          downloadBtn.onclick = () => downloadDBFile(fileData.filename, fileData.content);
+
+          const deleteBtn = document.createElement('button');
+          deleteBtn.textContent = 'Delete';
+          deleteBtn.className = 'db-delete-btn';
+          deleteBtn.onclick = () => {
+            if (confirm(`Delete ${fileData.filename} from DB?`)) {
+              removeFileFromIndexedDB(fileData.filename).then(() => {
+                loadDBFilesModal();
+              });
+            }
+          };
+
+          actions.appendChild(downloadBtn);
+          actions.appendChild(deleteBtn);
+          li.appendChild(actions);
+          dbFileList.appendChild(li);
+        });
+      };
+
+      document.getElementById('db-files-modal').style.display = 'block';
+    }
+
+    function loadAndOpenDBFile(filename) {
+      loadFileFromIndexedDB(filename).then(fileData => {
+        files[filename] = fileData.content;
+        savedFiles.add(filename);
+        if (fileData.autoSave) {
+          autoSaveFiles.add(filename);
+        }
+        lastSaveContent[filename] = fileData.content;
+        updateFileExplorer();
+        openFile(filename);
+      }).catch(error => {
+        console.error('Error loading DB file:', error);
+        alert('Failed to load file from DB.');
+      });
+    }
+
+    function downloadDBFile(filename, content) {
+      const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    }
+
+    // DB search
+    document.getElementById('db-search-input').addEventListener('input', function(e) {
+      const searchTerm = e.target.value.toLowerCase();
+      const items = document.querySelectorAll('#db-file-list li');
+      items.forEach(item => {
+        const filename = item.dataset.filename.toLowerCase();
+        item.style.display = filename.includes(searchTerm) ? 'flex' : 'none';
+      });
+    });
+
+    // Top bar search
+    const topBar = document.getElementById('top-bar');
+    const topSearchInput = document.getElementById('top-search-input');
+    const searchResults = document.getElementById('search-results');
+
+    document.getElementById('search-project-header-btn').addEventListener('click', function() {
+      topBar.classList.add('search-active');
+      topSearchInput.focus();
+    });
+
+    document.getElementById('search-back-btn').addEventListener('click', function() {
+      topBar.classList.remove('search-active');
+      topSearchInput.value = '';
+      searchResults.innerHTML = '';
+      searchResults.style.display = 'none';
+    });
+
+    topSearchInput.addEventListener('input', function(e) {
+      const searchTerm = e.target.value.toLowerCase();
+      searchResults.innerHTML = '';
+      if (searchTerm === '') {
+        searchResults.style.display = 'none';
+        return;
+      }
+      Object.keys(files).forEach(file => {
+        if (file.toLowerCase().includes(searchTerm)) {
+          const li = document.createElement('li');
+          li.textContent = file;
+          li.onclick = () => {
+            openFile(file);
+            topBar.classList.remove('search-active');
+            topSearchInput.value = '';
+            searchResults.innerHTML = '';
+            searchResults.style.display = 'none';
+          };
+          searchResults.appendChild(li);
+        }
+      });
+      searchResults.style.display = searchResults.children.length > 0 ? 'block' : 'none';
+    });
+
+    // Close DB modal
+    document.getElementById('close-db-modal').onclick = () => {
+      document.getElementById('db-files-modal').style.display = 'none';
+    };
+
+    // Close settings modal
+    document.getElementById('close-settings-modal').onclick = () => {
+      document.getElementById('settings-modal').style.display = 'none';
+    };
+
+    // Open settings modal
+    document.getElementById('settings-header-btn').onclick = () => {
+      document.getElementById('settings-modal').style.display = 'block';
+    };
+
+    // Settings search
+    document.getElementById('settings-search').addEventListener('input', function(e) {
+      const searchTerm = e.target.value.toLowerCase();
+      const sections = document.querySelectorAll('.settings-section');
+      sections.forEach(section => {
+        const label = section.querySelector('label');
+        if (label) {
+          const text = label.textContent.toLowerCase();
+          section.style.display = text.includes(searchTerm) ? 'block' : 'none';
+        }
+      });
+    });
+
+    // Customization settings event listeners
+    document.getElementById('top-bar-color').addEventListener('input', function(e) {
+      document.getElementById('top-bar').style.backgroundColor = e.target.value;
+      saveSetting('topBarColor', e.target.value);
+    });
+
+    document.getElementById('editor-theme').addEventListener('change', function(e) {
+      editor.setTheme(`ace/theme/${e.target.value}`);
+      saveSetting('editorTheme', e.target.value);
+    });
+
+    document.getElementById('editor-font-size').addEventListener('input', function(e) {
+      editor.setFontSize(`${e.target.value}px`);
+      saveSetting('editorFontSize', parseInt(e.target.value));
+    });
+
+    document.getElementById('editor-font-family').addEventListener('change', function(e) {
+      document.getElementById('code-editor').style.fontFamily = e.target.value;
+      saveSetting('editorFontFamily', e.target.value);
+    });
+
+    document.getElementById('word-wrap').addEventListener('change', function(e) {
+      editor.session.setUseWrapMode(e.target.value !== 'off');
+      editor.session.setWrapLimitRange(e.target.value === 'wordWrapColumn' ? 80 : null);
+      saveSetting('wordWrap', e.target.value);
+    });
+
+    document.getElementById('tab-size').addEventListener('input', function(e) {
+      editor.session.setTabSize(e.target.value);
+      saveSetting('tabSize', parseInt(e.target.value));
+    });
+
+    document.getElementById('auto-save-interval').addEventListener('input', function(e) {
+      autoSaveDelay = parseInt(e.target.value);
+      saveSetting('autoSaveInterval', autoSaveDelay);
+    });
+
+    document.getElementById('show-line-numbers').addEventListener('change', function(e) {
+      editor.renderer.setShowGutter(e.target.checked);
+      saveSetting('showLineNumbers', e.target.checked);
+    });
+
+    document.getElementById('enable-autocomplete').addEventListener('change', function(e) {
+      editor.setOptions({
+        enableBasicAutocompletion: e.target.checked,
+        enableSnippets: e.target.checked,
+        enableLiveAutocompletion: e.target.checked
+      });
+      saveSetting('enableAutocomplete', e.target.checked);
+    });
+
+    document.getElementById('use-soft-tabs').addEventListener('change', function(e) {
+      editor.session.setUseSoftTabs(e.target.checked);
+      saveSetting('useSoftTabs', e.target.checked);
+    });
+
+    document.getElementById('show-print-margin').addEventListener('change', function(e) {
+      editor.setShowPrintMargin(e.target.checked);
+      saveSetting('showPrintMargin', e.target.checked);
+    });
+
+    document.getElementById('highlight-active-line').addEventListener('change', function(e) {
+      editor.setHighlightActiveLine(e.target.checked);
+      saveSetting('highlightActiveLine', e.target.checked);
+    });
+
+    document.getElementById('highlight-selected-word').addEventListener('change', function(e) {
+      editor.setHighlightSelectedWord(e.target.checked);
+      saveSetting('highlightSelectedWord', e.target.checked);
+    });
+
+    document.getElementById('show-invisibles').addEventListener('change', function(e) {
+      editor.setShowInvisibles(e.target.checked);
+      saveSetting('showInvisibles', e.target.checked);
+    });
+
+    document.getElementById('show-fold-widgets').addEventListener('change', function(e) {
+      editor.renderer.setShowFoldWidgets(e.target.checked);
+      saveSetting('showFoldWidgets', e.target.checked);
+    });
+
+    document.getElementById('fade-fold-widgets').addEventListener('change', function(e) {
+      editor.setFadeFoldWidgets(e.target.checked);
+      saveSetting('fadeFoldWidgets', e.target.checked);
+    });
+
+    document.getElementById('highlight-gutter-line').addEventListener('change', function(e) {
+      editor.setHighlightGutterLine(e.target.checked);
+      saveSetting('highlightGutterLine', e.target.checked);
+    });
+
+    document.getElementById('indented-soft-wrap').addEventListener('change', function(e) {
+      editor.renderer.setOption('indentedSoftWrap', e.target.checked);
+      saveSetting('indentedSoftWrap', e.target.checked);
+    });
+
+    document.getElementById('navigate-within-soft-tabs').addEventListener('change', function(e) {
+      editor.session.setNavigateWithinSoftTabs(e.target.checked);
+      saveSetting('navigateWithinSoftTabs', e.target.checked);
+    });
+
+    document.getElementById('enable-multiselect').addEventListener('change', function(e) {
+      editor.setOption('enableMultiselect', e.target.checked);
+      saveSetting('enableMultiselect', e.target.checked);
+    });
+
+    document.getElementById('scroll-past-end').addEventListener('input', function(e) {
+      editor.setOption('scrollPastEnd', parseFloat(e.target.value));
+      saveSetting('scrollPastEnd', parseFloat(e.target.value));
+    });
+
+    document.getElementById('fixed-width-gutter').addEventListener('change', function(e) {
+      editor.renderer.setOption('fixedWidthGutter', e.target.checked);
+      saveSetting('fixedWidthGutter', e.target.checked);
+    });
+
+    document.getElementById('print-margin-column').addEventListener('input', function(e) {
+      editor.setOption('printMarginColumn', parseInt(e.target.value));
+      saveSetting('printMarginColumn', parseInt(e.target.value));
+    });
+
+    document.getElementById('new-line-mode').addEventListener('change', function(e) {
+      editor.session.setNewLineMode(e.target.value);
+      saveSetting('newLineMode', e.target.value);
+    });
+
+    document.getElementById('use-worker').addEventListener('change', function(e) {
+      editor.session.setUseWorker(e.target.checked);
+      saveSetting('useWorker', e.target.checked);
+    });
+
+    document.getElementById('enable-emmet').addEventListener('change', function(e) {
+      editor.setOption('enableEmmet', e.target.checked);
+      saveSetting('enableEmmet', e.target.checked);
+    });
+
+    document.getElementById('keyboard-handler').addEventListener('change', function(e) {
+      editor.setKeyboardHandler(e.target.value);
+      saveSetting('keyboardHandler', e.target.value);
+    });
+
+    document.getElementById('max-lines').addEventListener('input', function(e) {
+      const value = parseInt(e.target.value) || Infinity;
+      editor.setOption('maxLines', value);
+      saveSetting('maxLines', value === Infinity ? 0 : value);
+    });
+
+    document.getElementById('min-lines').addEventListener('input', function(e) {
+      const value = parseInt(e.target.value) || 0;
+      editor.setOption('minLines', value);
+      saveSetting('minLines', value);
+    });
+
+    document.getElementById('overwrite').addEventListener('change', function(e) {
+      editor.session.setOverwrite(e.target.checked);
+      saveSetting('overwrite', e.target.checked);
+    });
+
+    document.getElementById('read-only').addEventListener('change', function(e) {
+      editor.setReadOnly(e.target.checked);
+      saveSetting('readOnly', e.target.checked);
+    });
+
+    document.getElementById('sidebar-width').addEventListener('input', function(e) {
+      document.getElementById('file-explorer').style.width = `${e.target.value}px`;
+      saveSetting('sidebarWidth', parseInt(e.target.value));
+    });
+
+    document.getElementById('default-language').addEventListener('change', function(e) {
+      saveSetting('defaultLanguage', e.target.value);
+      // Apply to new files
+    });
+
+    document.getElementById('auto-pair-brackets').addEventListener('change', function(e) {
+      editor.setBehavioursEnabled(e.target.checked);
+      saveSetting('autoPairBrackets', e.target.checked);
+    });
+
+    // Initialize file explorer - will load from IndexedDB if available
+    updateFileExplorer();
+    
+    // Initialize IndexedDB but don't create default files
+    setTimeout(() => {
+      updateSaveButtons();
+    }, 100);
+
+    // Function to extract title from HTML content
+    function extractHtmlTitle(htmlContent) {
+      const titleMatch = htmlContent.match(/<title[^>]*>(.*?)<\/title>/i);
+      return titleMatch ? titleMatch[1].trim() : null;
+    }
+
+    // Modal handling
+    document.getElementById("preview-code-btn").onclick = () => {
+      if (!currentFile) {
+        alert("No file selected!");
+        return;
+      }
+      
+      saveCurrentFile();
+      const previewModal = document.getElementById("preview-modal");
+      const previewFrame = document.getElementById("code-preview");
+      const previewFilename = document.getElementById("preview-filename");
+      
+      const fileContent = files[currentFile];
+      const extension = currentFile.split('.').pop().toLowerCase();
+      
+      let previewTitle = currentFile;
+      if (extension === 'html') {
+        const htmlTitle = extractHtmlTitle(fileContent);
+        if (htmlTitle) {
+          previewTitle = htmlTitle;
+        }
+      }
+      
+      previewFilename.textContent = previewTitle;
+      previewFrame.srcdoc = fileContent;
+      previewModal.style.display = "block";
+    };
+
+    document.getElementById("close-preview-modal").onclick = () => {
+      document.getElementById("preview-modal").style.display = "none";
+    };
+
+    document.getElementById("change-language-btn").onclick = () => {
+      document.getElementById("language-modal").style.display = "block";
+    };
+
+    document.getElementById("close-language-modal").onclick = () => {
+      document.getElementById("language-modal").style.display = "none";
+    };
+
+    document.querySelectorAll(".language-option").forEach(btn => {
+      btn.onclick = function() {
+        const mode = "ace/mode/" + this.dataset.lang;
+        editor.session.setMode(mode);
+        document.getElementById("language-modal").style.display = "none";
+      };
+    });
+
+    // Close modals when clicking outside
+    window.onclick = function(event) {
+      const previewModal = document.getElementById("preview-modal");
+      const languageModal = document.getElementById("language-modal");
+      const dbModal = document.getElementById("db-files-modal");
+      const settingsModal = document.getElementById("settings-modal");
+      
+      if (event.target === previewModal) {
+        previewModal.style.display = "none";
+      }
+      if (event.target === languageModal) {
+        languageModal.style.display = "none";
+      }
+      if (event.target === dbModal) {
+        dbModal.style.display = "none";
+      }
+      if (event.target === settingsModal) {
+        settingsModal.style.display = "none";
+      }
+    };
+
+    // Handle escape key to close modals
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        document.getElementById("preview-modal").style.display = "none";
+        document.getElementById("language-modal").style.display = "none";
+        document.getElementById("db-files-modal").style.display = "none";
+        document.getElementById("settings-modal").style.display = "none";
+      }
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(event) {
+      if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+        event.preventDefault();
+        if (currentFile && !autoSaveFiles.has(currentFile)) {
+          saveCurrentFile();
+          const content = files[currentFile];
+          function doSave() {
+            saveFileToIndexedDB(currentFile, content)
+              .then(() => {
+                showAutosaveIndicator('Saved manually');
+              })
+              .catch(error => {
+                showAutosaveIndicator('Save failed', 'error');
+              });
+          }
+          if (!db) {
+            initIndexedDB().then(doSave).catch(() => {
+              showAutosaveIndicator('Save failed', 'error');
+            });
+          } else {
+            doSave();
+          }
+        }
+      }
+      
+      if ((event.ctrlKey || event.metaKey) && event.key === 'n') {
+        event.preventDefault();
+        document.getElementById("new-file-btn").click();
+      }
+      
+      if ((event.ctrlKey || event.metaKey) && event.key === 'o') {
+        event.preventDefault();
+        document.getElementById("open-file-btn").click();
+      }
+    });
+
+    // Save before page unload
+    window.addEventListener('beforeunload', function(event) {
+      saveCurrentFile();
+      if (currentFile && autoSaveFiles.has(currentFile)) {
+        navigator.sendBeacon && autoSaveFile(currentFile, files[currentFile]);
+      }
+    });
+
+    // Initialize additional editor options
+    editor.setOptions({
+      enableBasicAutocompletion: true,
+      enableSnippets: true,
+      enableLiveAutocompletion: true
+    });
+
+    // Hide sidebar by default on mobile
+    if (window.innerWidth <= 768) {
+      document.getElementById('file-explorer').classList.add('hidden');
+    }
+    const settingKeys = [
+  'topBarColor', 'editorTheme', 'editorFontSize', 'editorFontFamily',
+  'wordWrap', 'tabSize', 'autoSaveInterval', 'showLineNumbers',
+  'enableAutocomplete', 'useSoftTabs', 'showPrintMargin', 'highlightActiveLine',
+  'highlightSelectedWord', 'showInvisibles', 'showFoldWidgets', 'fadeFoldWidgets',
+  'highlightGutterLine', 'indentedSoftWrap', 'navigateWithinSoftTabs', 'enableMultiselect',
+  'scrollPastEnd', 'fixedWidthGutter', 'printMarginColumn', 'newLineMode',
+  'useWorker', 'enableEmmet', 'keyboardHandler', 'maxLines',
+  'minLines', 'overwrite', 'readOnly', 'sidebarWidth',
+  'defaultLanguage', 'autoPairBrackets'
+];
+
+function resetSettings() {
+  if (!confirm('Are you sure you want to reset all settings to defaults?')) return;
+
+  const defaultSettings = {};
+  settingKeys.forEach(key => {
+    defaultSettings[key] = getDefaultSetting(key);
+  });
+
+  applySettings(defaultSettings);
+
+  settingKeys.forEach(key => {
+    saveSetting(key, defaultSettings[key]);
+  });
+}
+
+document.getElementById('reset-settings-btn').addEventListener('click', resetSettings);
+  </script>
+</body>
+</html>
