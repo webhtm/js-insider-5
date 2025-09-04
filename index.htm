@@ -1,25 +1,27 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JS Insider 5.0</title>
+  <title>JS Insider 5.1</title>
   <style>
-   /* ALLAH IS THE GREATEST */
-   input { font-family: Heebo;}
-   /* Style for file items */
-   #file-list .file-item.selected {
+    /* ALLAH IS THE GREATEST */
+    input { font-family: Heebo; }
+    /* Style for file items */
+    #file-list .file-item.selected {
       background-color: rgb(0, 183, 255); /* Highlight color for the selected file */
       color: #333;
     }
-#settings-search {
-  margin-top: 10px;
-  margin-right: 5px;
-  border: none;
-}
-#input {
-  border: none;
-}
+    #settings-search {
+      margin-top: 10px;
+      margin-right: 5px;
+      border: none;
+    }
+    #input {
+      border: none;
+    }
     /* Style for saved files */
     #file-list .file-item.saved {
       color: #27ae60; /* Changed to green for better visibility */
@@ -204,15 +206,10 @@
       overflow-x: hidden;
       padding-right: 5px;
     }
-body {overflow-y: hidden;}
+    body {overflow-y: scroll;}
 
     /* Custom scrollbar for file explorer */
-    #file-explorer-content::-webkit-scrollbar {
-      width: 8px;
-      height: 100px;
-    }
-
-    #file-explorer-content::-webkit-scrollbar-track {
+   #file-explorer::-webkit-scrollbar-track {
       background: #1a1a1a00;
       border-radius: 2px;
     }
@@ -226,6 +223,7 @@ body {overflow-y: hidden;}
     #file-explorer-content::-webkit-scrollbar-thumb:hover {
       background: #5a7288;
     }
+
 
     #file-list {
       list-style-type: none;
@@ -498,13 +496,11 @@ body {overflow-y: hidden;}
       fill: #ddd;
     }
 
-    /* Header left */
     .header-left {
       display: flex;
       align-items: center;
     }
 
-    /* Search container */
     .search-container {
       display: none;
       flex: 1;
@@ -523,7 +519,6 @@ body {overflow-y: hidden;}
       display: block;
     }
 
-    /* Search results */
     .search-results {
       position: absolute;
       top: 100%;
@@ -627,6 +622,58 @@ body {overflow-y: hidden;}
     #nomi {
       margin-bottom: 10px;
     }
+    /* Improved UI: Add subtle animations */
+    .modal {
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .file-item {
+      transition: background-color 0.2s ease;
+    }
+    /* Better button styling */
+    button {
+      transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+    button:active {
+      transform: scale(0.98);
+    }
+    /* Dark mode toggle (placeholder for feature) */
+    body.dark-mode {
+      background-color: #1e1e1e;
+    }
+    /* Search in editor styles (new) */
+    #find-replace-modal .modal-body {
+      padding: 20px;
+    }
+    #find-replace-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    #find-replace-form input {
+      padding: 8px;
+      background-color: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+    #find-replace-form button {
+      background-color: #3498db;
+      color: white;
+      padding: 8px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #find-replace-form button:hover {
+      background-color: #2980b9;
+    }
+    label {
+        color: white;
+    }
   </style>
 </head>
 <body>
@@ -654,10 +701,16 @@ body {overflow-y: hidden;}
             <path d="M25.3 34.3L12.4 21.5l2.1-2.1 10 10V16h3v13.4l10-10 2.1 2.1-12.9 12.8z"></path>
           </svg>
         </button>
+        <button id="find-replace-header-btn" class="header-btn" title="Find/Replace">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="100" height="100">
+    <rect x="4" y="4" width="12" height="12" fill="none" stroke="white" stroke-width="2"/>
+    <path d="M15 15l4.5 4.5m-1.5-4.5a3.5 3.5 0 1 0-7 0 3.5 3.5 0 0 0 7 0z"/>
+  </svg>
+        </button>
         <button id="settings-header-btn" class="header-btn" title="Settings">
           <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 50 50">
-    <path d="M47.16,21.221l-5.91-0.966c-0.346-1.186-0.819-2.326-1.411-3.405l3.45-4.917c0.279-0.397,0.231-0.938-0.112-1.282 l-3.889-3.887c-0.347-0.346-0.893-0.391-1.291-0.104l-4.843,3.481c-1.089-0.602-2.239-1.08-3.432-1.427l-1.031-5.886 C28.607,2.35,28.192,2,27.706,2h-5.5c-0.49,0-0.908,0.355-0.987,0.839l-0.956,5.854c-1.2,0.345-2.352,0.818-3.437,1.412l-4.83-3.45 c-0.399-0.285-0.942-0.239-1.289,0.106L6.82,10.648c-0.343,0.343-0.391,0.883-0.112,1.28l3.399,4.863 c-0.605,1.095-1.087,2.254-1.438,3.46l-5.831,0.971c-0.482,0.08-0.836,0.498-0.836,0.986v5.5c0,0.485,0.348,0.9,0.825,0.985 l5.831,1.034c0.349,1.203,0.831,2.362,1.438,3.46l-3.441,4.813c-0.284,0.397-0.239,0.942,0.106,1.289l3.888,3.891 c0.343,0.343,0.884,0.391,1.281,0.112l4.87-3.411c1.093,0.601,2.248,1.078,3.445,1.424l0.976,5.861C21.3,47.647,21.717,48,22.206,48 h5.5c0.485,0,0.9-0.348,0.984-0.825l1.045-5.89c1.199-0.353,2.348-0.833,3.43-1.435l4.905,3.441 c0.398,0.281,0.938,0.232,1.282-0.111l3.888-3.891c0.346-0.347,0.391-0.894,0.104-1.292l-3.498-4.857 c0.593-1.08,1.064-2.222,1.407-3.408l5.918-1.039c0.479-0.084,0.827-0.5,0.827-0.985v-5.5C47.999,21.718,47.644,21.3,47.16,21.221z M25,32c-3.866,0-7-3.134-7-7c0-3.866,3.134-7,7-7s7,3.134,7,7C32,28.866,28.866,32,25,32z"></path>
-</svg>
+            <path d="M47.16,21.221l-5.91-0.966c-0.346-1.186-0.819-2.326-1.411-3.405l3.45-4.917c0.279-0.397,0.231-0.938-0.112-1.282 l-3.889-3.887c-0.347-0.346-0.893-0.391-1.291-0.104l-4.843,3.481c-1.089-0.602-2.239-1.08-3.432-1.427l-1.031-5.886 C28.607,2.35,28.192,2,27.706,2h-5.5c-0.49,0-0.908,0.355-0.987,0.839l-0.956,5.854c-1.2,0.345-2.352,0.818-3.437,1.412l-4.83-3.45 c-0.399-0.285-0.942-0.239-1.289,0.106L6.82,10.648c-0.343,0.343-0.391,0.883-0.112,1.28l3.399,4.863 c-0.605,1.095-1.087,2.254-1.438,3.46l-5.831,0.971c-0.482,0.08-0.836,0.498-0.836,0.986v5.5c0,0.485,0.348,0.9,0.825,0.985 l5.831,1.034c0.349,1.203,0.831,2.362,1.438,3.46l-3.441,4.813c-0.284,0.397-0.239,0.942,0.106,1.289l3.888,3.891 c0.343,0.343,0.884,0.391,1.281,0.112l4.87-3.411c1.093,0.601,2.248,1.078,3.445,1.424l0.976,5.861C21.3,47.647,21.717,48,22.206,48 h5.5c0.485,0,0.9-0.348,0.984-0.825l1.045-5.89c1.199-0.353,2.348-0.833,3.43-1.435l4.905,3.441 c0.398,0.281,0.938,0.232,1.282-0.111l3.888-3.891c0.346-0.347,0.391-0.894,0.104-1.292l-3.498-4.857 c0.593-1.08,1.064-2.222,1.407-3.408l5.918-1.039c0.479-0.084,0.827-0.5,0.827-0.985v-5.5C47.999,21.718,47.644,21.3,47.16,21.221z M25,32c-3.866,0-7-3.134-7-7c0-3.866,3.134-7,7-7s7,3.134,7,7C32,28.866,28.866,32,25,32z"></path>
+          </svg>
         </button>
       </div>
     </div>
@@ -713,6 +766,11 @@ body {overflow-y: hidden;}
     <div class="modal-content">
       <div class="modal-header">
         <h3 class="modal-title">Code Preview - <span id="preview-filename"></span></h3>
+        <button id="reload-preview-btn" class="header-btn" title="Reload Preview">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24" height="24">
+            <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+          </svg>
+        </button>
         <button id="close-preview-modal" class="close-btn">&times;</button>
       </div>
       <div class="modal-body">
@@ -761,6 +819,27 @@ body {overflow-y: hidden;}
       <div class="modal-body">
         <input type="text" id="db-search-input" placeholder="Search files...">
         <ul id="db-file-list"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Modal for Find/Replace -->
+  <div id="find-replace-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Find and Replace</h3>
+        <button id="close-find-replace-modal" class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="find-replace-form">
+          <input type="text" id="find-text" placeholder="Find...">
+          <input type="text" id="replace-text" placeholder="Replace with...">
+          <label><input type="checkbox" id="case-sensitive"> Case sensitive</label>
+          <label><input type="checkbox" id="whole-word"> Whole word</label>
+          <button type="button" id="find-next-btn">Find Next</button>
+          <button type="button" id="replace-btn">Replace</button>
+          <button type="button" id="replace-all-btn">Replace All</button>
+        </form>
       </div>
     </div>
   </div>
@@ -990,6 +1069,7 @@ body {overflow-y: hidden;}
               <label for="auto-pair-brackets">Auto Pair Brackets</label>
             </div>
           </div>
+          <button id="reset-settings-btn" style="background-color: #e74c3c; color: white; padding: 8px; border: none; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 20px;">Reset to Defaults</button>
         </div>
       </div>
     </div>
@@ -1460,7 +1540,7 @@ body {overflow-y: hidden;}
     function updateFileExplorer() {
       const fileList = document.getElementById("file-list");
       fileList.innerHTML = "";
-      Object.keys(files).forEach(file => {
+      Object.keys(files).sort().forEach(file => { // Sorted alphabetically for better UX
         const li = document.createElement("li");
         li.textContent = file;
         li.className = "file-item";
@@ -1489,7 +1569,7 @@ body {overflow-y: hidden;}
         files[filename] = "";
       }
       
-      editor.setValue(files[filename]);
+      editor.setValue(files[filename], -1); // Move cursor to start
       editor.clearSelection();
       highlightFile(filename);
       setEditorMode(filename);
@@ -1697,6 +1777,10 @@ body {overflow-y: hidden;}
           const content = e.target.result;
           const filename = file.name;
           
+          if (files.hasOwnProperty(filename)) {
+            if (!confirm(`File ${filename} already exists. Overwrite?`)) return;
+          }
+          
           saveCurrentFile();
           
           files[filename] = content;
@@ -1865,7 +1949,7 @@ body {overflow-y: hidden;}
       const request = objectStore.getAll();
 
       request.onsuccess = () => {
-        const dbFiles = request.result;
+        const dbFiles = request.result.sort((a, b) => a.filename.localeCompare(b.filename)); // Sorted for better UX
         dbFiles.forEach(fileData => {
           const li = document.createElement('li');
           li.textContent = `${fileData.filename} (Last modified: ${fileData.lastModified})`;
@@ -2190,14 +2274,6 @@ body {overflow-y: hidden;}
       saveSetting('autoPairBrackets', e.target.checked);
     });
 
-    // Initialize file explorer - will load from IndexedDB if available
-    updateFileExplorer();
-    
-    // Initialize IndexedDB but don't create default files
-    setTimeout(() => {
-      updateSaveButtons();
-    }, 100);
-
     // Function to extract title from HTML content
     function extractHtmlTitle(htmlContent) {
       const titleMatch = htmlContent.match(/<title[^>]*>(.*?)<\/title>/i);
@@ -2232,13 +2308,21 @@ body {overflow-y: hidden;}
       previewModal.style.display = "block";
     };
 
-    document.getElementById("close-preview-modal").onclick = () => {
-      document.getElementById("preview-modal").style.display = "none";
+    document.getElementById("reload-preview-btn").onclick = () => {
+      const previewFrame = document.getElementById('code-preview');
+      previewFrame.contentWindow.location.reload();
     };
 
-    document.getElementById("change-language-btn").onclick = () => {
-      document.getElementById("language-modal").style.display = "block";
-    };
+    function closePreviewModal() {
+      const previewFrame = document.getElementById('code-preview');
+      if (previewFrame.contentDocument) {
+        const mediaElements = previewFrame.contentDocument.querySelectorAll('audio, video');
+        mediaElements.forEach(el => el.pause());
+      }
+      document.getElementById('preview-modal').style.display = 'none';
+    }
+
+    document.getElementById("close-preview-modal").onclick = closePreviewModal;
 
     document.getElementById("close-language-modal").onclick = () => {
       document.getElementById("language-modal").style.display = "none";
@@ -2252,15 +2336,59 @@ body {overflow-y: hidden;}
       };
     });
 
+    // New Find/Replace functionality
+    document.getElementById('find-replace-header-btn').addEventListener('click', () => {
+      document.getElementById('find-replace-modal').style.display = 'block';
+    });
+
+    document.getElementById('close-find-replace-modal').addEventListener('click', () => {
+      document.getElementById('find-replace-modal').style.display = 'none';
+    });
+
+    let findRange = null;
+    document.getElementById('find-next-btn').addEventListener('click', () => {
+      const needle = document.getElementById('find-text').value;
+      if (needle) {
+        findRange = editor.find(needle, {
+          backwards: false,
+          wrap: true,
+          caseSensitive: document.getElementById('case-sensitive').checked,
+          wholeWord: document.getElementById('whole-word').checked,
+          regExp: false,
+          start: findRange || editor.getCursorPosition()
+        });
+      }
+    });
+
+    document.getElementById('replace-btn').addEventListener('click', () => {
+      const replaceWith = document.getElementById('replace-text').value;
+      editor.replace(replaceWith);
+      document.getElementById('find-next-btn').click(); // Find next after replace
+    });
+
+    document.getElementById('replace-all-btn').addEventListener('click', () => {
+      const needle = document.getElementById('find-text').value;
+      const replaceWith = document.getElementById('replace-text').value;
+      if (needle) {
+        editor.replaceAll(replaceWith, {
+          needle: needle,
+          caseSensitive: document.getElementById('case-sensitive').checked,
+          wholeWord: document.getElementById('whole-word').checked,
+          regExp: false
+        });
+      }
+    });
+
     // Close modals when clicking outside
     window.onclick = function(event) {
       const previewModal = document.getElementById("preview-modal");
       const languageModal = document.getElementById("language-modal");
       const dbModal = document.getElementById("db-files-modal");
       const settingsModal = document.getElementById("settings-modal");
+      const findReplaceModal = document.getElementById("find-replace-modal");
       
       if (event.target === previewModal) {
-        previewModal.style.display = "none";
+        closePreviewModal();
       }
       if (event.target === languageModal) {
         languageModal.style.display = "none";
@@ -2271,15 +2399,21 @@ body {overflow-y: hidden;}
       if (event.target === settingsModal) {
         settingsModal.style.display = "none";
       }
+      if (event.target === findReplaceModal) {
+        findReplaceModal.style.display = "none";
+      }
     };
 
     // Handle escape key to close modals
     document.addEventListener('keydown', function(event) {
       if (event.key === 'Escape') {
-        document.getElementById("preview-modal").style.display = "none";
+        if (document.getElementById("preview-modal").style.display === "block") {
+          closePreviewModal();
+        }
         document.getElementById("language-modal").style.display = "none";
         document.getElementById("db-files-modal").style.display = "none";
         document.getElementById("settings-modal").style.display = "none";
+        document.getElementById("find-replace-modal").style.display = "none";
       }
     });
 
@@ -2317,6 +2451,11 @@ body {overflow-y: hidden;}
       if ((event.ctrlKey || event.metaKey) && event.key === 'o') {
         event.preventDefault();
         document.getElementById("open-file-btn").click();
+      }
+
+      if ((event.ctrlKey || event.metaKey) && event.key === 'f') {
+        event.preventDefault();
+        document.getElementById('find-replace-header-btn').click();
       }
     });
 
@@ -2367,6 +2506,169 @@ function resetSettings() {
 }
 
 document.getElementById('reset-settings-btn').addEventListener('click', resetSettings);
+
+    // Initialize file explorer - will load from IndexedDB if available
+    updateFileExplorer();
+    
+    // Initialize IndexedDB but don't create default files
+    setTimeout(() => {
+      updateSaveButtons();
+    }, 100);
+    
+    // Event listener for the "Change Language" button
+document.getElementById("change-language-btn").onclick = () => {
+  const languageModal = document.getElementById("language-modal");
+  languageModal.style.display = "block";
+};
+
+// Event listener for closing the language modal
+document.getElementById("close-language-modal").onclick = () => {
+  document.getElementById("language-modal").style.display = "none";
+};
+
+// Event listener for language selection
+document.querySelectorAll(".language-option").forEach(btn => {
+  btn.onclick = function() {
+    if (!currentFile) {
+      alert("No file selected!");
+      return;
+    }
+    
+    const mode = "ace/mode/" + this.dataset.lang;
+    editor.session.setMode(mode);
+    document.getElementById("language-modal").style.display = "none";
+    
+    // Update the file's mode in the files object if needed
+    files[currentFile] = editor.getValue(); // Ensure content is saved
+    setEditorMode(currentFile); // Reapply mode to ensure consistency
+  };
+});
+
+// Function to set the editor mode based on the file extension
+function setEditorMode(filename) {
+  const mode = getEditorModeFromExtension(filename);
+  editor.session.setMode(`ace/mode/${mode}`);
+}
+
+// Function to get editor mode based on file extension
+function getEditorModeFromExtension(filename) {
+  const extension = filename.split('.').pop().toLowerCase();
+  
+  switch (extension) {
+    case 'js':
+    case 'jsx':
+      return "javascript";
+    case 'ts':
+    case 'tsx':
+      return "typescript";
+    case 'html':
+    case 'htm':
+      return "html";
+    case 'css':
+      return "css";
+    case 'json':
+      return "json";
+    case 'xml':
+      return "xml";
+    case 'md':
+    case 'markdown':
+      return "markdown";
+    case 'py':
+      return "python";
+    case 'java':
+      return "java";
+    case 'c':
+    case 'cpp':
+    case 'cc':
+    case 'cxx':
+      return "c_cpp";
+    case 'php':
+      return "php";
+    case 'rb':
+      return "ruby";
+    case 'go':
+      return "golang";
+    case 'rs':
+      return "rust";
+    case 'sql':
+      return "sql";
+    case 'sh':
+    case 'bash':
+      return "sh";
+    case 'yaml':
+    case 'yml':
+      return "yaml";
+    case 'txt':
+    default:
+      return document.getElementById("default-language").value || "text";
+  }
+}
+
+// Ensure modal closes when clicking outside
+window.onclick = function(event) {
+  const languageModal = document.getElementById("language-modal");
+  if (event.target === languageModal) {
+    languageModal.style.display = "none";
+  }
+};
+
+// Handle escape key to close the modal
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') {
+    document.getElementById("language-modal").style.display = "none";
+  }
+});
+// Close modals when clicking outside their content
+window.onclick = function(event) {
+  const modals = [
+    document.getElementById("preview-modal"),
+    document.getElementById("language-modal"),
+    document.getElementById("db-files-modal"),
+    document.getElementById("settings-modal"),
+    document.getElementById("find-replace-modal")
+  ];
+
+  modals.forEach(modal => {
+    if (event.target === modal) {
+      if (modal.id === "preview-modal") {
+        // Special handling for preview modal to pause media
+        const previewFrame = document.getElementById('code-preview');
+        if (previewFrame.contentDocument) {
+          const mediaElements = previewFrame.contentDocument.querySelectorAll('audio, video');
+          mediaElements.forEach(el => el.pause());
+        }
+      }
+      modal.style.display = "none";
+    }
+  });
+};
+
+// Handle escape key to close all modals
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') {
+    const modals = [
+      document.getElementById("preview-modal"),
+      document.getElementById("language-modal"),
+      document.getElementById("db-files-modal"),
+      document.getElementById("settings-modal"),
+      document.getElementById("find-replace-modal")
+    ];
+
+    modals.forEach(modal => {
+      if (modal.style.display === "block") {
+        if (modal.id === "preview-modal") {
+          // Special handling for preview modal to pause media
+          const previewFrame = document.getElementById('code-preview');
+          if (previewFrame.contentDocument) {
+            const mediaElements = previewFrame.contentDocument.querySelectorAll('audio, video');
+            mediaElements.forEach(el => el.pause());
+          }
+        }
+        modal.style.display = "none";
+      }
+    });
+  }
+});
   </script>
 </body>
 </html>
