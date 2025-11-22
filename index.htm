@@ -91,6 +91,8 @@
       font-size: 14px;
     }
 
+
+
     .save-to-db-btn {
       background-color: #27AE60;
       color: white;
@@ -161,13 +163,25 @@
       padding: 0;
       display: flex;
       flex-direction: column;
-    }
+      overflow: hidden;
 
+    }
+body {
+  overflow: none;
+}
     #coder-ai {
       flex: 1;
       display: flex;
       height: 100%;
+      overflow: hidden;
     }
+    #coder-ai::-webkit-scrollbar {
+display: none;
+    }
+    body::-webkit-scrollbar {
+      display: none;
+    }
+
 
     #editor-container {
       flex: 1;
@@ -180,7 +194,28 @@
       flex: 3;
       background-color: #2c3e50;
     }
+/* 1. Prevent the whole page from scrolling */
 
+
+/* 2. Limit the file list height and enable internal scrolling */
+#file-list {
+  max-height: 110px; /* Limit height to approx 5 items */
+  overflow-y: auto;  /* Enable scrollbar for list if needed */
+  border-bottom: 1px solid #444; /* Optional: adds separation */
+  margin-bottom: 10px;
+}
+
+/* 3. Style the scrollbar for the file list to match the theme */
+#file-list::-webkit-scrollbar {
+  width: 6px;
+}
+#file-list::-webkit-scrollbar-track {
+  background: #1a1a1a00;
+}
+#file-list::-webkit-scrollbar-thumb {
+  background: #1d68ad;
+  border-radius: 4px;
+}
     #file-explorer {
       width: 200px;
       background-color: #262626;
