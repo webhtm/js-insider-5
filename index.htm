@@ -1,11 +1,9 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JS Insider 5.1</title>
+  <title>JS Insider</title>
   <style>
     /* ALLAH IS THE GREATEST */
     input { font-family: Heebo; }
@@ -29,7 +27,7 @@
       font-weight: bold;
     }
     #file-list .file-item.saved:hover {
-      background-color: #27ae6026; 
+      background-color: #27ae6026;
       color: white;/* Green color for saved files */
       font-weight: bold;
     }
@@ -37,7 +35,6 @@
       background-color: #27ae60; /* Darker green for selected saved files */
       color: rgb(255, 255, 255);
     }
-
     /* Auto-save indicator */
     .autosave-indicator {
       position: absolute;
@@ -52,19 +49,15 @@
       transition: opacity 0.3s ease;
       z-index: 1000;
     }
-
     .autosave-indicator.show {
       opacity: 1;
     }
-
     .autosave-indicator.saving {
       background-color: #F39C12;
     }
-
     .autosave-indicator.error {
       background-color: #E74C3C;
     }
-
     /* Settings panel styles */
     .settings-panel {
       background-color: #34495e;
@@ -74,25 +67,19 @@
       margin: 10px 0;
       max-width: 400px; /* Less wide */
     }
-
     .settings-toggle {
       display: flex;
       align-items: center;
       margin: 10px 0;
     }
-
     .settings-toggle input[type="checkbox"] {
       margin-right: 10px;
       transform: scale(1.2);
     }
-
     .settings-toggle label {
       cursor: pointer;
       font-size: 14px;
     }
-
-
-
     .save-to-db-btn {
       background-color: #27AE60;
       color: white;
@@ -104,16 +91,13 @@
       margin-top: 5px;
       font-family: trebuchet ms;
     }
-
     .save-to-db-btn:hover {
       background-color: #219A52;
     }
-
     .save-to-db-btn:disabled {
       background-color: #95A5A6;
       cursor: not-allowed;
     }
-
     .remove-from-db-btn {
       background-color: #E67E22;
       color: white;
@@ -125,18 +109,15 @@
       margin-top: 5px;
       font-family: trebuchet ms;
     }
-
     .remove-from-db-btn:hover {
       background-color: #D35400;
     }
-
     body {
       font-family: trebuchet ms;
       margin: 0;
       padding: 0;
       background-color: #f0f0f0;
     }
-
     h1 {
       background-color: #0b487e;
       color: white;
@@ -146,9 +127,8 @@
       justify-content: space-between;
       align-items: center;
       z-index: 10000;
-      
+     
     }
-
     #hide-sidebar-btn {
       background: none;
       border: none;
@@ -156,7 +136,6 @@
       cursor: pointer;
       font-size: 24px;
     }
-
     html, body {
       height: 100%;
       margin: 0;
@@ -164,7 +143,6 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-
     }
 body {
   overflow: none;
@@ -181,30 +159,24 @@ display: none;
     body::-webkit-scrollbar {
       display: none;
     }
-
-
     #editor-container {
       flex: 1;
       display: flex;
       position: relative;
     }
-
     #editor-container {
       display: flex;
       flex: 3;
       background-color: #2c3e50;
     }
 /* 1. Prevent the whole page from scrolling */
-
-
 /* 2. Limit the file list height and enable internal scrolling */
 #file-list {
   max-height: 110px; /* Limit height to approx 5 items */
-  overflow-y: auto;  /* Enable scrollbar for list if needed */
+  overflow-y: auto; /* Enable scrollbar for list if needed */
   border-bottom: 1px solid #444; /* Optional: adds separation */
   margin-bottom: 10px;
 }
-
 /* 3. Style the scrollbar for the file list to match the theme */
 #file-list::-webkit-scrollbar {
   width: 6px;
@@ -228,13 +200,11 @@ display: none;
       overflow: hidden;
       box-shadow: 2px 0 5px rgba(0,0,0,0.2); /* Added shadow for better depth */
     }
-
     #file-explorer.hidden {
       width: 0;
       padding: 0;
       overflow: hidden;
     }
-
     /* Make file explorer content scrollable */
     #file-explorer-content {
       flex: 1;
@@ -243,30 +213,24 @@ display: none;
       padding-right: 5px;
     }
     body {overflow-y: scroll;}
-
     /* Custom scrollbar for file explorer */
    #file-explorer::-webkit-scrollbar-track {
       background: #1a1a1a00;
       border-radius: 2px;
     }
-
     #file-explorer-content::-webkit-scrollbar-thumb {
       background: #1d68ad;
       border-radius: 4px;
-      
+     
     }
-
     #file-explorer-content::-webkit-scrollbar-thumb:hover {
       background: #5a7288;
     }
-
-
     #file-list {
       list-style-type: none;
       padding: 0;
       margin: 0;
     }
-
     #file-list li {
       cursor: pointer;
       padding: 8px 5px;
@@ -275,11 +239,9 @@ display: none;
       word-wrap: break-word;
       overflow-wrap: break-word;
     }
-
     #file-list li:hover {
       background-color: #4a6278;
     }
-
     #new-file-btn, #rename-file-btn, #delete-file-btn, #download-file-btn, #preview-code-btn, #change-language-btn, #open-file-btn, #db-files-btn {
       width: 100%;
       padding: 5px;
@@ -290,33 +252,27 @@ display: none;
       border-radius: 5px;
       font-family: trebuchet ms;
       padding: 7px;
-      
+     
     }
-
     #new-file-btn, #rename-file-btn, #download-file-btn, #preview-code-btn, #change-language-btn, #open-file-btn, #db-files-btn {
       background-color: #3498db;
       font-size: medium;
     }
-
     .delete-btn {
       background-color: #e74c3c;
       font-size: medium;
     }
-
     #new-file-btn:hover, #rename-file-btn:hover, #download-file-btn:hover, #preview-code-btn:hover, #change-language-btn:hover, #open-file-btn:hover, .delete-btn:hover, #db-files-btn:hover {
       background-color: #2980b9;
       font-size: medium;
     }
-
     .delete-btn:hover {
       background-color: #c0392b;
     }
-
     #code-editor {
       flex: 1;
       font-size: 14px;
     }
-
     /* Modal styles */
     .modal {
       display: none;
@@ -329,9 +285,7 @@ display: none;
       overflow: auto;
       background-color: rgba(60, 60, 60, 0.608);
       z-index: 100000;
-
     }
-
     .modal-content {
       background-color: #2c3e50;
       margin: 20px auto;
@@ -346,7 +300,6 @@ display: none;
       flex-direction: column;
       box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     }
-
     .modal-header {
       background-color: #363636;
       color: white;
@@ -357,25 +310,21 @@ display: none;
       align-items: center;
       border-bottom: 1px solid #444;
     }
-
     .modal-title {
       margin: 0;
       font-size: 18px;
       font-weight: bold;
     }
-
     .modal-body {
       flex: 1;
       padding: 0;
       overflow: hidden;
     }
-
     .modal-content h3 {
       color: white;
       border-radius: 5px;
       margin: 20px;
     }
-
     .close-btn {
       color: rgb(231, 76, 60);
       font-size: 28px;
@@ -391,13 +340,11 @@ display: none;
       justify-content: center;
       transition: all 0.3s ease;
     }
-
     .close-btn:hover, .close-btn:focus {
       color: rgb(135, 24, 24);
       background-color: rgba(231, 76, 60, 0.1);
       text-decoration: none;
     }
-
     .language-option {
       width: calc(100% - 40px);
       padding: 10px;
@@ -409,36 +356,30 @@ display: none;
       background-color: #2980b9;
       font-family: trebuchet ms;
     }
-
     .language-option:hover {
       background-color: #236590;
     }
-
     #code-preview {
       width: 100%;
       height: 100%;
       border: none;
       background-color: white;
     }
-
     /* Language modal specific styles */
     .language-modal-content {
       height: auto;
       max-height: 80vh;
       overflow-y: auto;
     }
-
     /* Additional settings styles */
     .settings-section {
       margin: 10px 0;
     }
-
     .settings-section label {
       display: block;
       margin-bottom: 5px;
       font-size: 14px;
     }
-
     .settings-section select,
     .settings-section input[type="color"],
     .settings-section input[type="number"] {
@@ -449,17 +390,14 @@ display: none;
       border: none;
       border-radius: 4px;
     }
-
     input[type="color"] {
       height: 50px; /* Larger height for color picker */
     }
-
     /* DB Files Modal */
     #db-files-modal .modal-body {
       padding: 20px;
       overflow-y: auto;
     }
-
     #db-search-input {
       width: 100%;
       padding: 8px;
@@ -469,13 +407,11 @@ display: none;
       border: none;
       border-radius: 4px;
     }
-
     #db-file-list {
       list-style-type: none;
       padding: 0;
       margin: 0;
     }
-
     #db-file-list li {
       display: flex;
       justify-content: space-between;
@@ -483,33 +419,40 @@ display: none;
       padding: 8px;
       border-bottom: 1px solid #444;
       cursor: pointer;
+      color: white;
     }
-
     #db-file-list li:hover {
       background-color: #34495e;
     }
-
     #db-file-list .file-actions button {
-      margin-left: 5px;
-      padding: 4px 8px;
-      font-size: 12px;
+      margin-left: 10px;
+      padding: 6px 12px;
+      font-size: 14px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s;
     }
-
     .db-download-btn {
       background-color: #3498db;
+      color: white;
     }
-
+    .db-download-btn:hover {
+      background-color: #2980b9;
+    }
     .db-delete-btn {
       background-color: #e74c3c;
+      color: white;
     }
-
+    .db-delete-btn:hover {
+      background-color: #c0392b;
+    }
     /* Header icons */
     .header-icons {
       display: flex;
       gap: 10px;
       align-items: center;
     }
-
     .header-btn {
       background: none;
       border: none;
@@ -521,28 +464,23 @@ display: none;
       align-items: center;
       justify-content: center;
     }
-
     .header-btn svg {
       width: 30px;
       height: 30px;
       fill: white;
     }
-
     .header-btn:hover svg {
       fill: #ddd;
     }
-
     .header-left {
       display: flex;
       align-items: center;
     }
-
     .search-container {
       display: none;
       flex: 1;
       position: relative;
     }
-
     #top-search-input {
       padding: 5px 10px;
       border-radius: 4px;
@@ -554,7 +492,6 @@ display: none;
       margin: 0 auto;
       display: block;
     }
-
     .search-results {
       position: absolute;
       top: 100%;
@@ -574,75 +511,60 @@ display: none;
       box-shadow: 0 2px 10px rgba(0,0,0,0.5);
       border-radius: 0 0 4px 4px;
     }
-
     .search-results li {
       padding: 8px;
       cursor: pointer;
     }
-
     .search-results li:hover {
       background: #4a6278;
     }
-
     #top-bar.search-active .search-container {
       display: block;
     }
-
     /* Hide back button on desktop */
     @media (min-width: 769px) {
       #search-back-btn {
         display: none !important;
       }
     }
-
     /* Mobile specific */
     @media (max-width: 768px) {
       #search-back-btn {
         display: none;
       }
-
       #top-bar.search-active #search-back-btn {
         display: flex;
       }
-
       #top-bar.search-active .header-icons {
         display: none;
       }
-
       #top-bar.search-active #hide-sidebar-btn {
         display: none;
       }
-
       #top-bar.search-active .search-container {
         margin: 0 10px;
       }
-
       #top-search-input {
         max-width: 300px;
       }
-
       .search-results {
         left: 0;
         transform: none;
         width: 100%;
       }
-
-      
+     
     }
-
     /* Settings modal */
     #settings-modal .modal-body {
       padding: 20px;
       overflow-y: auto;
     }
-
     #settings-modal .settings-panel {
       background-color: transparent;
       padding: 0;
       margin: 0 auto;
       max-width: 400px; /* Less wide */
     }
-
     #settings-search {
       width: 100%;
       padding: 8px;
@@ -660,11 +582,11 @@ display: none;
     }
     /* Improved UI: Add subtle animations */
     .modal {
-      animation: fadeIn 0.3s ease-in-out;
+      animation: fadeIn 0.16s ease-in-out;
     }
     @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      from {scale: 0 }
+      to { scale: 1 }
     }
     .file-item {
       transition: background-color 0.2s ease;
@@ -681,9 +603,6 @@ display: none;
       background-color: #1e1e1e;
     }
     /* Search in editor styles (new) */
-    #find-replace-modal .modal-body {
-      padding: 20px;
-    }
     #find-replace-form {
       display: flex;
       flex-direction: column;
@@ -710,6 +629,42 @@ display: none;
     label {
         color: white;
     }
+    /* Sidebar panels */
+    .sidebar-panel {
+      display: none;
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+    }
+    .sidebar-panel.active {
+      display: block;
+    }
+    .sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .sidebar-close-btn {
+      background: none;
+      border: none;
+      color: #e74c3c;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    #sidebar-language .language-list {
+      overflow-y: auto;
+      max-height: calc(100% - 50px);
+    }
+    .language-option {
+      width: 100%;
+      margin: 5px 0;
+      padding: 10px;
+    }
+    #db-files-modal button {
+        margin-bottom:10px;
+    }
+    
   </style>
 </head>
 <body>
@@ -756,7 +711,6 @@ display: none;
     </div>
     <button id="hide-sidebar-btn" title="Toggle Sidebar">&#9776;</button>
   </h1>
-
   <div id="coder-ai">
     <div id="editor-container">
       <div id="file-explorer">
@@ -766,11 +720,11 @@ display: none;
           <button id="new-file-btn">New File</button>
           <button id="rename-file-btn">Rename File</button>
           <button id="delete-file-btn" class="delete-btn">Delete File</button>
-          
+         
           <button id="open-file-btn">Open File</button>
           <button id="download-file-btn">Download File</button>
           <input type="file" id="file-input" style="display:none;" accept=".js,.jsx,.html,.htm,.css,.json,.xml,.txt,.md,.py,.java,.c,.cpp,.php,.rb,.go,.rs,.ts,.tsx,.sql,.sh,.bash,.yaml,.yml" />
-          
+         
           <!-- Settings Panel -->
           <div class="settings-panel">
             <h3 style="margin: 0 0 10px 0; font-size: 14px;">Storage Settings</h3>
@@ -782,26 +736,69 @@ display: none;
             <button id="remove-from-db-btn" class="remove-from-db-btn" style="display: none;">Remove from DB</button>
             <button id="db-files-btn">View DB Files</button>
           </div>
-          
+         
           <div name="tools">
-            
+           
             <button id="preview-code-btn">Preview Code</button>
             <button id="change-language-btn">Change Language</button>
             <br>
           </div>
         </div>
+        <!-- Sidebar Find/Replace Panel -->
+        <div id="sidebar-find-replace" class="sidebar-panel">
+          <div class="sidebar-header">
+            <h3>Find and Replace</h3>
+            <button class="sidebar-close-btn" id="close-sidebar-find-replace">&times;</button>
+          </div>
+          <form id="find-replace-form">
+            <input type="text" id="find-text" placeholder="Find...">
+            <input type="text" id="replace-text" placeholder="Replace with...">
+            <label><input type="checkbox" id="case-sensitive"> Case sensitive</label>
+            <label><input type="checkbox" id="whole-word"> Whole word</label>
+            <button type="button" id="find-next-btn">Find Next</button>
+            <button type="button" id="replace-btn">Replace</button>
+            <button type="button" id="replace-all-btn">Replace All</button>
+          </form>
+        </div>
+        <!-- Sidebar Language Panel -->
+        <div id="sidebar-language" class="sidebar-panel">
+          <div class="sidebar-header">
+            <h3>Change Language</h3>
+            <button class="sidebar-close-btn" id="close-sidebar-language">&times;</button>
+          </div>
+          <div class="language-list">
+            <button class="language-option" data-lang="javascript" data-ext="js">JavaScript</button>
+            <button class="language-option" data-lang="typescript" data-ext="ts">TypeScript</button>
+            <button class="language-option" data-lang="html" data-ext="html">HTML</button>
+            <button class="language-option" data-lang="css" data-ext="css">CSS</button>
+            <button class="language-option" data-lang="json" data-ext="json">JSON</button>
+            <button class="language-option" data-lang="xml" data-ext="xml">XML</button>
+            <button class="language-option" data-lang="markdown" data-ext="md">Markdown</button>
+            <button class="language-option" data-lang="python" data-ext="py">Python</button>
+            <button class="language-option" data-lang="java" data-ext="java">Java</button>
+            <button class="language-option" data-lang="c_cpp" data-ext="c">C/C++</button>
+            <button class="language-option" data-lang="php" data-ext="php">PHP</button>
+            <button class="language-option" data-lang="ruby" data-ext="rb">Ruby</button>
+            <button class="language-option" data-lang="golang" data-ext="go">Go</button>
+            <button class="language-option" data-lang="rust" data-ext="rs">Rust</button>
+            <button class="language-option" data-lang="sql" data-ext="sql">SQL</button>
+            <button class="language-option" data-lang="sh" data-ext="sh">Shell/Bash</button>
+            <button class="language-option" data-lang="yaml" data-ext="yaml">YAML</button>
+            <button class="language-option" data-lang="text" data-ext="txt">Plain Text</button>
+          </div>
+        </div>
       </div>
       
+     
       <div id="code-editor"></div>
       <div class="autosave-indicator" id="autosave-indicator">Auto-saved</div>
     </div>
   </div>
-
   <!-- Modal Dialog for Preview Code -->
   <div id="preview-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 class="modal-title">Code Preview - <span id="preview-filename"></span></h3>
+        <h3 class="modal-title"><span id="preview-filename"></span></h3>
         <button id="reload-preview-btn" class="header-btn" title="Reload Preview">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24" height="24">
             <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
@@ -814,37 +811,6 @@ display: none;
       </div>
     </div>
   </div>
-
-  <!-- Modal Dialog for Changing Language -->
-  <div id="language-modal" class="modal">
-    <div class="modal-content language-modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title">Change Language</h3>
-        <button id="close-language-modal" class="close-btn">&times;</button>
-      </div>
-      <div class="modal-body">
-        <button class="language-option" data-lang="javascript">JavaScript</button>
-        <button class="language-option" data-lang="typescript">TypeScript</button>
-        <button class="language-option" data-lang="html">HTML</button>
-        <button class="language-option" data-lang="css">CSS</button>
-        <button class="language-option" data-lang="json">JSON</button>
-        <button class="language-option" data-lang="xml">XML</button>
-        <button class="language-option" data-lang="markdown">Markdown</button>
-        <button class="language-option" data-lang="python">Python</button>
-        <button class="language-option" data-lang="java">Java</button>
-        <button class="language-option" data-lang="c_cpp">C/C++</button>
-        <button class="language-option" data-lang="php">PHP</button>
-        <button class="language-option" data-lang="ruby">Ruby</button>
-        <button class="language-option" data-lang="golang">Go</button>
-        <button class="language-option" data-lang="rust">Rust</button>
-        <button class="language-option" data-lang="sql">SQL</button>
-        <button class="language-option" data-lang="sh">Shell/Bash</button>
-        <button class="language-option" data-lang="yaml">YAML</button>
-        <button class="language-option" data-lang="text">Plain Text</button>
-      </div>
-    </div>
-  </div>
-
   <!-- Modal for DB Files -->
   <div id="db-files-modal" class="modal">
     <div class="modal-content">
@@ -858,45 +824,21 @@ display: none;
       </div>
     </div>
   </div>
-
-  <!-- New Modal for Find/Replace -->
-  <div id="find-replace-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title">Find and Replace</h3>
-        <button id="close-find-replace-modal" class="close-btn">&times;</button>
-      </div>
-      <div class="modal-body">
-        <form id="find-replace-form">
-          <input type="text" id="find-text" placeholder="Find...">
-          <input type="text" id="replace-text" placeholder="Replace with...">
-          <label><input type="checkbox" id="case-sensitive"> Case sensitive</label>
-          <label><input type="checkbox" id="whole-word"> Whole word</label>
-          <button type="button" id="find-next-btn">Find Next</button>
-          <button type="button" id="replace-btn">Replace</button>
-          <button type="button" id="replace-all-btn">Replace All</button>
-        </form>
-      </div>
-    </div>
-  </div>
-
   <!-- Modal for Customization Settings -->
   <div id="settings-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
         <h3 class="modal-title">Customization Settings</h3>
         <button id="close-settings-modal" class="close-btn">&times;</button>
-
       </div>
-
       <div class="modal-body">
-        
+       
 <br>
         <input type="text" id="settings-search" placeholder="Search settings...">
         <div class="settings-panel">
           <div class="settings-section">
             <label for="top-bar-color">Top Bar Color:</label>
-            <input type="color" id="top-bar-color" value="#252526">
+            <input type="color" id="top-bar-color" value="#0b487e">
           </div>
           <div class="settings-section">
             <label for="editor-theme">Editor Theme:</label>
@@ -1110,17 +1052,14 @@ display: none;
       </div>
     </div>
   </div>
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.5.1/axios.min.js"></script>
-
   <script>
     const editor = ace.edit("code-editor");
     editor.setTheme("ace/theme/monokai");
-
     let currentFile = null;
     const files = {};
-    
+   
     // IndexedDB management
     let db;
     const autoSaveFiles = new Set();
@@ -1128,35 +1067,32 @@ display: none;
     let autoSaveTimeout;
     let lastSaveContent = {};
     let autoSaveDelay = 2000;
-
     // Auto-save indicator
     const autosaveIndicator = document.getElementById('autosave-indicator');
-
     function showAutosaveIndicator(message, type = 'success') {
       autosaveIndicator.textContent = message;
       autosaveIndicator.className = 'autosave-indicator show';
-      
+     
       if (type === 'saving') {
         autosaveIndicator.classList.add('saving');
       } else if (type === 'error') {
         autosaveIndicator.classList.add('error');
       }
-      
+     
       setTimeout(() => {
         autosaveIndicator.classList.remove('show');
       }, 2000);
     }
-
     // Initialize IndexedDB
     function initIndexedDB() {
       return new Promise((resolve, reject) => {
         const request = indexedDB.open('JSInsiderDB', 2);
-        
+       
         request.onerror = () => {
           console.error('IndexedDB error:', request.error);
           reject(request.error);
         };
-        
+       
         request.onsuccess = () => {
           db = request.result;
           console.log('IndexedDB initialized successfully');
@@ -1165,7 +1101,7 @@ display: none;
           loadSettingsFromDB();
           resolve(db);
         };
-        
+       
         request.onupgradeneeded = (event) => {
           db = event.target.result;
           if (!db.objectStoreNames.contains('files')) {
@@ -1178,14 +1114,14 @@ display: none;
         };
       });
     }
-
+    
     // Load settings from IndexedDB
     async function loadSettingsFromDB() {
       if (!db) return;
-      
+     
       const transaction = db.transaction(['settings'], 'readonly');
       const objectStore = transaction.objectStore('settings');
-      
+     
       const keys = [
         'topBarColor', 'editorTheme', 'editorFontSize', 'editorFontFamily',
         'wordWrap', 'tabSize', 'autoSaveInterval', 'showLineNumbers',
@@ -1197,9 +1133,9 @@ display: none;
         'minLines', 'overwrite', 'readOnly', 'sidebarWidth',
         'defaultLanguage', 'autoPairBrackets'
       ];
-      
+     
       const requests = keys.map(key => objectStore.get(key));
-      
+     
       Promise.all(requests.map(req => new Promise((res) => { req.onsuccess = () => res(req.result?.value); })))
         .then(values => {
           const settings = {};
@@ -1209,10 +1145,9 @@ display: none;
           applySettings(settings);
         });
     }
-
     function getDefaultSetting(key) {
       const defaults = {
-        topBarColor: '#252526',
+        topBarColor: '#0b487e',
         editorTheme: 'monokai',
         editorFontSize: 14,
         editorFontFamily: 'monospace',
@@ -1249,178 +1184,173 @@ display: none;
       };
       return defaults[key];
     }
-
     // Save setting to IndexedDB
     function saveSetting(key, value) {
       if (!db) return;
-      
+     
       const transaction = db.transaction(['settings'], 'readwrite');
       const objectStore = transaction.objectStore('settings');
       objectStore.put({ key, value });
     }
-
     // Apply settings to UI and editor
     function applySettings(settings) {
       document.getElementById('top-bar-color').value = settings.topBarColor;
       document.getElementById('top-bar').style.backgroundColor = settings.topBarColor;
-      
+     
       document.getElementById('editor-theme').value = settings.editorTheme;
       editor.setTheme(`ace/theme/${settings.editorTheme}`);
-      
+     
       document.getElementById('editor-font-size').value = settings.editorFontSize;
       editor.setFontSize(`${settings.editorFontSize}px`);
-      
+     
       document.getElementById('editor-font-family').value = settings.editorFontFamily;
       document.getElementById('code-editor').style.fontFamily = settings.editorFontFamily;
-      
+     
       document.getElementById('word-wrap').value = settings.wordWrap;
       editor.session.setUseWrapMode(settings.wordWrap !== 'off');
       editor.session.setWrapLimitRange(settings.wordWrap === 'wordWrapColumn' ? 80 : null);
-      
+     
       document.getElementById('tab-size').value = settings.tabSize;
       editor.session.setTabSize(settings.tabSize);
-      
+     
       document.getElementById('auto-save-interval').value = settings.autoSaveInterval;
       autoSaveDelay = settings.autoSaveInterval;
-      
+     
       document.getElementById('show-line-numbers').checked = settings.showLineNumbers;
       editor.renderer.setShowGutter(settings.showLineNumbers);
-      
+     
       document.getElementById('enable-autocomplete').checked = settings.enableAutocomplete;
       editor.setOptions({
         enableBasicAutocompletion: settings.enableAutocomplete,
         enableSnippets: settings.enableAutocomplete,
         enableLiveAutocompletion: settings.enableAutocomplete
       });
-      
+     
       document.getElementById('use-soft-tabs').checked = settings.useSoftTabs;
       editor.session.setUseSoftTabs(settings.useSoftTabs);
-      
+     
       document.getElementById('show-print-margin').checked = settings.showPrintMargin;
       editor.setShowPrintMargin(settings.showPrintMargin);
-      
+     
       document.getElementById('highlight-active-line').checked = settings.highlightActiveLine;
       editor.setHighlightActiveLine(settings.highlightActiveLine);
-      
+     
       document.getElementById('highlight-selected-word').checked = settings.highlightSelectedWord;
       editor.setHighlightSelectedWord(settings.highlightSelectedWord);
-      
+     
       document.getElementById('show-invisibles').checked = settings.showInvisibles;
       editor.setShowInvisibles(settings.showInvisibles);
-      
+     
       document.getElementById('show-fold-widgets').checked = settings.showFoldWidgets;
       editor.renderer.setShowFoldWidgets(settings.showFoldWidgets);
-      
+     
       document.getElementById('fade-fold-widgets').checked = settings.fadeFoldWidgets;
       editor.setFadeFoldWidgets(settings.fadeFoldWidgets);
-      
+     
       document.getElementById('highlight-gutter-line').checked = settings.highlightGutterLine;
       editor.setHighlightGutterLine(settings.highlightGutterLine);
-      
+     
       document.getElementById('indented-soft-wrap').checked = settings.indentedSoftWrap;
       editor.renderer.setOption('indentedSoftWrap', settings.indentedSoftWrap);
-      
+     
       document.getElementById('navigate-within-soft-tabs').checked = settings.navigateWithinSoftTabs;
       editor.session.setNavigateWithinSoftTabs(settings.navigateWithinSoftTabs);
-      
+     
       document.getElementById('enable-multiselect').checked = settings.enableMultiselect;
       editor.setOption('enableMultiselect', settings.enableMultiselect);
-      
+     
       document.getElementById('scroll-past-end').value = settings.scrollPastEnd;
       editor.setOption('scrollPastEnd', settings.scrollPastEnd);
-      
+     
       document.getElementById('fixed-width-gutter').checked = settings.fixedWidthGutter;
       editor.renderer.setOption('fixedWidthGutter', settings.fixedWidthGutter);
-      
+     
       document.getElementById('print-margin-column').value = settings.printMarginColumn;
       editor.setOption('printMarginColumn', settings.printMarginColumn);
-      
+     
       document.getElementById('new-line-mode').value = settings.newLineMode;
       editor.session.setNewLineMode(settings.newLineMode);
-      
+     
       document.getElementById('use-worker').checked = settings.useWorker;
       editor.session.setUseWorker(settings.useWorker);
-      
+     
       document.getElementById('enable-emmet').checked = settings.enableEmmet;
       editor.setOption('enableEmmet', settings.enableEmmet);
-      
+     
       document.getElementById('keyboard-handler').value = settings.keyboardHandler;
       editor.setKeyboardHandler(settings.keyboardHandler);
-      
+     
       document.getElementById('max-lines').value = settings.maxLines || '';
       editor.setOption('maxLines', settings.maxLines || Infinity);
-      
+     
       document.getElementById('min-lines').value = settings.minLines || '';
       editor.setOption('minLines', settings.minLines || 0);
-      
+     
       document.getElementById('overwrite').checked = settings.overwrite;
       editor.session.setOverwrite(settings.overwrite);
-      
+     
       document.getElementById('read-only').checked = settings.readOnly;
       editor.setReadOnly(settings.readOnly);
-      
+     
       document.getElementById('sidebar-width').value = settings.sidebarWidth;
       document.getElementById('file-explorer').style.width = `${settings.sidebarWidth}px`;
-      
+     
       document.getElementById('default-language').value = settings.defaultLanguage;
       // For new files, set mode to defaultLanguage
-      
+     
       document.getElementById('auto-pair-brackets').checked = settings.autoPairBrackets;
       editor.setBehavioursEnabled(settings.autoPairBrackets);
     }
-
     // Load all files from IndexedDB into memory
     function loadAllFilesFromDB() {
       if (!db) return;
-      
+     
       const transaction = db.transaction(['files'], 'readonly');
       const objectStore = transaction.objectStore('files');
       const request = objectStore.getAll();
-      
+     
       request.onsuccess = () => {
         const dbFiles = request.result;
         dbFiles.forEach(fileData => {
           files[fileData.filename] = fileData.content;
           savedFiles.add(fileData.filename);
           lastSaveContent[fileData.filename] = fileData.content;
-          
+         
           if (fileData.autoSave) {
             autoSaveFiles.add(fileData.filename);
           }
         });
-        
+       
         updateFileExplorer();
-        
+       
         const fileNames = Object.keys(files);
         if (fileNames.length > 0) {
           openFile(fileNames[0]);
         }
       };
     }
-
     // Load list of saved files from IndexedDB
     function loadSavedFilesList() {
       if (!db) return;
-      
+     
       const transaction = db.transaction(['files'], 'readonly');
       const objectStore = transaction.objectStore('files');
       const request = objectStore.getAllKeys();
-      
+     
       request.onsuccess = () => {
         savedFiles.clear();
         request.result.forEach(filename => savedFiles.add(filename));
         updateFileExplorer();
       };
     }
-
     // Auto-save function
     function autoSaveFile(filename, content) {
       if (!db || !autoSaveFiles.has(filename) || !filename) return;
-      
+     
       if (lastSaveContent[filename] === content) return;
-      
+     
       showAutosaveIndicator('Saving...', 'saving');
-      
+     
       saveFileToIndexedDB(filename, content, true)
         .then(() => {
           lastSaveContent[filename] = content;
@@ -1431,24 +1361,23 @@ display: none;
           showAutosaveIndicator('Save failed', 'error');
         });
     }
-
     // Save file to IndexedDB
     function saveFileToIndexedDB(filename, content, isAutoSave = false) {
       if (!db) return Promise.reject('IndexedDB not available');
-      
+     
       return new Promise((resolve, reject) => {
         const transaction = db.transaction(['files'], 'readwrite');
         const objectStore = transaction.objectStore('files');
-        
+       
         const fileData = {
           filename: filename,
           content: content,
           autoSave: autoSaveFiles.has(filename),
           lastModified: new Date().toISOString()
         };
-        
+       
         const request = objectStore.put(fileData);
-        
+       
         request.onsuccess = () => {
           savedFiles.add(filename);
           updateFileExplorer();
@@ -1458,23 +1387,22 @@ display: none;
           }
           resolve();
         };
-        
+       
         request.onerror = () => {
           console.error('Error saving file to IndexedDB:', request.error);
           reject(request.error);
         };
       });
     }
-
     // Remove file from IndexedDB
     function removeFileFromIndexedDB(filename) {
       if (!db) return Promise.reject('IndexedDB not available');
-      
+     
       return new Promise((resolve, reject) => {
         const transaction = db.transaction(['files'], 'readwrite');
         const objectStore = transaction.objectStore('files');
         const request = objectStore.delete(filename);
-        
+       
         request.onsuccess = () => {
           savedFiles.delete(filename);
           autoSaveFiles.delete(filename);
@@ -1491,23 +1419,22 @@ display: none;
           console.log(`File ${filename} removed from IndexedDB`);
           resolve();
         };
-        
+       
         request.onerror = () => {
           console.error('Error removing file from IndexedDB:', request.error);
           reject(request.error);
         };
       });
     }
-
     // Load file from IndexedDB
     function loadFileFromIndexedDB(filename) {
       if (!db) return Promise.reject('IndexedDB not available');
-      
+     
       return new Promise((resolve, reject) => {
         const transaction = db.transaction(['files'], 'readonly');
         const objectStore = transaction.objectStore('files');
         const request = objectStore.get(filename);
-        
+       
         request.onsuccess = () => {
           if (request.result) {
             resolve(request.result);
@@ -1515,20 +1442,19 @@ display: none;
             reject('File not found in IndexedDB');
           }
         };
-        
+       
         request.onerror = () => {
           console.error('Error loading file from IndexedDB:', request.error);
           reject(request.error);
         };
       });
     }
-
     // Update save/remove buttons based on current file status
     function updateSaveButtons() {
       const saveBtn = document.getElementById('save-to-db-btn');
       const removeBtn = document.getElementById('remove-from-db-btn');
       const checkbox = document.getElementById('enable-indexeddb');
-      
+     
       if (!currentFile) {
         saveBtn.style.display = 'none';
         removeBtn.style.display = 'none';
@@ -1536,13 +1462,13 @@ display: none;
         checkbox.disabled = true;
         return;
       }
-      
+     
       checkbox.checked = autoSaveFiles.has(currentFile);
       checkbox.disabled = false;
-      
+     
       const isFileSaved = savedFiles.has(currentFile);
       const hasAutoSave = autoSaveFiles.has(currentFile);
-      
+     
       if (hasAutoSave) {
         saveBtn.style.display = 'none';
       } else {
@@ -1550,20 +1476,19 @@ display: none;
         saveBtn.disabled = false;
         saveBtn.textContent = isFileSaved ? 'Update in DB' : 'Save to DB';
       }
-        
+       
       removeBtn.style.display = isFileSaved ? 'block' : 'none';
     }
-
     // Save current file content before switching
     function saveCurrentFile() {
       if (currentFile && files.hasOwnProperty(currentFile)) {
         const content = editor.getValue();
         files[currentFile] = content;
-        
+       
         if (autoSaveFiles.has(currentFile) && autoSaveTimeout) {
           clearTimeout(autoSaveTimeout);
         }
-        
+       
         if (autoSaveFiles.has(currentFile)) {
           autoSaveTimeout = setTimeout(() => {
             autoSaveFile(currentFile, content);
@@ -1571,7 +1496,6 @@ display: none;
         }
       }
     }
-
     // Function to update file explorer
     function updateFileExplorer() {
       const fileList = document.getElementById("file-list");
@@ -1580,38 +1504,36 @@ display: none;
         const li = document.createElement("li");
         li.textContent = file;
         li.className = "file-item";
-        
+       
         if (savedFiles.has(file)) {
           li.classList.add("saved");
         }
-        
+       
         if (file === currentFile) {
           li.classList.add("selected");
         }
-        
+       
         li.onclick = () => openFile(file);
         fileList.appendChild(li);
       });
       updateSaveButtons();
     }
-
     // Function to open a file and highlight the selected one
     function openFile(filename) {
       saveCurrentFile();
-      
+     
       currentFile = filename;
-      
+     
       if (!files.hasOwnProperty(filename)) {
         files[filename] = "";
       }
-      
+     
       editor.setValue(files[filename], -1); // Move cursor to start
       editor.clearSelection();
       highlightFile(filename);
       setEditorMode(filename);
       updateSaveButtons();
     }
-
     // Function to highlight the selected file
     function highlightFile(filename) {
       const fileListItems = document.querySelectorAll("#file-list .file-item");
@@ -1622,11 +1544,10 @@ display: none;
         }
       });
     }
-
     // Function to get editor mode based on file extension
     function getEditorModeFromExtension(filename) {
       const extension = filename.split('.').pop().toLowerCase();
-      
+     
       switch (extension) {
         case 'js':
         case 'jsx':
@@ -1677,13 +1598,11 @@ display: none;
           return "text";
       }
     }
-
     // Function to set the editor mode based on the file extension
     function setEditorMode(filename) {
       const mode = getEditorModeFromExtension(filename);
       editor.session.setMode(`ace/mode/${mode}`);
     }
-
     // Event listener for new file button (sidebar)
     document.getElementById("new-file-btn").onclick = () => {
       const filename = prompt("Enter new file name:");
@@ -1699,31 +1618,29 @@ display: none;
         openFile(trimmedFilename);
       }
     };
-
     // Event listener for new file header button
     document.getElementById("new-file-header-btn").onclick = document.getElementById("new-file-btn").onclick;
-
     // Event listener for rename file button
     document.getElementById("rename-file-btn").onclick = () => {
       if (!currentFile) {
         alert("No file selected!");
         return;
       }
-      
+     
       const newFilename = prompt("Enter new file name:", currentFile);
       if (newFilename && newFilename.trim() && newFilename.trim() !== currentFile) {
         const trimmedNewFilename = newFilename.trim();
-        
+       
         if (files.hasOwnProperty(trimmedNewFilename)) {
           alert("File already exists!");
           return;
         }
-        
+       
         saveCurrentFile();
-        
+       
         files[trimmedNewFilename] = files[currentFile];
         delete files[currentFile];
-        
+       
         if (savedFiles.has(currentFile)) {
           removeFileFromIndexedDB(currentFile).then(() => {
             if (autoSaveFiles.has(trimmedNewFilename)) {
@@ -1731,37 +1648,36 @@ display: none;
             }
           });
         }
-        
+       
         if (autoSaveFiles.has(currentFile)) {
           autoSaveFiles.delete(currentFile);
           autoSaveFiles.add(trimmedNewFilename);
         }
-        
+       
         currentFile = trimmedNewFilename;
-        
+       
         updateFileExplorer();
         highlightFile(trimmedNewFilename);
         setEditorMode(trimmedNewFilename);
       }
     };
-
     // Event listener for delete file button
     document.getElementById("delete-file-btn").onclick = () => {
       if (!currentFile) {
         alert("No file selected!");
         return;
       }
-      
+     
       if (confirm(`Are you sure you want to delete ${currentFile}?`)) {
         autoSaveFiles.delete(currentFile);
-        
+       
         if (savedFiles.has(currentFile)) {
           removeFileFromIndexedDB(currentFile);
         }
-        
+       
         delete files[currentFile];
         updateFileExplorer();
-        
+       
         const remainingFiles = Object.keys(files);
         if (remainingFiles.length > 0) {
           openFile(remainingFiles[0]);
@@ -1772,14 +1688,13 @@ display: none;
         }
       }
     };
-
     // Event listener for download file button
     document.getElementById("download-file-btn").onclick = () => {
       if (!currentFile) {
         alert("No file selected!");
         return;
       }
-      
+     
       saveCurrentFile();
       const content = files[currentFile];
       const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
@@ -1793,17 +1708,14 @@ display: none;
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     };
-
     // Header download button
     document.getElementById("download-header-btn").onclick = () => {
       document.getElementById("download-file-btn").click();
     };
-
     // Event listener for open file button
     document.getElementById("open-file-btn").onclick = () => {
       document.getElementById("file-input").click();
     };
-
     // Handle file selection
     document.getElementById("file-input").addEventListener("change", function(event) {
       const file = event.target.files[0];
@@ -1812,23 +1724,22 @@ display: none;
         reader.onload = function(e) {
           const content = e.target.result;
           const filename = file.name;
-          
+         
           if (files.hasOwnProperty(filename)) {
             if (!confirm(`File ${filename} already exists. Overwrite?`)) return;
           }
-          
+         
           saveCurrentFile();
-          
+         
           files[filename] = content;
           updateFileExplorer();
           openFile(filename);
         };
         reader.readAsText(file);
-        
+       
         event.target.value = '';
       }
     });
-
     // Toggle sidebar visibility
     document.getElementById("hide-sidebar-btn").onclick = () => {
       const fileExplorer = document.getElementById("file-explorer");
@@ -1837,45 +1748,42 @@ display: none;
       const isMobile = window.innerWidth <= 768;
       if (isMobile) {
         document.body.style.overflow = isHidden ? "auto" : "auto";
-      } 
+      }
     };
-
     // Auto-save functionality - save current file content when typing
     editor.on('change', function() {
       if (currentFile) {
         files[currentFile] = editor.getValue();
-        
+       
         if (autoSaveFiles.has(currentFile)) {
           if (autoSaveTimeout) {
             clearTimeout(autoSaveTimeout);
           }
-          
+         
           autoSaveTimeout = setTimeout(() => {
             autoSaveFile(currentFile, files[currentFile]);
           }, autoSaveDelay);
         }
       }
     });
-
     // Initialize IndexedDB and set up event listeners
     initIndexedDB().catch(error => {
       console.error('Failed to initialize IndexedDB:', error);
     });
-
     // IndexedDB toggle event listener
     document.getElementById('enable-indexeddb').addEventListener('change', function(e) {
       if (!currentFile) return;
-      
+     
       if (e.target.checked) {
         autoSaveFiles.add(currentFile);
-        
+       
         saveCurrentFile();
         const content = files[currentFile];
-        
+       
         function enableAutoSave() {
           autoSaveFile(currentFile, content);
         }
-        
+       
         if (!db) {
           initIndexedDB().then(() => {
             enableAutoSave();
@@ -1901,17 +1809,16 @@ display: none;
             });
         }
       }
-      
+     
       updateSaveButtons();
     });
-
     // Save to IndexedDB button
     document.getElementById('save-to-db-btn').addEventListener('click', function() {
       if (!currentFile) return;
-      
+     
       saveCurrentFile();
       const content = files[currentFile];
-      
+     
       function doSave() {
         saveFileToIndexedDB(currentFile, content)
           .then(() => {
@@ -1922,7 +1829,7 @@ display: none;
             alert('Error saving file to IndexedDB: ' + error);
           });
       }
-      
+     
       if (!db) {
         initIndexedDB().then(() => {
           doSave();
@@ -1934,11 +1841,10 @@ display: none;
         doSave();
       }
     });
-
     // Remove from IndexedDB button
     document.getElementById('remove-from-db-btn').addEventListener('click', function() {
       if (!currentFile) return;
-      
+     
       if (confirm(`Remove "${currentFile}" from IndexedDB?`)) {
         function doRemove() {
           removeFileFromIndexedDB(currentFile)
@@ -1950,7 +1856,7 @@ display: none;
               alert('Error removing file from IndexedDB: ' + error);
             });
         }
-        
+       
         if (!db) {
           initIndexedDB().then(() => {
             doRemove();
@@ -1963,7 +1869,6 @@ display: none;
         }
       }
     });
-
     // View DB Files button
     document.getElementById('db-files-btn').addEventListener('click', function() {
       if (!db) {
@@ -1975,15 +1880,13 @@ display: none;
         loadDBFilesModal();
       }
     });
-
     function loadDBFilesModal() {
       const dbFileList = document.getElementById('db-file-list');
       dbFileList.innerHTML = '';
-      
+     
       const transaction = db.transaction(['files'], 'readonly');
       const objectStore = transaction.objectStore('files');
       const request = objectStore.getAll();
-
       request.onsuccess = () => {
         const dbFiles = request.result.sort((a, b) => a.filename.localeCompare(b.filename)); // Sorted for better UX
         dbFiles.forEach(fileData => {
@@ -1994,15 +1897,12 @@ display: none;
             loadAndOpenDBFile(fileData.filename);
             document.getElementById('db-files-modal').style.display = 'none';
           };
-
           const actions = document.createElement('div');
           actions.className = 'file-actions';
-
           const downloadBtn = document.createElement('button');
           downloadBtn.textContent = 'Download';
           downloadBtn.className = 'db-download-btn';
           downloadBtn.onclick = () => downloadDBFile(fileData.filename, fileData.content);
-
           const deleteBtn = document.createElement('button');
           deleteBtn.textContent = 'Delete';
           deleteBtn.className = 'db-delete-btn';
@@ -2013,17 +1913,14 @@ display: none;
               });
             }
           };
-
           actions.appendChild(downloadBtn);
           actions.appendChild(deleteBtn);
           li.appendChild(actions);
           dbFileList.appendChild(li);
         });
       };
-
       document.getElementById('db-files-modal').style.display = 'block';
     }
-
     function loadAndOpenDBFile(filename) {
       loadFileFromIndexedDB(filename).then(fileData => {
         files[filename] = fileData.content;
@@ -2039,7 +1936,6 @@ display: none;
         alert('Failed to load file from DB.');
       });
     }
-
     function downloadDBFile(filename, content) {
       const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
       const url = window.URL.createObjectURL(blob);
@@ -2052,7 +1948,6 @@ display: none;
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     }
-
     // DB search
     document.getElementById('db-search-input').addEventListener('input', function(e) {
       const searchTerm = e.target.value.toLowerCase();
@@ -2062,24 +1957,20 @@ display: none;
         item.style.display = filename.includes(searchTerm) ? 'flex' : 'none';
       });
     });
-
     // Top bar search
     const topBar = document.getElementById('top-bar');
     const topSearchInput = document.getElementById('top-search-input');
     const searchResults = document.getElementById('search-results');
-
     document.getElementById('search-project-header-btn').addEventListener('click', function() {
       topBar.classList.add('search-active');
       topSearchInput.focus();
     });
-
     document.getElementById('search-back-btn').addEventListener('click', function() {
       topBar.classList.remove('search-active');
       topSearchInput.value = '';
       searchResults.innerHTML = '';
       searchResults.style.display = 'none';
     });
-
     topSearchInput.addEventListener('input', function(e) {
       const searchTerm = e.target.value.toLowerCase();
       searchResults.innerHTML = '';
@@ -2103,22 +1994,18 @@ display: none;
       });
       searchResults.style.display = searchResults.children.length > 0 ? 'block' : 'none';
     });
-
     // Close DB modal
     document.getElementById('close-db-modal').onclick = () => {
       document.getElementById('db-files-modal').style.display = 'none';
     };
-
     // Close settings modal
     document.getElementById('close-settings-modal').onclick = () => {
       document.getElementById('settings-modal').style.display = 'none';
     };
-
     // Open settings modal
     document.getElementById('settings-header-btn').onclick = () => {
       document.getElementById('settings-modal').style.display = 'block';
     };
-
     // Settings search
     document.getElementById('settings-search').addEventListener('input', function(e) {
       const searchTerm = e.target.value.toLowerCase();
@@ -2131,49 +2018,40 @@ display: none;
         }
       });
     });
-
     // Customization settings event listeners
     document.getElementById('top-bar-color').addEventListener('input', function(e) {
       document.getElementById('top-bar').style.backgroundColor = e.target.value;
       saveSetting('topBarColor', e.target.value);
     });
-
     document.getElementById('editor-theme').addEventListener('change', function(e) {
       editor.setTheme(`ace/theme/${e.target.value}`);
       saveSetting('editorTheme', e.target.value);
     });
-
     document.getElementById('editor-font-size').addEventListener('input', function(e) {
       editor.setFontSize(`${e.target.value}px`);
       saveSetting('editorFontSize', parseInt(e.target.value));
     });
-
     document.getElementById('editor-font-family').addEventListener('change', function(e) {
       document.getElementById('code-editor').style.fontFamily = e.target.value;
       saveSetting('editorFontFamily', e.target.value);
     });
-
     document.getElementById('word-wrap').addEventListener('change', function(e) {
       editor.session.setUseWrapMode(e.target.value !== 'off');
       editor.session.setWrapLimitRange(e.target.value === 'wordWrapColumn' ? 80 : null);
       saveSetting('wordWrap', e.target.value);
     });
-
     document.getElementById('tab-size').addEventListener('input', function(e) {
       editor.session.setTabSize(e.target.value);
       saveSetting('tabSize', parseInt(e.target.value));
     });
-
     document.getElementById('auto-save-interval').addEventListener('input', function(e) {
       autoSaveDelay = parseInt(e.target.value);
       saveSetting('autoSaveInterval', autoSaveDelay);
     });
-
     document.getElementById('show-line-numbers').addEventListener('change', function(e) {
       editor.renderer.setShowGutter(e.target.checked);
       saveSetting('showLineNumbers', e.target.checked);
     });
-
     document.getElementById('enable-autocomplete').addEventListener('change', function(e) {
       editor.setOptions({
         enableBasicAutocompletion: e.target.checked,
@@ -2182,155 +2060,128 @@ display: none;
       });
       saveSetting('enableAutocomplete', e.target.checked);
     });
-
     document.getElementById('use-soft-tabs').addEventListener('change', function(e) {
       editor.session.setUseSoftTabs(e.target.checked);
       saveSetting('useSoftTabs', e.target.checked);
     });
-
     document.getElementById('show-print-margin').addEventListener('change', function(e) {
       editor.setShowPrintMargin(e.target.checked);
       saveSetting('showPrintMargin', e.target.checked);
     });
-
     document.getElementById('highlight-active-line').addEventListener('change', function(e) {
       editor.setHighlightActiveLine(e.target.checked);
       saveSetting('highlightActiveLine', e.target.checked);
     });
-
     document.getElementById('highlight-selected-word').addEventListener('change', function(e) {
       editor.setHighlightSelectedWord(e.target.checked);
       saveSetting('highlightSelectedWord', e.target.checked);
     });
-
     document.getElementById('show-invisibles').addEventListener('change', function(e) {
       editor.setShowInvisibles(e.target.checked);
       saveSetting('showInvisibles', e.target.checked);
     });
-
     document.getElementById('show-fold-widgets').addEventListener('change', function(e) {
       editor.renderer.setShowFoldWidgets(e.target.checked);
       saveSetting('showFoldWidgets', e.target.checked);
     });
-
     document.getElementById('fade-fold-widgets').addEventListener('change', function(e) {
       editor.setFadeFoldWidgets(e.target.checked);
       saveSetting('fadeFoldWidgets', e.target.checked);
     });
-
     document.getElementById('highlight-gutter-line').addEventListener('change', function(e) {
       editor.setHighlightGutterLine(e.target.checked);
       saveSetting('highlightGutterLine', e.target.checked);
     });
-
     document.getElementById('indented-soft-wrap').addEventListener('change', function(e) {
       editor.renderer.setOption('indentedSoftWrap', e.target.checked);
       saveSetting('indentedSoftWrap', e.target.checked);
     });
-
     document.getElementById('navigate-within-soft-tabs').addEventListener('change', function(e) {
       editor.session.setNavigateWithinSoftTabs(e.target.checked);
       saveSetting('navigateWithinSoftTabs', e.target.checked);
     });
-
     document.getElementById('enable-multiselect').addEventListener('change', function(e) {
       editor.setOption('enableMultiselect', e.target.checked);
       saveSetting('enableMultiselect', e.target.checked);
     });
-
     document.getElementById('scroll-past-end').addEventListener('input', function(e) {
       editor.setOption('scrollPastEnd', parseFloat(e.target.value));
       saveSetting('scrollPastEnd', parseFloat(e.target.value));
     });
-
     document.getElementById('fixed-width-gutter').addEventListener('change', function(e) {
       editor.renderer.setOption('fixedWidthGutter', e.target.checked);
       saveSetting('fixedWidthGutter', e.target.checked);
     });
-
     document.getElementById('print-margin-column').addEventListener('input', function(e) {
       editor.setOption('printMarginColumn', parseInt(e.target.value));
       saveSetting('printMarginColumn', parseInt(e.target.value));
     });
-
     document.getElementById('new-line-mode').addEventListener('change', function(e) {
       editor.session.setNewLineMode(e.target.value);
       saveSetting('newLineMode', e.target.value);
     });
-
     document.getElementById('use-worker').addEventListener('change', function(e) {
       editor.session.setUseWorker(e.target.checked);
       saveSetting('useWorker', e.target.checked);
     });
-
     document.getElementById('enable-emmet').addEventListener('change', function(e) {
       editor.setOption('enableEmmet', e.target.checked);
       saveSetting('enableEmmet', e.target.checked);
     });
-
     document.getElementById('keyboard-handler').addEventListener('change', function(e) {
       editor.setKeyboardHandler(e.target.value);
       saveSetting('keyboardHandler', e.target.value);
     });
-
     document.getElementById('max-lines').addEventListener('input', function(e) {
       const value = parseInt(e.target.value) || Infinity;
       editor.setOption('maxLines', value);
       saveSetting('maxLines', value === Infinity ? 0 : value);
     });
-
     document.getElementById('min-lines').addEventListener('input', function(e) {
       const value = parseInt(e.target.value) || 0;
       editor.setOption('minLines', value);
       saveSetting('minLines', value);
     });
-
     document.getElementById('overwrite').addEventListener('change', function(e) {
       editor.session.setOverwrite(e.target.checked);
       saveSetting('overwrite', e.target.checked);
     });
-
     document.getElementById('read-only').addEventListener('change', function(e) {
       editor.setReadOnly(e.target.checked);
       saveSetting('readOnly', e.target.checked);
     });
-
     document.getElementById('sidebar-width').addEventListener('input', function(e) {
       document.getElementById('file-explorer').style.width = `${e.target.value}px`;
       saveSetting('sidebarWidth', parseInt(e.target.value));
     });
-
     document.getElementById('default-language').addEventListener('change', function(e) {
       saveSetting('defaultLanguage', e.target.value);
       // Apply to new files
     });
-
     document.getElementById('auto-pair-brackets').addEventListener('change', function(e) {
       editor.setBehavioursEnabled(e.target.checked);
       saveSetting('autoPairBrackets', e.target.checked);
     });
-
     // Function to extract title from HTML content
     function extractHtmlTitle(htmlContent) {
       const titleMatch = htmlContent.match(/<title[^>]*>(.*?)<\/title>/i);
       return titleMatch ? titleMatch[1].trim() : null;
     }
-
     // Modal handling
     document.getElementById("preview-code-btn").onclick = () => {
       if (!currentFile) {
         alert("No file selected!");
         return;
       }
-      
+     
       saveCurrentFile();
       const previewModal = document.getElementById("preview-modal");
       const previewFrame = document.getElementById("code-preview");
       const previewFilename = document.getElementById("preview-filename");
-      
+     
       const fileContent = files[currentFile];
       const extension = currentFile.split('.').pop().toLowerCase();
-      
+     
       let previewTitle = currentFile;
       if (extension === 'html') {
         const htmlTitle = extractHtmlTitle(fileContent);
@@ -2338,17 +2189,15 @@ display: none;
           previewTitle = htmlTitle;
         }
       }
-      
+     
       previewFilename.textContent = previewTitle;
       previewFrame.srcdoc = fileContent;
       previewModal.style.display = "block";
     };
-
     document.getElementById("reload-preview-btn").onclick = () => {
       const previewFrame = document.getElementById('code-preview');
       previewFrame.contentWindow.location.reload();
     };
-
     function closePreviewModal() {
       const previewFrame = document.getElementById('code-preview');
       if (previewFrame.contentDocument) {
@@ -2357,30 +2206,8 @@ display: none;
       }
       document.getElementById('preview-modal').style.display = 'none';
     }
-
     document.getElementById("close-preview-modal").onclick = closePreviewModal;
-
-    document.getElementById("close-language-modal").onclick = () => {
-      document.getElementById("language-modal").style.display = "none";
-    };
-
-    document.querySelectorAll(".language-option").forEach(btn => {
-      btn.onclick = function() {
-        const mode = "ace/mode/" + this.dataset.lang;
-        editor.session.setMode(mode);
-        document.getElementById("language-modal").style.display = "none";
-      };
-    });
-
     // New Find/Replace functionality
-    document.getElementById('find-replace-header-btn').addEventListener('click', () => {
-      document.getElementById('find-replace-modal').style.display = 'block';
-    });
-
-    document.getElementById('close-find-replace-modal').addEventListener('click', () => {
-      document.getElementById('find-replace-modal').style.display = 'none';
-    });
-
     let findRange = null;
     document.getElementById('find-next-btn').addEventListener('click', () => {
       const needle = document.getElementById('find-text').value;
@@ -2395,13 +2222,11 @@ display: none;
         });
       }
     });
-
     document.getElementById('replace-btn').addEventListener('click', () => {
       const replaceWith = document.getElementById('replace-text').value;
       editor.replace(replaceWith);
       document.getElementById('find-next-btn').click(); // Find next after replace
     });
-
     document.getElementById('replace-all-btn').addEventListener('click', () => {
       const needle = document.getElementById('find-text').value;
       const replaceWith = document.getElementById('replace-text').value;
@@ -2414,20 +2239,98 @@ display: none;
         });
       }
     });
-
+    // Sidebar panels toggle
+    const fileExplorerContent = document.getElementById('file-explorer-content');
+    const sidebarFindReplace = document.getElementById('sidebar-find-replace');
+    const sidebarLanguage = document.getElementById('sidebar-language');
+    function showSidebarPanel(panel) {
+      fileExplorerContent.style.display = 'none';
+      sidebarFindReplace.classList.remove('active');
+      sidebarLanguage.classList.remove('active');
+      panel.classList.add('active');
+      const fileExplorer = document.getElementById('file-explorer');
+      if (fileExplorer.classList.contains('hidden')) {
+        fileExplorer.classList.remove('hidden');
+      }
+    }
+    function hideSidebarPanels() {
+      fileExplorerContent.style.display = 'block';
+      sidebarFindReplace.classList.remove('active');
+      sidebarLanguage.classList.remove('active');
+    }
+    document.getElementById('find-replace-header-btn').addEventListener('click', () => {
+      showSidebarPanel(sidebarFindReplace);
+    });
+    document.getElementById('close-sidebar-find-replace').addEventListener('click', () => {
+      hideSidebarPanels();
+    });
+    document.getElementById('change-language-btn').addEventListener('click', () => {
+      showSidebarPanel(sidebarLanguage);
+    });
+    document.getElementById('close-sidebar-language').addEventListener('click', () => {
+      hideSidebarPanels();
+    });
+    // Language selection with rename
+    document.querySelectorAll("#sidebar-language .language-option").forEach(btn => {
+      btn.onclick = function() {
+        if (!currentFile) {
+          alert("No file selected!");
+          return;
+        }
+       
+        const mode = "ace/mode/" + this.dataset.lang;
+        const ext = this.dataset.ext;
+        editor.session.setMode(mode);
+       
+        // Rename file with new extension
+        let newFilename = currentFile;
+        const dotIndex = currentFile.lastIndexOf('.');
+        if (dotIndex !== -1) {
+          newFilename = currentFile.substring(0, dotIndex) + '.' + ext;
+        } else {
+          newFilename += '.' + ext;
+        }
+       
+        if (newFilename === currentFile) return;
+       
+        if (files.hasOwnProperty(newFilename)) {
+          alert("File with new name already exists!");
+          return;
+        }
+       
+        saveCurrentFile();
+        files[newFilename] = files[currentFile];
+        delete files[currentFile];
+       
+        if (savedFiles.has(currentFile)) {
+          removeFileFromIndexedDB(currentFile).then(() => {
+            if (autoSaveFiles.has(newFilename)) {
+              autoSaveFile(newFilename, files[newFilename]);
+            }
+          });
+        }
+       
+        if (autoSaveFiles.has(currentFile)) {
+          autoSaveFiles.delete(currentFile);
+          autoSaveFiles.add(newFilename);
+        }
+       
+        currentFile = newFilename;
+       
+        updateFileExplorer();
+        highlightFile(newFilename);
+        setEditorMode(newFilename);
+        hideSidebarPanels();
+      };
+    });
     // Close modals when clicking outside
     window.onclick = function(event) {
       const previewModal = document.getElementById("preview-modal");
-      const languageModal = document.getElementById("language-modal");
       const dbModal = document.getElementById("db-files-modal");
       const settingsModal = document.getElementById("settings-modal");
-      const findReplaceModal = document.getElementById("find-replace-modal");
-      
+     
       if (event.target === previewModal) {
         closePreviewModal();
-      }
-      if (event.target === languageModal) {
-        languageModal.style.display = "none";
       }
       if (event.target === dbModal) {
         dbModal.style.display = "none";
@@ -2435,24 +2338,18 @@ display: none;
       if (event.target === settingsModal) {
         settingsModal.style.display = "none";
       }
-      if (event.target === findReplaceModal) {
-        findReplaceModal.style.display = "none";
-      }
     };
-
-    // Handle escape key to close modals
+    // Handle escape key to close modals and sidebar panels
     document.addEventListener('keydown', function(event) {
       if (event.key === 'Escape') {
         if (document.getElementById("preview-modal").style.display === "block") {
           closePreviewModal();
         }
-        document.getElementById("language-modal").style.display = "none";
         document.getElementById("db-files-modal").style.display = "none";
         document.getElementById("settings-modal").style.display = "none";
-        document.getElementById("find-replace-modal").style.display = "none";
+        hideSidebarPanels();
       }
     });
-
     // Keyboard shortcuts
     document.addEventListener('keydown', function(event) {
       if ((event.ctrlKey || event.metaKey) && event.key === 's') {
@@ -2478,23 +2375,21 @@ display: none;
           }
         }
       }
-      
+     
       if ((event.ctrlKey || event.metaKey) && event.key === 'n') {
         event.preventDefault();
         document.getElementById("new-file-btn").click();
       }
-      
+     
       if ((event.ctrlKey || event.metaKey) && event.key === 'o') {
         event.preventDefault();
         document.getElementById("open-file-btn").click();
       }
-
       if ((event.ctrlKey || event.metaKey) && event.key === 'f') {
         event.preventDefault();
-        document.getElementById('find-replace-header-btn').click();
+        showSidebarPanel(sidebarFindReplace);
       }
     });
-
     // Save before page unload
     window.addEventListener('beforeunload', function(event) {
       saveCurrentFile();
@@ -2502,14 +2397,12 @@ display: none;
         navigator.sendBeacon && autoSaveFile(currentFile, files[currentFile]);
       }
     });
-
     // Initialize additional editor options
     editor.setOptions({
       enableBasicAutocompletion: true,
       enableSnippets: true,
       enableLiveAutocompletion: true
     });
-
     // Hide sidebar by default on mobile
     if (window.innerWidth <= 768) {
       document.getElementById('file-explorer').classList.add('hidden');
@@ -2525,186 +2418,34 @@ display: none;
   'minLines', 'overwrite', 'readOnly', 'sidebarWidth',
   'defaultLanguage', 'autoPairBrackets'
 ];
-
 function resetSettings() {
   if (!confirm('Are you sure you want to reset all settings to defaults?')) return;
-
   const defaultSettings = {};
   settingKeys.forEach(key => {
     defaultSettings[key] = getDefaultSetting(key);
   });
-
-  applySettings(defaultSettings);
-
-  settingKeys.forEach(key => {
-    saveSetting(key, defaultSettings[key]);
-  });
+  if (db) {
+    const transaction = db.transaction(['settings'], 'readwrite');
+    const objectStore = transaction.objectStore('settings');
+    objectStore.clear();
+    transaction.oncomplete = () => {
+      applySettings(defaultSettings);
+    };
+    transaction.onerror = (event) => {
+      console.error('Error clearing settings:', event.target.error);
+    };
+  } else {
+    applySettings(defaultSettings);
+  }
 }
-
 document.getElementById('reset-settings-btn').addEventListener('click', resetSettings);
-
     // Initialize file explorer - will load from IndexedDB if available
     updateFileExplorer();
-    
+   
     // Initialize IndexedDB but don't create default files
     setTimeout(() => {
       updateSaveButtons();
     }, 100);
-    
-    // Event listener for the "Change Language" button
-document.getElementById("change-language-btn").onclick = () => {
-  const languageModal = document.getElementById("language-modal");
-  languageModal.style.display = "block";
-};
-
-// Event listener for closing the language modal
-document.getElementById("close-language-modal").onclick = () => {
-  document.getElementById("language-modal").style.display = "none";
-};
-
-// Event listener for language selection
-document.querySelectorAll(".language-option").forEach(btn => {
-  btn.onclick = function() {
-    if (!currentFile) {
-      alert("No file selected!");
-      return;
-    }
-    
-    const mode = "ace/mode/" + this.dataset.lang;
-    editor.session.setMode(mode);
-    document.getElementById("language-modal").style.display = "none";
-    
-    // Update the file's mode in the files object if needed
-    files[currentFile] = editor.getValue(); // Ensure content is saved
-    setEditorMode(currentFile); // Reapply mode to ensure consistency
-  };
-});
-
-// Function to set the editor mode based on the file extension
-function setEditorMode(filename) {
-  const mode = getEditorModeFromExtension(filename);
-  editor.session.setMode(`ace/mode/${mode}`);
-}
-
-// Function to get editor mode based on file extension
-function getEditorModeFromExtension(filename) {
-  const extension = filename.split('.').pop().toLowerCase();
-  
-  switch (extension) {
-    case 'js':
-    case 'jsx':
-      return "javascript";
-    case 'ts':
-    case 'tsx':
-      return "typescript";
-    case 'html':
-    case 'htm':
-      return "html";
-    case 'css':
-      return "css";
-    case 'json':
-      return "json";
-    case 'xml':
-      return "xml";
-    case 'md':
-    case 'markdown':
-      return "markdown";
-    case 'py':
-      return "python";
-    case 'java':
-      return "java";
-    case 'c':
-    case 'cpp':
-    case 'cc':
-    case 'cxx':
-      return "c_cpp";
-    case 'php':
-      return "php";
-    case 'rb':
-      return "ruby";
-    case 'go':
-      return "golang";
-    case 'rs':
-      return "rust";
-    case 'sql':
-      return "sql";
-    case 'sh':
-    case 'bash':
-      return "sh";
-    case 'yaml':
-    case 'yml':
-      return "yaml";
-    case 'txt':
-    default:
-      return document.getElementById("default-language").value || "text";
-  }
-}
-
-// Ensure modal closes when clicking outside
-window.onclick = function(event) {
-  const languageModal = document.getElementById("language-modal");
-  if (event.target === languageModal) {
-    languageModal.style.display = "none";
-  }
-};
-
-// Handle escape key to close the modal
-document.addEventListener('keydown', function(event) {
-  if (event.key === 'Escape') {
-    document.getElementById("language-modal").style.display = "none";
-  }
-});
-// Close modals when clicking outside their content
-window.onclick = function(event) {
-  const modals = [
-    document.getElementById("preview-modal"),
-    document.getElementById("language-modal"),
-    document.getElementById("db-files-modal"),
-    document.getElementById("settings-modal"),
-    document.getElementById("find-replace-modal")
-  ];
-
-  modals.forEach(modal => {
-    if (event.target === modal) {
-      if (modal.id === "preview-modal") {
-        // Special handling for preview modal to pause media
-        const previewFrame = document.getElementById('code-preview');
-        if (previewFrame.contentDocument) {
-          const mediaElements = previewFrame.contentDocument.querySelectorAll('audio, video');
-          mediaElements.forEach(el => el.pause());
-        }
-      }
-      modal.style.display = "none";
-    }
-  });
-};
-
-// Handle escape key to close all modals
-document.addEventListener('keydown', function(event) {
-  if (event.key === 'Escape') {
-    const modals = [
-      document.getElementById("preview-modal"),
-      document.getElementById("language-modal"),
-      document.getElementById("db-files-modal"),
-      document.getElementById("settings-modal"),
-      document.getElementById("find-replace-modal")
-    ];
-
-    modals.forEach(modal => {
-      if (modal.style.display === "block") {
-        if (modal.id === "preview-modal") {
-          // Special handling for preview modal to pause media
-          const previewFrame = document.getElementById('code-preview');
-          if (previewFrame.contentDocument) {
-            const mediaElements = previewFrame.contentDocument.querySelectorAll('audio, video');
-            mediaElements.forEach(el => el.pause());
-          }
-        }
-        modal.style.display = "none";
-      }
-    });
-  }
-});
   </script>
 </body>
 </html>
