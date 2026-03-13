@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -518,6 +520,7 @@ display: none;
     .search-results li:hover {
       background: #4a6278;
     }
+    
     #top-bar.search-active .search-container {
       display: block;
     }
@@ -664,8 +667,111 @@ display: none;
     #db-files-modal button {
         margin-bottom:10px;
     }
-    
+    /* VS Code style inline color swatches */
+/* CUSTOM CONTEXT MENU - replaces browser menu */
+#custom-context-menu {
+    display: none;
+    position: absolute;
+    background: #262626;
+    color: white;
+    border: 1px solid #444;
+    border-radius: 6px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+    z-index: 999999;
+    min-width: 190px;
+    font-family: Trebuchet MS;
+    font-size: 14px;
+    padding: 4px 0;
+    user-select: none;
+}
+.ctx-item {
+    display: block;
+    width: 100%;
+    padding: 8px 16px;
+    background: none;
+    border: none;
+    color: white;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    border-radius:5px;
+}
+.ctx-item:hover {
+    background: #3498db;
+}
+.ctx-item:disabled {
+    color: #777;
+    cursor: not-allowed;
+}
+#custom-context-menu hr {
+    margin: 4px 12px;
+    border: none;
+    border-top: 1px solid #444;
+}
+/* ADD THIS CSS at the end of your <style> tag */
+.draggable-window {
+    position: fixed;
+    user-select: none;
+}
+.window-header {
+    user-select: none;
+}
+/* FIXED OPTIMIZER BUTTONS + SLIM TITLE BAR */
+.opt-btn {
+    width: 100%;
+    padding: 9px 14px;
+    margin-bottom: 7px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: Trebuchet MS;
+    font-size: 14px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+.opt-btn:hover {
+    background-color: #2980b9;
+}
+.opt-btn:active {
+    transform: scale(0.97);
+}
+
+/* Slimmer title bars for all draggable windows */
+.window-header {
+    padding: 5px 12px !important;   /* was 8px */
+    font-size: 15px;
+}
+
+/* Make sure Tools submenu is beside the option */
+#tools-submenu {
+    min-width: 200px;
+}
+/* FIX: Editor shift + clean sidebar collapse */
+#editor-container {
+    display: flex !important;
+    flex: 0 !important;           /* forces full width */
+    background-color: #2c3e50;
+}
+
+#file-explorer {
+    flex-shrink: 0;               /* prevents shrinking weirdly */
+    transition: width 0.3s ease;
+}
+
+#file-explorer.hidden {
+    flex: 0 0 0px !important;     /* ← THIS IS THE KEY LINE */
+    min-width: 0;
+}
+
+#code-editor {
+    flex: 1;
+    min-width: 0;                 /* prevents Ace from overflowing */
+}
   </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.0/beautify.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.0/beautify-css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.0/beautify-html.min.js"></script>
 </head>
 <body>
   <h1 id="top-bar">
@@ -788,12 +894,68 @@ display: none;
           </div>
         </div>
       </div>
-      
-     
+      <!-- CUSTOM CONTEXT MENU (replaces browser + Ace default) -->
+<!-- CUSTOM CONTEXT MENU - Tools now directly inside -->
+<div id="custom-context-menu">
+    <button class="ctx-item" data-action="undo">Undo</button>
+    <button class="ctx-item" data-action="redo">Redo</button>
+    <hr>
+    <button class="ctx-item" data-action="cut">Cut</button>
+    <button class="ctx-item" data-action="copy">Copy</button>
+    <button class="ctx-item" data-action="paste">Paste</button>
+    <button class="ctx-item" data-action="selectall">Select All</button>
+    <hr id="color-hr" style="display:none">
+    <button id="change-color-btn" class="ctx-item" style="display:none; color:#27ae60; font-weight:bold;">
+        Change Color...
+    </button>
+    <hr>
+    <!-- TOOLS BUTTONS — directly in menu -->
+    <button class="ctx-item" data-tool="goto-section" style="color:#27ae60; font-weight:bold;">Go to Section...</button>
+    <button class="ctx-item" data-tool="insert-script" style="color:#27ae60; font-weight:bold;">Insert Script...</button>
+    
+</div>
+</div>
+ 
+
+<!-- GO TO SECTION + SCRIPT INSERTER WINDOW (draggable) -->
+<div id="goto-window" class="draggable-window" style="display:none; width:420px; background:#2c3e50; color:white; border-radius:8px; box-shadow:0 10px 30px rgba(0,0,0,0.7); z-index:1000000; position:fixed;">
+    <div class="window-header" style="background:#34495e; padding:8px 12px; cursor:move; display:flex; justify-content:space-between; align-items:center;">
+        <span id="goto-title">Go to Section / Insert Script</span>
+        <button class="close-window-btn" style="background:none; border:none; color:#e74c3c; font-size:20px; cursor:pointer;">×</button>
+    </div>
+    <div style="padding:15px;">
+        <!-- Go to Section -->
+        <div id="goto-section-part">
+            <button onclick="jumpToSection('style')" class="ctx-item" style="margin-bottom:5px;">Jump to &lt;style&gt; (CSS)</button>
+            <button onclick="jumpToSection('body')" class="ctx-item" style="margin-bottom:5px;">Jump to &lt;body&gt;</button>
+            <button onclick="jumpToSection('script')" class="ctx-item">Jump to &lt;script&gt; (JS)</button>
+        </div>
+        
+        <!-- Insert Script -->
+        <div id="insert-script-part" style="margin-top:15px; border-top:1px solid #444; padding-top:15px;">
+            <label style="display:block; margin-bottom:5px;">Target function (e.g. reload() or async function go())</label>
+            <input id="target-func" type="text" placeholder="reload()" style="width:96%; padding:8px; background:#34495e; color:white; border:none; border-radius:4px;">
+            
+            <div style="margin:10px 0; display:flex; gap:10px;">
+                <label><input type="radio" name="insert-pos" value="last" checked> At the end of function</label>
+                <label><input type="radio" name="insert-pos" value="top"> At the top of function</label>
+            </div>
+            
+            <label style="display:block; margin-bottom:5px;">Code to insert</label>
+            <textarea id="script-code" style="width:100%; height:90px; background:#34495e; color:white; border:none; border-radius:4px; resize:none;"></textarea>
+            
+            <button onclick="insertScriptIntoFunction()" style="margin-top:10px; width:100%; background:#27ae60; color:white; border:none; padding:10px; border-radius:4px;">Insert Code</button>
+            <div id="insert-error" style="color:#e74c3c; margin-top:8px; display:none;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- UPDATED OPTIMIZER WINDOW (paste this exactly) -->
+
       <div id="code-editor"></div>
       <div class="autosave-indicator" id="autosave-indicator">Auto-saved</div>
     </div>
-  </div>
+  
   <!-- Modal Dialog for Preview Code -->
   <div id="preview-modal" class="modal">
     <div class="modal-content">
@@ -1055,6 +1217,7 @@ display: none;
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.5.1/axios.min.js"></script>
   <script>
+    
     const editor = ace.edit("code-editor");
     editor.setTheme("ace/theme/monokai");
     let currentFile = null;
@@ -2446,6 +2609,593 @@ document.getElementById('reset-settings-btn').addEventListener('click', resetSet
     setTimeout(() => {
       updateSaveButtons();
     }, 100);
+    
+    
+   // ==================== FULL CUSTOM CONTEXT MENU (replaces browser menu) ====================
+const contextMenu = document.getElementById('custom-context-menu');
+let currentColorRange = null;
+let currentColorValue = null;
+
+const colorRegex = /(#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})|rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*(?:,\s*[\d.]+)?\s*\)|hsla?\(\s*\d{1,3}\s*,\s*\d+%?\s*,\s*\d+%?\s*(?:,\s*[\d.]+)?\s*\))/gi;
+
+// Show menu on right-click
+editor.container.addEventListener('contextmenu', function(e) {
+    e.preventDefault();                    // ← KILLS browser + Ace default menu
+    e.stopImmediatePropagation();
+
+    const coords = editor.renderer.screenToTextCoordinates(e.clientX, e.clientY);
+    const row = Math.max(0, coords.row);
+    const col = Math.max(0, coords.column);
+    const line = editor.session.getLine(row) || "";
+
+    // Detect if we clicked on a color
+    currentColorRange = null;
+    currentColorValue = null;
+    colorRegex.lastIndex = 0;
+    let match;
+    while ((match = colorRegex.exec(line)) !== null) {
+        const start = match.index;
+        const end = start + match[0].length;
+        if (col >= start && col <= end) {
+            currentColorRange = new ace.Range(row, start, row, end);
+            currentColorValue = match[0];
+            break;
+        }
+    }
+
+    // Show/hide "Change Color" option
+    const changeBtn = document.getElementById('change-color-btn');
+    const colorHr = document.getElementById('color-hr');
+    if (currentColorRange) {
+        changeBtn.style.display = 'block';
+        colorHr.style.display = 'block';
+    } else {
+        changeBtn.style.display = 'none';
+        colorHr.style.display = 'none';
+    }
+
+    // Position menu (smart: don't go off-screen)
+    let menuX = e.clientX;
+    let menuY = e.clientY;
+    if (menuX + 200 > window.innerWidth) menuX = window.innerWidth - 210;
+    if (menuY + 300 > window.innerHeight) menuY = e.clientY - 280;
+
+    contextMenu.style.left = menuX + 'px';
+    contextMenu.style.top = menuY + 'px';
+    contextMenu.style.display = 'block';
+});
+
+// Hide menu when clicking anywhere else
+function hideContextMenu() {
+    contextMenu.style.display = 'none';
+}
+document.addEventListener('click', hideContextMenu);
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') hideContextMenu();
+});
+
+// Menu actions (event delegation)
+// ==================== CONTEXT MENU CLICK HANDLER (now includes Tools directly) ====================
+contextMenu.addEventListener('click', function(e) {
+    const btn = e.target.closest('.ctx-item');
+    if (!btn) return;
+
+    hideContextMenu();
+
+    const action = btn.dataset.action;
+    const tool = btn.dataset.tool;
+
+    if (action) {
+        switch (action) {
+            case 'undo': editor.undo(); break;
+            case 'redo': editor.redo(); break;
+            case 'cut': editor.cut(); break;
+            case 'copy': editor.copy(); break;
+            case 'paste':
+                navigator.clipboard.readText().then(text => {
+                    editor.insert(text);
+                }).catch(() => {
+                    editor.focus();
+                    document.execCommand('paste');
+                });
+                break;
+            case 'selectall': editor.selectAll(); break;
+        }
+    }
+
+    // === TOOLS DIRECTLY ===
+    if (tool) {
+        if (tool === 'goto-section') openGotoWindow();
+        if (tool === 'insert-script') openGotoWindow(true);
+        if (tool === 'code-optimizer') openOptimizerWindow();
+    }
+});
+
+// CHANGE COLOR (exactly like old swatch)
+document.getElementById('change-color-btn').addEventListener('click', function() {
+    if (!currentColorRange || !currentColorValue) return;
+
+    const picker = document.createElement('input');
+    picker.type = 'color';
+    picker.value = currentColorValue.startsWith('#') ? currentColorValue : '#ffffff';
+    document.body.appendChild(picker);
+
+    picker.style.position = 'fixed';
+    picker.style.left = '50%';
+    picker.style.top = '50%';
+    picker.style.transform = 'translate(-50%, -50%)';
+    picker.style.opacity = '0';
+    picker.style.width = '1px';
+    picker.style.height = '1px';
+    picker.focus();
+
+    picker.oninput = () => {
+        const newColor = picker.value;
+        editor.session.replace(currentColorRange, newColor);
+    };
+
+    picker.onchange = picker.onblur = () => {
+        document.body.removeChild(picker);
+    };
+});
+// ADD THIS JAVASCRIPT right after your existing contextMenu code (after the change-color-btn listener)
+
+
+
+// Click any tool = close BOTH menus + open window
+document.querySelectorAll('#tools-submenu .ctx-item').forEach(btn => {
+    btn.onclick = function() {
+        toolsSubmenu.style.display = 'none';
+        // main menu already closed above
+        const tool = this.dataset.tool;
+        if (tool === 'goto-section') openGotoWindow();
+        if (tool === 'insert-script') openGotoWindow(true);
+        if (tool === 'code-optimizer') openOptimizerWindow();
+    };
+});
+
+// ONE click-outside handler that closes BOTH menus (but NOT the windows)
+document.addEventListener('click', function(e) {
+    if (!contextMenu.contains(e.target)) {
+        contextMenu.style.display = 'none';
+    }
+});
+
+// Escape key also closes both menus
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        contextMenu.style.display = 'none';
+        toolsSubmenu.style.display = 'none';
+    }
+    // ==================== TOOLS BUTTON – main menu stays open, submenu beside it ====================
+const toolsBtn = document.getElementById('tools-btn');
+const toolsSubmenu = document.getElementById('tools-submenu');
+
+toolsBtn.onclick = function(e) {
+    e.stopImmediatePropagation();
+    // ← MAIN MENU NO LONGER CLOSES
+
+    const rect = toolsBtn.getBoundingClientRect();
+    toolsSubmenu.style.left = (rect.right + 8) + 'px';
+    toolsSubmenu.style.top  = rect.top + 'px';
+    toolsSubmenu.style.display = 'block';
+};
+
+// Tool clicks (closes only submenu)
+document.querySelectorAll('#tools-submenu .ctx-item').forEach(btn => {
+    btn.onclick = function() {
+        toolsSubmenu.style.display = 'none';
+        const tool = this.dataset.tool;
+        if (tool === 'goto-section') openGotoWindow();
+        if (tool === 'insert-script') openGotoWindow(true);
+        if (tool === 'code-optimizer') openOptimizerWindow();
+    };
+});
+});
+
+
+// ==================== DRAGGABLE WINDOWS (reusable) ====================
+// FIXED DRAGGABLE – cannot go off-screen
+function makeDraggable(win) {
+    const header = win.querySelector('.window-header');
+    let offsetX = 0, offsetY = 0;
+
+    header.onmousedown = function(e) {
+        offsetX = e.clientX - win.offsetLeft;
+        offsetY = e.clientY - win.offsetTop;
+
+        document.onmousemove = function(e) {
+            let newLeft = e.clientX - offsetX;
+            let newTop  = e.clientY - offsetY;
+
+            // Clamp to screen edges
+            newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - win.offsetWidth - 10));
+            newTop  = Math.max(0, Math.min(newTop,  window.innerHeight - win.offsetHeight - 10));
+
+            win.style.left = newLeft + 'px';
+            win.style.top  = newTop + 'px';
+        };
+
+        document.onmouseup = () => {
+            document.onmousemove = document.onmouseup = null;
+        };
+    };
+}
+
+// Close buttons
+document.querySelectorAll('.close-window-btn').forEach(btn => {
+    btn.onclick = () => {
+        btn.closest('.draggable-window').style.display = 'none';
+    };
+});
+
+// Open windows
+function openGotoWindow(insertOnly = false) {
+    const win = document.getElementById('goto-window');
+    document.getElementById('goto-section-part').style.display = insertOnly ? 'none' : 'block';
+    document.getElementById('insert-script-part').style.display = insertOnly ? 'block' : 'none';
+    document.getElementById('goto-title').textContent = insertOnly ? 'Insert Script into Function' : 'Go to Section';
+    win.style.left = '35%';
+    win.style.top = '25%';
+    win.style.display = 'block';
+    makeDraggable(win);
+}
+
+function openOptimizerWindow() {
+    const win = document.getElementById('optimizer-window');
+    document.getElementById('choose-remove-panel').style.display = 'none';
+    win.style.left = '30%';
+    win.style.top = '20%';
+    win.style.display = 'block';
+    makeDraggable(win);
+}
+
+// ==================== GO TO SECTION (simple HTML sections) ====================
+function jumpToSection(section) {
+    const content = editor.getValue();
+    let regex;
+    if (section === 'style') regex = /<style[^>]*>/i;
+    else if (section === 'body') regex = /<body[^>]*>/i;
+    else if (section === 'script') regex = /<script[^>]*>/i;
+    
+    const match = content.match(regex);
+    if (match) {
+        const pos = editor.session.getDocument().indexToPosition(match.index);
+        editor.gotoLine(pos.row + 1, pos.column);
+        editor.focus();
+        document.getElementById('goto-window').style.display = 'none';
+    } else {
+        alert(`No <${section}> section found in this file.`);
+    }
+}
+
+// ==================== INSERT SCRIPT INTO FUNCTION (smart + error handling) ====================
+function insertScriptIntoFunction() {
+    const funcInput = document.getElementById('target-func').value.trim();
+    const codeToInsert = document.getElementById('script-code').value.trim();
+    const insertPos = document.querySelector('input[name="insert-pos"]:checked').value;
+    const errorDiv = document.getElementById('insert-error');
+    errorDiv.style.display = 'none';
+    
+    if (!funcInput || !codeToInsert) {
+        errorDiv.textContent = 'Both fields are required.';
+        errorDiv.style.display = 'block';
+        return;
+    }
+    
+    let content = editor.getValue();
+    // Smart regex: normal function or async function
+    let regex = new RegExp(`(async\\s+)?function\\s+${funcInput.replace(/[\(\)]/g, '\\$&')}\\s*\\(`, 'i');
+    let match = content.match(regex);
+    
+    if (!match) {
+        // Try without "function" keyword if user typed just name()
+        regex = new RegExp(`\\b${funcInput.replace(/[\(\)]/g, '\\$&')}\\s*\\(`, 'i');
+        match = content.match(regex);
+    }
+    
+    if (!match) {
+        errorDiv.textContent = `Function "${funcInput}" not found.`;
+        errorDiv.style.display = 'block';
+        return;
+    }
+    
+    // Check async mismatch
+    const isAsyncInCode = match[1] ? true : false;
+    const userTypedAsync = funcInput.toLowerCase().includes('async');
+    if (userTypedAsync !== isAsyncInCode) {
+        if (!confirm(`You typed "${userTypedAsync ? 'async' : 'normal'}", but found ${isAsyncInCode ? 'async' : 'normal'} function.\nContinue anyway?`)) {
+            return;
+        }
+    }
+    
+    // Find the closing } of the function (last one before next function)
+    const startIdx = match.index + match[0].length;
+    let braceCount = 0;
+    let endIdx = startIdx;
+    for (let i = startIdx; i < content.length; i++) {
+        if (content[i] === '{') braceCount++;
+        if (content[i] === '}') {
+            braceCount--;
+            if (braceCount === 0) {
+                endIdx = i;
+                break;
+            }
+        }
+    }
+    
+    const insertionPoint = insertPos === 'last' ? endIdx : startIdx + 1;
+    const indent = '    '; // safe indent
+    
+    content = content.slice(0, insertionPoint) + '\n' + indent + codeToInsert + '\n' + content.slice(insertionPoint);
+    
+    editor.setValue(content);
+    editor.gotoLine(editor.session.getDocument().indexToPosition(insertionPoint).row + 1);
+    document.getElementById('goto-window').style.display = 'none';
+}
+
+
+
+// Beautify globals are now available from CDN
+
+function getCurrentMode() {
+    const mode = editor.session.getMode().$id || '';
+    const ext = (currentFile || '').split('.').pop().toLowerCase();
+    if (mode.includes('html') || ext === 'html' || ext === 'htm') return 'html';
+    if (mode.includes('javascript') || ext === 'js') return 'js';
+    if (mode.includes('css') || ext === 'css') return 'css';
+    return 'text';
+}
+
+// ───── CLEAN CODE (beautify) ─────
+function cleanCurrentFile() {
+    const mode = getCurrentMode();
+    let code = editor.getValue();
+    let cleaned = code;
+
+    if (mode === 'html') cleaned = html_beautify(code, { indent_size: 4 });
+    else if (mode === 'js') cleaned = js_beautify(code, { indent_size: 4 });
+    else if (mode === 'css') cleaned = css_beautify(code, { indent_size: 4 });
+    else cleaned = html_beautify(code, { indent_size: 4 });
+
+    editor.setValue(cleaned);
+    alert('Code cleaned & beautified');
+}
+
+// ───── MINIFY ─────
+function minifyCurrentFile() {
+    const mode = getCurrentMode();
+    let code = editor.getValue();
+    let minified = code;
+
+    if (mode === 'html') minified = html_beautify(code, { indent_size: 0 }).replace(/\n\s*/g, ' ');
+    else if (mode === 'js') minified = js_beautify(code, { indent_size: 0 }).replace(/\n\s*/g, ' ');
+    else if (mode === 'css') minified = css_beautify(code, { indent_size: 0 }).replace(/\n\s*/g, ' ');
+    else minified = code.replace(/\s+/g, ' ').trim();
+
+    editor.setValue(minified);
+    
+}
+
+// ───── REMOVE UNUSED CSS (smart DOM check - works in HTML only) ─────
+function removeUnusedCSS() {
+    let code = editor.getValue();
+
+    // Only work on HTML files (same as before)
+    if (!currentFile || !currentFile.toLowerCase().endsWith('.html')) {
+        alert('Unused CSS removal only works on .html files');
+        return;
+    }
+
+    // Pure string regex – exactly like the JS version (no DOM, no full rewrite)
+    const styleRegex = /(<style[^>]*>)([\s\S]*?)(<\/style>)/gi;
+
+    code = code.replace(styleRegex, (fullMatch, openTag, styleContent, closeTag) => {
+        let cleanedStyle = styleContent;
+
+        // Find every CSS rule: selector { ... }
+        const ruleRegex = /([^{}]+?)\s*\{[\s\S]*?\}/g;
+        let ruleMatch;
+        const keptRules = [];
+
+        while ((ruleMatch = ruleRegex.exec(styleContent)) !== null) {
+            const fullRule = ruleMatch[0];
+            const selector = ruleMatch[1].trim().split(',')[0].trim(); // take first selector only
+
+            // Skip @media, @keyframes, @font-face etc.
+            if (selector.startsWith('@')) {
+                keptRules.push(fullRule);
+                continue;
+            }
+
+            // Check if this selector appears ANYWHERE in the HTML (outside <style>)
+            const htmlWithoutStyles = code.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+            const isUsed = new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i')
+                .test(htmlWithoutStyles);
+
+            if (isUsed) {
+                keptRules.push(fullRule);
+            }
+            // else → completely delete this rule (this is the "trash" removal)
+        }
+
+        // Rebuild only the cleaned <style> block
+        return openTag + keptRules.join('\n') + closeTag;
+    });
+
+    editor.setValue(code);
+    alert('Unused CSS cleaned');
+}
+
+// ───── CHOOSE WHAT TO REMOVE (ONLY UNUSED ITEMS) ─────
+let itemsToRemove = [];
+
+function showChooseRemovePanel() {
+    const panel = document.getElementById('choose-remove-panel');
+    const list = document.getElementById('unused-list');
+    list.innerHTML = '';
+    itemsToRemove = [];
+
+    const mode = getCurrentMode();
+    const code = editor.getValue();
+
+    if (mode === 'html') {
+        // Smart: both unused JS + unused CSS
+        const doc = new DOMParser().parseFromString(code, 'text/html');
+
+        // Unused JS functions
+        const funcRegex = /function\s+([a-zA-Z_$][0-9a-zA-Z_$]*)\s*\(/g;
+        let m;
+        const funcs = [];
+        while ((m = funcRegex.exec(code)) !== null) funcs.push(m[1]);
+
+        funcs.forEach(name => {
+            const calls = (code.match(new RegExp('\\b' + name + '\\b', 'g')) || []).length;
+            if (calls <= 1) addToggleItem(list, 'js', `function ${name}()`);
+        });
+
+        // Unused CSS rules
+        const styles = doc.querySelectorAll('style');
+        styles.forEach(style => {
+            if (!style.sheet) return;
+            for (let rule of style.sheet.cssRules) {
+                if (rule.selectorText && doc.querySelectorAll(rule.selectorText).length === 0) {
+                    addToggleItem(list, 'css', rule.selectorText);
+                }
+            }
+        });
+    } 
+    else if (mode === 'js') {
+        // Only unused JS functions
+        const funcRegex = /function\s+([a-zA-Z_$][0-9a-zA-Z_$]*)\s*\(/g;
+        let m;
+        const funcs = [];
+        while ((m = funcRegex.exec(code)) !== null) funcs.push(m[1]);
+
+        funcs.forEach(name => {
+            const calls = (code.match(new RegExp('\\b' + name + '\\b', 'g')) || []).length;
+            if (calls <= 1) addToggleItem(list, 'js', `function ${name}()`);
+        });
+    } 
+    else {
+        alert('Choose panel only works on HTML/JS files (needs context for unused detection)');
+        return;
+    }
+
+    if (list.children.length === 0) {
+        list.innerHTML = '<div style="color:#e74c3c;padding:10px;">No unused items detected!</div>';
+    }
+    panel.style.display = 'block';
+}
+
+function addToggleItem(list, type, text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    div.style.color = type === 'js' ? '#3498db' : '#27ae60';
+    div.style.padding = '6px';
+    div.style.cursor = 'pointer';
+    div.style.borderRadius = '3px';
+
+    div.onclick = () => {
+        const already = itemsToRemove.some(i => i.text === text);
+        if (already) {
+            itemsToRemove = itemsToRemove.filter(i => i.text !== text);
+            div.style.textDecoration = 'none';
+        } else {
+            itemsToRemove.push({type, text});
+            div.style.textDecoration = 'line-through';
+        }
+    };
+    list.appendChild(div);
+}
+
+function applyChosenRemovals() {
+    let code = editor.getValue();
+    itemsToRemove.forEach(item => {
+        const esc = item.text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        if (item.type === 'js') {
+            code = code.replace(new RegExp('function\\s+' + esc.replace('function ', '') + '\\s*\\([^)]*\\)\\s*{[\\s\\S]*?}', 'g'), '');
+        } else {
+            code = code.replace(new RegExp(esc, 'g'), '');
+        }
+    });
+    editor.setValue(code);
+    hideChooseRemovePanel();
+    
+}
+
+function hideChooseRemovePanel() {
+    document.getElementById('choose-remove-panel').style.display = 'none';
+}
+
+// ───── UPDATE OPTIMIZER WINDOW BUTTONS ─────
+function openOptimizerWindow() {
+    const win = document.getElementById('optimizer-window');
+    document.getElementById('choose-remove-panel').style.display = 'none';
+    win.style.left = '30%';
+    win.style.top = '20%';
+    win.style.display = 'block';
+    makeDraggable(win);
+}
+
+
+// Make windows draggable on load
+setTimeout(() => {
+    document.querySelectorAll('.draggable-window').forEach(makeDraggable);
+}, 500);
+// FIXED COLOR PICKER – now always appears
+// ==================== FIXED COLOR PICKER (replaces + live drag works) ====================
+document.getElementById('change-color-btn').addEventListener('click', function() {
+    if (!currentColorRange || !currentColorValue) return;
+
+    hideContextMenu(); // close main menu immediately
+
+    const picker = document.createElement('input');
+    picker.type = 'color';
+    
+    // Use original color if it's already hex, otherwise start from white
+    picker.value = currentColorValue.startsWith('#') 
+        ? currentColorValue 
+        : '#ffffff';
+
+    // Hide the dummy picker off-screen (native color dialog still opens)
+    document.body.appendChild(picker);
+    picker.style.position = 'fixed';
+    picker.style.left = '-9999px';
+    picker.style.top = '-9999px';
+    picker.style.opacity = '0';
+
+    // Force native color dialog to open instantly
+    picker.focus();
+    picker.click();
+
+    // === LIVE REPLACE WHILE DRAGGING ===
+    picker.oninput = () => {
+        if (!currentColorRange) return;
+
+        const newColor = picker.value;   // always #rrggbb
+
+        // Replace the color
+        editor.session.replace(currentColorRange, newColor);
+
+        // ← CRITICAL FIX: Update the range for the next oninput
+        // (prevents "adding" instead of replacing when you slide)
+        const newLength = newColor.length;
+        currentColorRange = new ace.Range(
+            currentColorRange.start.row,
+            currentColorRange.start.column,
+            currentColorRange.start.row,
+            currentColorRange.start.column + newLength
+        );
+    };
+
+    // Cleanup when picker closes
+    picker.onchange = picker.onblur = () => {
+        document.body.removeChild(picker);
+        currentColorRange = null;   // reset for next right-click
+        currentColorValue = null;
+    };
+});
   </script>
 </body>
 </html>
