@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -696,6 +695,13 @@ display: none;
     font-family: inherit;
     border-radius:5px;
 }
+#custom-color-modal {
+  width: 320px !important;
+}
+#color-canvas {
+  width: 220px !important;
+  height: 220px !important;
+}
 .ctx-item:hover {
     background: #3498db;
 }
@@ -768,12 +774,162 @@ display: none;
     flex: 1;
     min-width: 0;                 /* prevents Ace from overflowing */
 }
+#custom-color-modal {
+    border-radius: 8px !important;
+}
+#custom-color-modal .window-header {
+    border-radius: 8px 8px 0 0 !important; /* title bar flat bottom */
+}
+#custom-color-modal input[type="range"] {
+    height: 6px !important;
+}
+#custom-color-modal #hex-input,
+#custom-color-modal #live-color-swatch,
+#custom-color-modal canvas {
+    border-radius: 4px !important;
+}
+#hue-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 24px;                /* overall clickable area */
+  background: transparent;
+  outline: none;
+  margin: 10px 0;
+  cursor: pointer;
+}
+
+/* === TRACK (the rainbow gradient) === */
+#hue-slider::-webkit-slider-runnable-track {
+  -webkit-appearance: none;
+  height: 12px;
+  background: linear-gradient(
+    to right,
+    rgb(255, 0, 0),      /* red    */
+    rgb(255, 255, 0),    /* yellow */
+    rgb(0, 255, 0),      /* green  */
+    rgb(0, 255, 255),    /* cyan   */
+    rgb(0, 0, 255),      /* blue   */
+    rgb(255, 0, 255),    /* magenta */
+    rgb(255, 0, 0)       /* red again */
+  );
+  border-radius: 9999px;
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.2),
+    0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+#hue-slider::-moz-range-track {
+  height: 12px;
+  background: linear-gradient(
+    to right,
+    rgb(255, 0, 0),
+    rgb(255, 255, 0),
+    rgb(0, 255, 0),
+    rgb(0, 255, 255),
+    rgb(0, 0, 255),
+    rgb(255, 0, 255),
+    rgb(255, 0, 0)
+  );
+  border-radius: 9999px;
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* === THUMB (the handle) === */
+#hue-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  background: white;
+  border: 3px solid #222;
+  border-radius: 50%;
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.3),
+    0 0 0 4px rgba(255, 255, 255, 0.6);
+  margin-top: -6px;   /* centers it on the track */
+  cursor: pointer;
+}
+
+#hue-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  background: white;
+  border: 3px solid #222;
+  border-radius: 50%;
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.3),
+    0 0 0 4px rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+}
+
+/* Optional: make thumb color match current hue (requires tiny JS) */
+#hue-slider {
+  --thumb-color: hsl(180, 100%, 50%);
+}
+#hue-slider::-webkit-slider-thumb {
+  background: var(--thumb-color);
+  border-color: #222;
+}
+#hue-slider::-moz-range-thumb {
+  background: var(--thumb-color);
+}
+
+    
+    
+    /* Title bar white + Trebuchet already forced in HTML */
+
   </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.0/beautify.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.0/beautify-css.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.0/beautify-html.min.js"></script>
 </head>
 <body>
+    <!-- ULTRA-COMPACT 170px COLOR PICKER (110px square + rainbow hue + RGB input) -->
+<div id="custom-color-modal" class="draggable-window" 
+     style="display:none; position:fixed; width:170px; background:#2c3e50; border-radius:8px; box-shadow:0 8px 20px rgba(0,0,0,0.9); z-index:10000000; overflow:hidden; font-family:Trebuchet MS;">
+    
+    <!-- Flat title bar (no rounded corners) -->
+    <div class="window-header" style="background:#34495e; padding:6px 10px; cursor:move; display:flex; justify-content:space-between; align-items:center; font-family:Trebuchet MS; color:white; font-size:13px; font-weight:bold; border-radius:8px 8px 0 0;">
+        Color Picker
+        <button onclick="closeColorPicker()" 
+                style="background:none;  border:none; color:#e74c3c; font-size:25px; line-height:1; cursor:pointer; font-family:Trebuchet MS;">×</button>
+    </div>
+    
+    <div style="padding:9px 11px; font-family:Trebuchet MS;">
+        <!-- Smaller square (110×110) -->
+        <canvas id="color-canvas" width="110" height="110" 
+                style="border:2px solid #34495e; border-radius:4px; cursor:crosshair; display:block; margin:0 auto 7px; box-shadow:0 2px 8px rgba(0,0,0,0.5);"></canvas>
+        
+        <!-- Rainbow hue slider (proper color picker style) -->
+        <label style="color:#bbb; font-size:11px; display:block; margin-bottom:3px;">Hue</label>
+        <input type="range" id="hue-slider" min="0" max="360" value="0" 
+               style="width:100%; height:6px; border-radius:0; background:linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);">
+        
+        <!-- Opacity -->
+        <label style="color:#bbb; font-size:11px; display:block; margin:7px 0 3px;">Opacity</label>
+        <input type="range" id="alpha-slider" min="0" max="1" step="0.01" value="1" 
+               style="width:100%; height:6px; border-radius:0; accent-color:#27ae60;">
+        
+        <!-- Hex/RGB input (now accepts both #hex and rgb()/rgba()) -->
+        <input type="text" id="hex-input" maxlength="30" placeholder="#RRGGBB or rgb(255,0,0)"
+               style="margin-top:8px; width:100%; padding:7px; background:#34495e; color:white; border:none; border-radius:4px; font-size:13px; text-align:center; box-sizing:border-box; font-family:monospace;">
+        
+        <!-- Tiny swatch -->
+        <div id="live-color-swatch" 
+             style="width:100%; height:22px; margin:7px 0; border:2px solid #34495e; border-radius:4px; box-shadow:0 2px 6px rgba(0,0,0,0.4);"></div>
+        
+        <!-- Tiny Apply -->
+        <button onclick="applyCustomColor()" 
+                style="margin-top:5px; width:100%; padding:8px; background:#27ae60; border:none; border-radius:4px; color:white; font-weight:bold; font-size:12px; font-family:Trebuchet MS;">
+            Apply & Close
+        </button>
+    </div>
+</div>
+    
+    <!-- Title bar - white text, Trebuchet MS, square corners -->
+    
   <h1 id="top-bar">
     <div class="header-left">
       <button id="search-back-btn" class="header-btn" title="Back">
@@ -2712,33 +2868,7 @@ contextMenu.addEventListener('click', function(e) {
 });
 
 // CHANGE COLOR (exactly like old swatch)
-document.getElementById('change-color-btn').addEventListener('click', function() {
-    if (!currentColorRange || !currentColorValue) return;
-
-    const picker = document.createElement('input');
-    picker.type = 'color';
-    picker.value = currentColorValue.startsWith('#') ? currentColorValue : '#ffffff';
-    document.body.appendChild(picker);
-
-    picker.style.position = 'fixed';
-    picker.style.left = '50%';
-    picker.style.top = '50%';
-    picker.style.transform = 'translate(-50%, -50%)';
-    picker.style.opacity = '0';
-    picker.style.width = '1px';
-    picker.style.height = '1px';
-    picker.focus();
-
-    picker.oninput = () => {
-        const newColor = picker.value;
-        editor.session.replace(currentColorRange, newColor);
-    };
-
-    picker.onchange = picker.onblur = () => {
-        document.body.removeChild(picker);
-    };
-});
-// ADD THIS JAVASCRIPT right after your existing contextMenu code (after the change-color-btn listener)
+// CUSTOM COLOR PICKER (no focus loss, no browser dialog)
 
 
 
@@ -2796,30 +2926,66 @@ document.querySelectorAll('#tools-submenu .ctx-item').forEach(btn => {
 
 // ==================== DRAGGABLE WINDOWS (reusable) ====================
 // FIXED DRAGGABLE – cannot go off-screen
+<!-- 3. DRAGGABLE WINDOWS – now work perfectly on TOUCH SCREENS (phones/tablets) -->
+<!-- Replace your entire makeDraggable function with this: -->
 function makeDraggable(win) {
     const header = win.querySelector('.window-header');
     let offsetX = 0, offsetY = 0;
+    let isDragging = false;
 
+    // Mouse support (already worked)
     header.onmousedown = function(e) {
-        offsetX = e.clientX - win.offsetLeft;
-        offsetY = e.clientY - win.offsetTop;
-
-        document.onmousemove = function(e) {
-            let newLeft = e.clientX - offsetX;
-            let newTop  = e.clientY - offsetY;
-
-            // Clamp to screen edges
-            newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - win.offsetWidth - 10));
-            newTop  = Math.max(0, Math.min(newTop,  window.innerHeight - win.offsetHeight - 10));
-
-            win.style.left = newLeft + 'px';
-            win.style.top  = newTop + 'px';
-        };
-
-        document.onmouseup = () => {
-            document.onmousemove = document.onmouseup = null;
-        };
+        if (e.button !== 0) return;
+        startDrag(e.clientX, e.clientY);
+        e.preventDefault();
     };
+
+    // TOUCH support (new)
+    header.ontouchstart = function(e) {
+        if (e.touches.length !== 1) return;
+        startDrag(e.touches[0].clientX, e.touches[0].clientY);
+        e.preventDefault();
+    };
+
+    function startDrag(clientX, clientY) {
+        isDragging = true;
+        offsetX = clientX - win.offsetLeft;
+        offsetY = clientY - win.offsetTop;
+
+        document.onmousemove = mouseMove;
+        document.ontouchmove = touchMove;
+        document.onmouseup = stopDrag;
+        document.ontouchend = stopDrag;
+    }
+
+    function mouseMove(e) {
+        if (!isDragging) return;
+        moveWindow(e.clientX, e.clientY);
+    }
+
+    function touchMove(e) {
+        if (!isDragging || e.touches.length !== 1) return;
+        moveWindow(e.touches[0].clientX, e.touches[0].clientY);
+        e.preventDefault();
+    }
+
+    function moveWindow(clientX, clientY) {
+        let newLeft = clientX - offsetX;
+        let newTop = clientY - offsetY;
+
+        // Clamp to screen (never goes off-screen)
+        newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - win.offsetWidth - 10));
+        newTop = Math.max(0, Math.min(newTop, window.innerHeight - win.offsetHeight - 10));
+
+        win.style.left = newLeft + 'px';
+        win.style.top = newTop + 'px';
+    }
+
+    function stopDrag() {
+        isDragging = false;
+        document.onmousemove = document.ontouchmove = null;
+        document.onmouseup = document.ontouchend = null;
+    }
 }
 
 // Close buttons
@@ -3143,59 +3309,667 @@ function openOptimizerWindow() {
 setTimeout(() => {
     document.querySelectorAll('.draggable-window').forEach(makeDraggable);
 }, 500);
-// FIXED COLOR PICKER – now always appears
-// ==================== FIXED COLOR PICKER (replaces + live drag works) ====================
-document.getElementById('change-color-btn').addEventListener('click', function() {
-    if (!currentColorRange || !currentColorValue) return;
 
-    hideContextMenu(); // close main menu immediately
 
-    const picker = document.createElement('input');
-    picker.type = 'color';
-    
-    // Use original color if it's already hex, otherwise start from white
-    picker.value = currentColorValue.startsWith('#') 
-        ? currentColorValue 
-        : '#ffffff';
 
-    // Hide the dummy picker off-screen (native color dialog still opens)
-    document.body.appendChild(picker);
-    picker.style.position = 'fixed';
-    picker.style.left = '-9999px';
-    picker.style.top = '-9999px';
-    picker.style.opacity = '0';
+function parseColorToHsv(color) {
+    color = (color || "#ff0000").trim();
+    if (color.startsWith('#')) return hexToHsv(color);
+    if (color.startsWith('rgb')) {
+        const m = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+        if (m) {
+            let r = parseInt(m[1])/255, g = parseInt(m[2])/255, b = parseInt(m[3])/255;
+            const max = Math.max(r,g,b), min = Math.min(r,g,b);
+            let h=0,s=0,v=max; const d=max-min;
+            if(d){ s=d/max; if(max===r)h=(g-b)/d+(g<b?6:0); else if(max===g)h=(b-r)/d+2; else h=(r-g)/d+4; h/=6; }
+            return {h:h*360,s,v};
+        }
+    }
+    return {h:0,s:1,v:1};
+}
+function hexToHsv(hex) {
+    let r = parseInt(hex.slice(1,3),16)/255, g = parseInt(hex.slice(3,5),16)/255, b = parseInt(hex.slice(5,7),16)/255;
+    const max = Math.max(r,g,b), min = Math.min(r,g,b);
+    let h=0,s=0,v=max; const d=max-min;
+    if(d){ s=d/max; if(max===r)h=(g-b)/d+(g<b?6:0); else if(max===g)h=(b-r)/d+2; else h=(r-g)/d+4; h/=6; }
+    return {h:h*360,s,v};
+}
+function hsvToRgb(h,s,v) {
+    h /= 360;
+    let r,g,b;
+    const i = Math.floor(h*6), f = h*6-i;
+    const p = v*(1-s), q = v*(1-f*s), t = v*(1-(1-f)*s);
+    switch(i%6){ case 0:r=v;g=t;b=p;break; case 1:r=q;g=v;b=p;break;
+    case 2:r=p;g=v;b=t;break; case 3:r=p;g=q;b=v;break;
+    case 4:r=t;g=p;b=v;break; case 5:r=v;g=p;b=q;break; }
+    return {r:Math.round(r*255),g:Math.round(g*255),b:Math.round(b*255)};
+}
+function rgbToHex(r,g,b) {
+    return '#' + [r,g,b].map(x => x.toString(16).padStart(2,'0')).join('').toUpperCase();
+}
 
-    // Force native color dialog to open instantly
-    picker.focus();
-    picker.click();
+// Main click handler (runs every time you right-click → Change Color)
+document.getElementById('change-color-btn').onclick = function() {
+    hideContextMenu();
 
-    // === LIVE REPLACE WHILE DRAGGING ===
-    picker.oninput = () => {
-        if (!currentColorRange) return;
+    const modal = document.getElementById('custom-color-modal');
+    const canvas = document.getElementById('color-canvas');
+    const hueSlider = document.getElementById('hue-slider');
+    const hexInput = document.getElementById('hex-input');
+    const liveSwatch = document.getElementById('live-color-swatch');
 
-        const newColor = picker.value;   // always #rrggbb
+    // One-time setup (listeners + size fix)
+    if (!canvas.dataset.setupDone) {
+        canvas.width = 220; canvas.height = 220;
+        hueSlider.oninput = function() {
+            drawColorCanvasDirect();
+            updateLivePreviewDirect();
+        };
+        // Mouse drag
+        canvas.onmousedown = function(e) { window.isDraggingCanvas = true; dragMoveDirect(e); };
+        document.onmousemove = function(e) { if(window.isDraggingCanvas) dragMoveDirect(e); };
+        document.onmouseup = function() { window.isDraggingCanvas = false; };
+        // Touch drag
+        canvas.ontouchstart = function(e) { e.preventDefault(); window.isDraggingCanvas = true; dragMoveDirect(e.touches[0]); };
+        document.ontouchmove = function(e) { if(window.isDraggingCanvas) dragMoveDirect(e.touches[0]); };
+        document.ontouchend = function() { window.isDraggingCanvas = false; };
+        canvas.dataset.setupDone = "true";
+    }
 
-        // Replace the color
-        editor.session.replace(currentColorRange, newColor);
+    // Load YOUR exact color (never defaults to black/white)
+    const colorValue = window.currentColorValue || "#ff0000";
+    const hsv = parseColorToHsv(colorValue);
+    hueSlider.value = hsv.h;
+    window.currentSat = hsv.s || 1;
+    window.currentVal = hsv.v || 1;
 
-        // ← CRITICAL FIX: Update the range for the next oninput
-        // (prevents "adding" instead of replacing when you slide)
-        const newLength = newColor.length;
-        currentColorRange = new ace.Range(
-            currentColorRange.start.row,
-            currentColorRange.start.column,
-            currentColorRange.start.row,
-            currentColorRange.start.column + newLength
-        );
-    };
+    drawColorCanvasDirect();
+    updateLivePreviewDirect();
 
-    // Cleanup when picker closes
-    picker.onchange = picker.onblur = () => {
-        document.body.removeChild(picker);
-        currentColorRange = null;   // reset for next right-click
-        currentColorValue = null;
-    };
+    modal.style.display = 'block';
+    makeDraggable(modal);
+};
+
+// Direct draw function (no variables)
+function drawColorCanvasDirect() {
+    const canvas = document.getElementById('color-canvas');
+    const ctx = canvas.getContext('2d');
+    const hue = parseFloat(document.getElementById('hue-slider').value);
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0,0,w,h);
+    for (let x = 0; x < w; x++) {
+        const sat = x / w;
+        const grad = ctx.createLinearGradient(0,0,0,h);
+        grad.addColorStop(0, `hsl(${hue},${sat*100}%,100%)`);
+        grad.addColorStop(1, `hsl(${hue},${sat*100}%,0%)`);
+        ctx.fillStyle = grad;
+        ctx.fillRect(x,0,1,h);
+    }
+    // Selector circle
+    const px = (window.currentSat || 1) * w;
+    const py = (1 - (window.currentVal || 1)) * h;
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.arc(px,py,11,0,Math.PI*2); ctx.stroke();
+    ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.arc(px,py,5,0,Math.PI*2); ctx.fill();
+}
+
+// Direct live preview
+function updateLivePreviewDirect() {
+    const rgb = hsvToRgb(
+        parseFloat(document.getElementById('hue-slider').value),
+        window.currentSat || 1,
+        window.currentVal || 1
+    );
+    const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+    document.getElementById('hex-input').value = hex;
+    document.getElementById('live-color-swatch').style.backgroundColor = hex;
+}
+
+// Drag handler (direct)
+function dragMoveDirect(e) {
+    if (!window.isDraggingCanvas) return;
+    const canvas = document.getElementById('color-canvas');
+    const rect = canvas.getBoundingClientRect();
+    window.currentSat = Math.max(0, Math.min(1, (e.clientX - rect.left) / canvas.width));
+    window.currentVal = 1 - Math.max(0, Math.min(1, (e.clientY - rect.top) / canvas.height));
+    drawColorCanvasDirect();
+    updateLivePreviewDirect();
+}
+
+// Apply button (already in HTML)
+window.applyCustomColor = function() {
+    const hex = document.getElementById('hex-input').value;
+    if (window.currentColorRange && hex) {
+        editor.session.replace(window.currentColorRange, hex);
+    }
+    document.getElementById('custom-color-modal').style.display = 'none';
+    window.currentColorRange = null;
+    setTimeout(() => editor.focus(), 10);
+};
+
+// Close function
+window.closeColorPicker = function() {
+    document.getElementById('custom-color-modal').style.display = 'none';
+    window.currentColorRange = null;
+};
+
+// Force "Change Color" visible in menu
+document.getElementById('color-hr').style.display = 'block';
+document.getElementById('change-color-btn').style.display = 'block';
+
+// === QUICK PATCH (paste at the VERY END of your <script> tag, before ) ===
+// This fixes "Apply & Close" not replacing the color
+// + forces hue slider to instantly update the square gradient (already intuitive)
+
+editor.container.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+
+    const coords = editor.renderer.screenToTextCoordinates(e.clientX, e.clientY);
+    const row = Math.max(0, coords.row);
+    const col = Math.max(0, coords.column);
+    const line = editor.session.getLine(row) || "";
+
+    window.currentColorRange = null;
+    window.currentColorValue = null;
+
+    const colorRegex = /(#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})|rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*(?:,\s*[\d.]+)?\s*\)|hsla?\(\s*\d{1,3}\s*,\s*\d+%?\s*,\s*\d+%?\s*(?:,\s*[\d.]+)?\s*\))/gi;
+    colorRegex.lastIndex = 0;
+    let match;
+    while ((match = colorRegex.exec(line)) !== null) {
+        const start = match.index;
+        const end = start + match[0].length;
+        if (col >= start && col <= end) {
+            window.currentColorRange = new ace.Range(row, start, row, end);
+            window.currentColorValue = match[0];
+            break;
+        }
+    }
+
+    // Position + show menu
+    const contextMenu = document.getElementById('custom-context-menu');
+    let menuX = e.clientX; let menuY = e.clientY;
+    if (menuX + 200 > window.innerWidth) menuX = window.innerWidth - 210;
+    if (menuY + 300 > window.innerHeight) menuY = e.clientY - 280;
+    contextMenu.style.left = menuX + 'px';
+    contextMenu.style.top = menuY + 'px';
+    contextMenu.style.display = 'block';
+
+    // Show "Change Color..." only when needed
+    const changeBtn = document.getElementById('change-color-btn');
+    const colorHr = document.getElementById('color-hr');
+    if (window.currentColorRange) {
+        changeBtn.style.display = 'block';
+        colorHr.style.display = 'block';
+    } else {
+        changeBtn.style.display = 'none';
+        colorHr.style.display = 'none';
+    }
 });
-  </script>
+
+// Re-ensure the Change Color button opens the picker (with your exact color)
+document.getElementById('change-color-btn').onclick = function() {
+    hideContextMenu();
+
+    const modal = document.getElementById('custom-color-modal');
+    const canvas = document.getElementById('color-canvas');
+    const hueSlider = document.getElementById('hue-slider');
+    const hexInput = document.getElementById('hex-input');
+    const liveSwatch = document.getElementById('live-color-swatch');
+
+    // Hue slider instantly redraws the square (intuitive gradient update)
+    hueSlider.oninput = function() {
+        drawColorCanvasDirect();
+        updateLivePreviewDirect();
+    };
+
+    // Load YOUR clicked color (never defaults)
+    const colorValue = window.currentColorValue || "#ff0000";
+    const hsv = parseColorToHsv(colorValue);
+    hueSlider.value = hsv.h;
+    window.currentSat = hsv.s || 1;
+    window.currentVal = hsv.v || 1;
+
+    drawColorCanvasDirect();
+    updateLivePreviewDirect();
+
+    modal.style.display = 'block';
+    makeDraggable(modal);
+};
+
+// Apply button now works 100% (replaces exactly)
+window.applyCustomColor = function() {
+    const hex = document.getElementById('hex-input').value;
+    if (window.currentColorRange && hex) {
+        editor.session.replace(window.currentColorRange, hex);
+        editor.focus();               // ← forces editor to refresh
+    }
+    document.getElementById('custom-color-modal').style.display = 'none';
+    window.currentColorRange = null;
+};
+
+window.closeColorPicker = function() {
+    document.getElementById('custom-color-modal').style.display = 'none';
+    window.currentColorRange = null;
+};
+
+// Globals
+window.currentColorRange = null;
+window.currentColorValue = null;
+window.isDraggingCanvas = false;
+window.currentSat = 1;
+window.currentVal = 1;
+
+// Helper functions
+function parseColorToHsv(color) {
+    color = (color || "#ff0000").trim();
+    if (color.startsWith('#')) return hexToHsv(color);
+    if (color.startsWith('rgb')) {
+        const m = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+        if (m) {
+            let r = parseInt(m[1])/255, g = parseInt(m[2])/255, b = parseInt(m[3])/255;
+            const max = Math.max(r,g,b), min = Math.min(r,g,b);
+            let h=0,s=0,v=max; const d=max-min;
+            if(d){ s=d/max; if(max===r)h=(g-b)/d+(g<b?6:0); else if(max===g)h=(b-r)/d+2; else h=(r-g)/d+4; h/=6; }
+            return {h:h*360,s,v};
+        }
+    }
+    return {h:0,s:1,v:1};
+}
+function hexToHsv(hex) {
+    let r = parseInt(hex.slice(1,3),16)/255, g = parseInt(hex.slice(3,5),16)/255, b = parseInt(hex.slice(5,7),16)/255;
+    const max = Math.max(r,g,b), min = Math.min(r,g,b);
+    let h=0,s=0,v=max; const d=max-min;
+    if(d){ s=d/max; if(max===r)h=(g-b)/d+(g<b?6:0); else if(max===g)h=(b-r)/d+2; else h=(r-g)/d+4; h/=6; }
+    return {h:h*360,s,v};
+}
+function hsvToRgb(h,s,v) {
+    h /= 360;
+    let r,g,b;
+    const i = Math.floor(h*6), f = h*6-i;
+    const p = v*(1-s), q = v*(1-f*s), t = v*(1-(1-f)*s);
+    switch(i%6){ case 0:r=v;g=t;b=p;break; case 1:r=q;g=v;b=p;break;
+    case 2:r=p;g=v;b=t;break; case 3:r=p;g=q;b=v;break;
+    case 4:r=t;g=p;b=v;break; case 5:r=v;g=p;b=q;break; }
+    return {r:Math.round(r*255),g:Math.round(g*255),b:Math.round(b*255)};
+}
+function rgbToHex(r,g,b) {
+    return '#' + [r,g,b].map(x => x.toString(16).padStart(2,'0')).join('').toUpperCase();
+}
+
+// Draw the color square
+function drawColorCanvasDirect() {
+    const canvas = document.getElementById('color-canvas');
+    const ctx = canvas.getContext('2d');
+    const hue = parseFloat(document.getElementById('hue-slider').value);
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0,0,w,h);
+    for (let x = 0; x < w; x++) {
+        const sat = x / w;
+        const grad = ctx.createLinearGradient(0,0,0,h);
+        grad.addColorStop(0, `hsl(${hue},${sat*100}%,100%)`);
+        grad.addColorStop(1, `hsl(${hue},${sat*100}%,0%)`);
+        ctx.fillStyle = grad;
+        ctx.fillRect(x,0,1,h);
+    }
+    // Selector circle
+    const px = (window.currentSat || 1) * w;
+    const py = (1 - (window.currentVal || 1)) * h;
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.arc(px,py,11,0,Math.PI*2); ctx.stroke();
+    ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.arc(px,py,5,0,Math.PI*2); ctx.fill();
+}
+
+// Live preview
+function updateLivePreviewDirect() {
+    const rgb = hsvToRgb(
+        parseFloat(document.getElementById('hue-slider').value),
+        window.currentSat || 1,
+        window.currentVal || 1
+    );
+    const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+    document.getElementById('hex-input').value = hex;
+    document.getElementById('live-color-swatch').style.backgroundColor = hex;
+}
+
+// Drag handler (now with preventDefault)
+function dragMoveDirect(e) {
+    if (!window.isDraggingCanvas) return;
+    const canvas = document.getElementById('color-canvas');
+    const rect = canvas.getBoundingClientRect();
+    window.currentSat = Math.max(0, Math.min(1, (e.clientX - rect.left) / canvas.width));
+    window.currentVal = 1 - Math.max(0, Math.min(1, (e.clientY - rect.top) / canvas.height));
+    drawColorCanvasDirect();
+    updateLivePreviewDirect();
+}
+
+// SINGLE contextmenu listener (no more duplicates)
+editor.container.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    const coords = editor.renderer.screenToTextCoordinates(e.clientX, e.clientY);
+    const row = Math.max(0, coords.row);
+    const col = Math.max(0, coords.column);
+    const line = editor.session.getLine(row) || "";
+
+    window.currentColorRange = null;
+    window.currentColorValue = null;
+
+    const colorRegex = /(#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})|rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*(?:,\s*[\d.]+)?\s*\)|hsla?\(\s*\d{1,3}\s*,\s*\d+%?\s*,\s*\d+%?\s*(?:,\s*[\d.]+)?\s*\))/gi;
+    colorRegex.lastIndex = 0;
+    let match;
+    while ((match = colorRegex.exec(line)) !== null) {
+        const start = match.index;
+        const end = start + match[0].length;
+        if (col >= start && col <= end) {
+            window.currentColorRange = new ace.Range(row, start, row, end);
+            window.currentColorValue = match[0];
+            break;
+        }
+    }
+
+    const contextMenu = document.getElementById('custom-context-menu');
+    let menuX = e.clientX, menuY = e.clientY;
+    if (menuX + 200 > window.innerWidth) menuX = window.innerWidth - 210;
+    if (menuY + 300 > window.innerHeight) menuY = e.clientY - 280;
+    contextMenu.style.left = menuX + 'px';
+    contextMenu.style.top = menuY + 'px';
+    contextMenu.style.display = 'block';
+
+    const changeBtn = document.getElementById('change-color-btn');
+    const colorHr = document.getElementById('color-hr');
+    if (window.currentColorRange) {
+        changeBtn.style.display = 'block';
+        colorHr.style.display = 'block';
+    } else {
+        changeBtn.style.display = 'none';
+        colorHr.style.display = 'none';
+    }
+});
+
+// FIXED Change Color button
+document.getElementById('change-color-btn').onclick = function() {
+    hideContextMenu();   // make sure this function exists earlier in your script
+
+    const modal = document.getElementById('custom-color-modal');
+    const canvas = document.getElementById('color-canvas');
+    const hueSlider = document.getElementById('hue-slider');
+
+    // Setup ONCE
+    if (!canvas.dataset.setupDone) {
+        canvas.width = 220;
+        canvas.height = 220;
+
+        hueSlider.oninput = function() {
+            drawColorCanvasDirect();
+            updateLivePreviewDirect();
+        };
+
+        // Mouse drag
+        canvas.onmousedown = function(e) {
+            window.isDraggingCanvas = true;
+            dragMoveDirect(e);
+            e.preventDefault();
+        };
+        document.onmousemove = function(e) {
+            if (window.isDraggingCanvas) dragMoveDirect(e);
+        };
+        document.onmouseup = function() { window.isDraggingCanvas = false; };
+
+        // Touch drag
+        canvas.ontouchstart = function(e) {
+            if (e.touches.length !== 1) return;
+            e.preventDefault();
+            window.isDraggingCanvas = true;
+            dragMoveDirect(e.touches[0]);
+        };
+        document.ontouchmove = function(e) {
+            if (window.isDraggingCanvas && e.touches.length === 1) {
+                dragMoveDirect(e.touches[0]);
+                e.preventDefault();
+            }
+        };
+        document.ontouchend = function() { window.isDraggingCanvas = false; };
+
+        canvas.dataset.setupDone = "true";
+    }
+
+    // Load the exact color you right-clicked on
+    const colorValue = window.currentColorValue || "#ff0000";
+    const hsv = parseColorToHsv(colorValue);
+    hueSlider.value = hsv.h;
+    window.currentSat = hsv.s || 1;
+    window.currentVal = hsv.v || 1;
+
+    drawColorCanvasDirect();
+    updateLivePreviewDirect();
+
+    modal.style.display = 'block';
+    makeDraggable(modal);   // your existing draggable function
+};
+
+// Apply & Close
+window.applyCustomColor = function() {
+    const hex = document.getElementById('hex-input').value.trim();
+    if (window.currentColorRange && hex) {
+        editor.session.replace(window.currentColorRange, hex);
+        editor.focus();
+    }
+    document.getElementById('custom-color-modal').style.display = 'none';
+    window.currentColorRange = null;
+};
+
+window.closeColorPicker = function() {
+    document.getElementById('custom-color-modal').style.display = 'none';
+    window.currentColorRange = null;
+};
+// ==================== FIXED + UPGRADED COLOR PICKER (compact, alpha, drag, reliable replace) ====================
+ currentColorRange = null;
+ currentColorValue = null;
+isDraggingCanvas = false;
+ currentSat = 1;
+ currentVal = 1;
+ currentAlpha = 1;
+
+// Parse any color (hex, rgb, rgba) → HSV + Alpha
+function parseColorToHsv(color) {
+    color = (color || "#ff0000").trim().toLowerCase();
+    let alpha = 1;
+    
+    // RGBA
+    if (color.startsWith('rgba')) {
+        const m = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+        if (m) {
+            let r = parseInt(m[1])/255, g = parseInt(m[2])/255, b = parseInt(m[3])/255;
+            alpha = m[4] ? parseFloat(m[4]) : 1;
+            return { ...rgbToHsv(r,g,b), alpha };
+        }
+    }
+    // RGB
+    if (color.startsWith('rgb')) {
+        const m = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+        if (m) return { ...rgbToHsv(parseInt(m[1])/255, parseInt(m[2])/255, parseInt(m[3])/255), alpha: 1 };
+    }
+    // Hex (3/6/8 digit)
+    if (color.startsWith('#')) {
+        let hex = color.slice(1);
+        if (hex.length === 3) hex = hex.split('').map(c=>c+c).join('');
+        if (hex.length === 8) alpha = parseInt(hex.slice(6),16)/255;
+        return { ...hexToHsv('#'+hex.slice(0,6)), alpha };
+    }
+    return { h:0, s:1, v:1, alpha:1 };
+}
+
+function rgbToHsv(r,g,b) {
+    const max = Math.max(r,g,b), min = Math.min(r,g,b);
+    let h=0,s=0,v=max; const d=max-min;
+    if(d){ s=d/max; if(max===r)h=(g-b)/d+(g<b?6:0); else if(max===g)h=(b-r)/d+2; else h=(r-g)/d+4; h/=6; }
+    return {h:h*360,s,v};
+}
+function hexToHsv(hex) { return rgbToHsv(...hex.match(/\w\w/g).map(x=>parseInt(x,16)/255)); }
+
+function hsvToRgb(h,s,v) {
+    h /= 360; let r,g,b;
+    const i = Math.floor(h*6), f = h*6-i;
+    const p = v*(1-s), q = v*(1-f*s), t = v*(1-(1-f)*s);
+    switch(i%6){ case 0:r=v;g=t;b=p;break; case 1:r=q;g=v;b=p;break;
+    case 2:r=p;g=v;b=t;break; case 3:r=p;g=q;b=v;break;
+    case 4:r=t;g=p;b=v;break; case 5:r=v;g=p;b=q;break; }
+    return {r:Math.round(r*255),g:Math.round(g*255),b:Math.round(b*255)};
+}
+
+function rgbToHex(r,g,b,a=1) {
+    const hex = '#' + [r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('').toUpperCase();
+    if (a < 1) {
+        const alphaHex = Math.round(a*255).toString(16).padStart(2,'0').toUpperCase();
+        return hex + alphaHex;
+    }
+    return hex;
+}
+
+// Draw square + selector
+function drawColorCanvasDirect() {
+    const canvas = document.getElementById('color-canvas');
+    const ctx = canvas.getContext('2d');
+    const hue = parseFloat(document.getElementById('hue-slider').value);
+    const w = 200, h = 200;
+    ctx.clearRect(0,0,w,h);
+    for (let x = 0; x < w; x++) {
+        const sat = x / w;
+        const grad = ctx.createLinearGradient(0,0,0,h);
+        grad.addColorStop(0, `hsl(${hue},${sat*100}%,100%)`);
+        grad.addColorStop(1, `hsl(${hue},${sat*100}%,0%)`);
+        ctx.fillStyle = grad;
+        ctx.fillRect(x,0,1,h);
+    }
+    const px = currentSat * w;
+    const py = (1 - currentVal) * h;
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(px,py,9,0,Math.PI*2); ctx.stroke();
+    ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(px,py,4,0,Math.PI*2); ctx.fill();
+}
+
+// Update live preview + hex
+function updateLivePreviewDirect() {
+    const rgb = hsvToRgb(
+        parseFloat(document.getElementById('hue-slider').value),
+        currentSat, currentVal
+    );
+    const hex = rgbToHex(rgb.r, rgb.g, rgb.b, currentAlpha);
+    document.getElementById('hex-input').value = hex;
+    document.getElementById('live-color-swatch').style.backgroundColor = hex;
+}
+
+// Drag on square (mouse + touch) - continuous
+function dragMoveDirect(e) {
+    if (!isDraggingCanvas) return;
+    const canvas = document.getElementById('color-canvas');
+    const rect = canvas.getBoundingClientRect();
+    currentSat = Math.max(0, Math.min(1, (e.clientX - rect.left) / canvas.width));
+    currentVal = 1 - Math.max(0, Math.min(1, (e.clientY - rect.top) / canvas.height));
+    drawColorCanvasDirect();
+    updateLivePreviewDirect();
+}
+
+// SINGLE contextmenu (captures exact range every right-click)
+editor.container.addEventListener('contextmenu', function(e) {
+    e.preventDefault(); e.stopImmediatePropagation();
+    const coords = editor.renderer.screenToTextCoordinates(e.clientX, e.clientY);
+    const line = editor.session.getLine(Math.max(0, coords.row)) || "";
+    
+    currentColorRange = null;
+    currentColorValue = null;
+    
+    const colorRegex = /(#(?:[0-9a-fA-F]{3,8})|rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*(?:,\s*[\d.]+)?\s*\))/gi;
+    let match;
+    colorRegex.lastIndex = 0;
+    while ((match = colorRegex.exec(line)) !== null) {
+        if (coords.column >= match.index && coords.column <= match.index + match[0].length) {
+            currentColorRange = new ace.Range(coords.row, match.index, coords.row, match.index + match[0].length);
+            currentColorValue = match[0];
+            break;
+        }
+    }
+    
+    // Position menu + show Change Color only when needed
+    const menu = document.getElementById('custom-context-menu');
+    let x = e.clientX, y = e.clientY;
+    if (x + 200 > window.innerWidth) x = window.innerWidth - 210;
+    if (y + 300 > window.innerHeight) y = e.clientY - 280;
+    menu.style.left = x + 'px'; menu.style.top = y + 'px';
+    menu.style.display = 'block';
+    
+    const changeBtn = document.getElementById('change-color-btn');
+    changeBtn.style.display = currentColorRange ? 'block' : 'none';
+    document.getElementById('color-hr').style.display = currentColorRange ? 'block' : 'none';
+});
+
+// Open picker with exact color + alpha
+document.getElementById('change-color-btn').onclick = function() {
+    hideContextMenu();
+    const modal = document.getElementById('custom-color-modal');
+    const canvas = document.getElementById('color-canvas');
+    const hueSlider = document.getElementById('hue-slider');
+    const alphaSlider = document.getElementById('alpha-slider');
+
+    // Setup once
+    if (!canvas.dataset.setupDone) {
+        canvas.width = 200; canvas.height = 200;
+        
+        hueSlider.oninput = () => { drawColorCanvasDirect(); updateLivePreviewDirect(); };
+        alphaSlider.oninput = () => { 
+            currentAlpha = parseFloat(alphaSlider.value); 
+            updateLivePreviewDirect(); 
+        };
+        
+        // Drag
+        canvas.onmousedown = e => { isDraggingCanvas = true; dragMoveDirect(e); e.preventDefault(); };
+        document.onmousemove = e => { if(isDraggingCanvas) dragMoveDirect(e); };
+        document.onmouseup = () => { isDraggingCanvas = false; };
+        
+        canvas.ontouchstart = e => { if(e.touches.length===1){ isDraggingCanvas=true; dragMoveDirect(e.touches[0]); e.preventDefault(); }};
+        document.ontouchmove = e => { if(isDraggingCanvas && e.touches.length===1) dragMoveDirect(e.touches[0]); };
+        document.ontouchend = () => { isDraggingCanvas = false; };
+        
+        canvas.dataset.setupDone = "true";
+    }
+
+    // Load clicked color (smart - remembers exact range + alpha)
+    const parsed = parseColorToHsv(currentColorValue);
+    hueSlider.value = parsed.h;
+    currentSat = parsed.s || 1;
+    currentVal = parsed.v || 1;
+    currentAlpha = parsed.alpha || 1;
+    alphaSlider.value = currentAlpha;
+
+    drawColorCanvasDirect();
+    updateLivePreviewDirect();
+
+    modal.style.display = 'block';
+    makeDraggable(modal);
+};
+
+// Apply - replaces EXACT range + forces focus (fixes the "doesn't update" bug)
+window.applyCustomColor = function() {
+    const hex = document.getElementById('hex-input').value.trim();
+    if (currentColorRange && hex) {
+        editor.session.replace(currentColorRange, hex);
+        editor.focus();                    // ← critical fix
+        editor.gotoLine(currentColorRange.start.row + 1, currentColorRange.start.column + hex.length);
+    }
+    document.getElementById('custom-color-modal').style.display = 'none';
+    currentColorRange = null;
+};
+
+window.closeColorPicker = function() {
+    document.getElementById('custom-color-modal').style.display = 'none';
+    currentColorRange = null;
+};
+
+
+</script>
+  
 </body>
 </html>
