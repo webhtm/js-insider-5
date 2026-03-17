@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -703,7 +704,7 @@ display: none;
   height: 220px !important;
 }
 .ctx-item:hover {
-    background: #3498db;
+    background: #7544FBCED788;
 }
 .ctx-item:disabled {
     color: #777;
@@ -718,9 +719,12 @@ display: none;
 .draggable-window {
     position: fixed;
     user-select: none;
+    border-radius:5PX;
 }
 .window-header {
     user-select: none;
+    border-radius:5PX;
+    
 }
 /* FIXED OPTIMIZER BUTTONS + SLIM TITLE BAR */
 .opt-btn {
@@ -733,7 +737,7 @@ display: none;
     border-radius: 5px;
     cursor: pointer;
     font-family: Trebuchet MS;
-    font-size: 14px;
+    font-size: 18px;
     transition: background-color 0.2s ease, transform 0.1s ease;
 }
 .opt-btn:hover {
@@ -747,6 +751,7 @@ display: none;
 .window-header {
     padding: 5px 12px !important;   /* was 8px */
     font-size: 15px;
+    border-radius:5Px;
 }
 
 /* Make sure Tools submenu is beside the option */
@@ -843,11 +848,9 @@ display: none;
   width: 24px;
   height: 24px;
   background: white;
-  border: 3px solid #222;
+  border: none;
   border-radius: 50%;
-  box-shadow: 
-    0 4px 8px rgba(0, 0, 0, 0.3),
-    0 0 0 4px rgba(255, 255, 255, 0.6);
+  
   margin-top: -6px;   /* centers it on the track */
   cursor: pointer;
 }
@@ -858,9 +861,7 @@ display: none;
   background: white;
   border: 3px solid #222;
   border-radius: 50%;
-  box-shadow: 
-    0 4px 8px rgba(0, 0, 0, 0.3),
-    0 0 0 4px rgba(255, 255, 255, 0.6);
+  
   cursor: pointer;
 }
 
@@ -875,59 +876,131 @@ display: none;
 #hue-slider::-moz-range-thumb {
   background: var(--thumb-color);
 }
+#find-previous-btn {
+    font-family:trebuchet ms;
+}
+    
+    /* GOTO WINDOW TABS - clean hover + selected */
+.goto-tab {
+    padding: 6px 18px;
+    background: #34495e;
+    border: none;
+    color: #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: Trebuchet MS;
+}
 
+.goto-tab:hover {
+    background: #4a6278;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.goto-tab.active {
+    background: rgba(39, 174, 96, 0.4);
+    color: white;
+    font-weight: bold;
     
-    
+}
+
+/* TOAST NOTIFICATION - Green for success, Red for error */
+#toast {
+    opacity: 0;
+    pointer-events: none;
+}
+#toast.show {
+    opacity: 1;
+    pointer-events: auto;
+    animation: toastPop 0.3s ease;
+}
+#toast.success {
+    background: #27ae60;
+}
+#toast.error {
+    background: #e74c3c;
+}
+@keyframes toastPop {
+    0% { transform: translateX(-50%) scale(0.8); }
+    100% { transform: translateX(-50%) scale(1); }
+}
     /* Title bar white + Trebuchet already forced in HTML */
-
+#div-selector, #goto-div-selector { width:96%;}
   </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.0/beautify.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.0/beautify-css.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.0/beautify-html.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.15.1/beautify.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.15.1/beautify-html.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.15.1/beautify-css.min.js"></script>
 </head>
-<body>
-    <!-- ULTRA-COMPACT 170px COLOR PICKER (110px square + rainbow hue + RGB input) -->
-<div id="custom-color-modal" class="draggable-window" 
-     style="display:none; position:fixed; width:170px; background:#2c3e50; border-radius:8px; box-shadow:0 8px 20px rgba(0,0,0,0.9); z-index:10000000; overflow:hidden; font-family:Trebuchet MS;">
-    
-    <!-- Flat title bar (no rounded corners) -->
-    <div class="window-header" style="background:#34495e; padding:6px 10px; cursor:move; display:flex; justify-content:space-between; align-items:center; font-family:Trebuchet MS; color:white; font-size:13px; font-weight:bold; border-radius:8px 8px 0 0;">
+<!-- ULTRA-COMPACT 3-SLIDER COLOR PICKER -->
+<!-- TOAST NOTIFICATION (color-based, no x/tick) -->
+<div id="toast" style="display:none; position:absolute; bottom:20px; left:50%; transform:translateX(-50%); color:white; padding:12px 24px; border-radius:6px; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.4); z-index:999999; transition:all 0.3s ease; font-weight:500;">
+</div>
+<div id="custom-color-modal" class="draggable-window"
+     style="display:none; position:fixed; width:290px; background:#2c3e50; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.88); z-index:10000000; overflow:hidden; font-family:Trebuchet MS; color:#eee;">
+
+    <!-- Slim title bar -->
+    <div class="window-header" style="background:#34495e; padding:8px 12px; cursor:move; display:flex; justify-content:space-between; align-items:center; font-size:13px; font-weight:bold; border-radius:8px 8px 0 0;">
         Color Picker
-        <button onclick="closeColorPicker()" 
-                style="background:none;  border:none; color:#e74c3c; font-size:25px; line-height:1; cursor:pointer; font-family:Trebuchet MS;">×</button>
+        <button onclick="closeColorPicker()"
+                style="background:none; border:none; color:#e74c3c; font-size:24px; line-height:1; cursor:pointer;">×</button>
     </div>
-    
-    <div style="padding:9px 11px; font-family:Trebuchet MS;">
-        <!-- Smaller square (110×110) -->
-        <canvas id="color-canvas" width="110" height="110" 
-                style="border:2px solid #34495e; border-radius:4px; cursor:crosshair; display:block; margin:0 auto 7px; box-shadow:0 2px 8px rgba(0,0,0,0.5);"></canvas>
-        
-        <!-- Rainbow hue slider (proper color picker style) -->
-        <label style="color:#bbb; font-size:11px; display:block; margin-bottom:3px;">Hue</label>
-        <input type="range" id="hue-slider" min="0" max="360" value="0" 
-               style="width:100%; height:6px; border-radius:0; background:linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);">
-        
-        <!-- Opacity -->
-        <label style="color:#bbb; font-size:11px; display:block; margin:7px 0 3px;">Opacity</label>
-        <input type="range" id="alpha-slider" min="0" max="1" step="0.01" value="1" 
-               style="width:100%; height:6px; border-radius:0; accent-color:#27ae60;">
-        
-        <!-- Hex/RGB input (now accepts both #hex and rgb()/rgba()) -->
-        <input type="text" id="hex-input" maxlength="30" placeholder="#RRGGBB or rgb(255,0,0)"
-               style="margin-top:8px; width:100%; padding:7px; background:#34495e; color:white; border:none; border-radius:4px; font-size:13px; text-align:center; box-sizing:border-box; font-family:monospace;">
-        
-        <!-- Tiny swatch -->
-        <div id="live-color-swatch" 
-             style="width:100%; height:22px; margin:7px 0; border:2px solid #34495e; border-radius:4px; box-shadow:0 2px 6px rgba(0,0,0,0.4);"></div>
-        
-        <!-- Tiny Apply -->
-        <button onclick="applyCustomColor()" 
-                style="margin-top:5px; width:100%; padding:8px; background:#27ae60; border:none; border-radius:4px; color:white; font-weight:bold; font-size:12px; font-family:Trebuchet MS;">
+
+    <div style="padding:14px 16px; font-size:13px;">
+
+        <!-- Live preview swatch + Hex -->
+        <div style="display:flex; gap:12px; align-items:center; margin-bottom:14px;">
+            <div id="live-color-swatch"
+                 style="width:64px; height:64px; border:2px solid #444; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.5); background:#f00;"></div>
+            <div style="flex:1;">
+                <input type="text" id="hex-input" maxlength="9" placeholder="#RRGGBB or #RRGGBBAA"
+                       style="width:100%; padding:9px; background:#34495e; color:#eee; border:none; border-radius:5px; font-family:monospace; text-align:center; box-sizing:border-box;"/>
+            </div>
+        </div>
+
+        <!-- Hue slider (rainbow) -->
+        <label style="display:block; margin:8px 0 4px; color:#ccc; font-size:12px;">Hue</label>
+        <input type="range" id="hue-slider" min="0" max="360" value="0"
+               style="width:100%; height:18px; border-radius:9px; background:linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00); appearance:none; outline:none;"/>
+
+        <!-- Saturation slider (dynamic) -->
+        <label style="display:block; margin:12px 0 4px; color:#ccc; font-size:12px;">Saturation</label>
+        <input type="range" id="sat-slider" min="0" max="100" value="100"
+               style="width:100%; height:18px; border-radius:9px; appearance:none; outline:none;"/>
+
+        <!-- Value / Brightness slider (dynamic) -->
+        <label style="display:block; margin:12px 0 4px; color:#ccc; font-size:12px;">Value</label>
+        <input type="range" id="val-slider" min="0" max="100" value="100"
+               style="width:100%; height:18px; border-radius:9px; appearance:none; outline:none;"/>
+
+        <!-- Optional Alpha slider -->
+        <label style="display:block; margin:12px 0 4px; color:#ccc; font-size:12px;">Opacity</label>
+        <input type="range" id="alpha-slider" min="0" max="1" step="0.01" value="1"
+               style="width:100%; height:18px; border-radius:9px; accent-color:#27ae60;"/>
+
+        <!-- Apply button -->
+        <button onclick="applyCustomColor()"
+                style="margin-top:16px; width:100%; padding:10px; background:#27ae60; border:none; border-radius:6px; color:white; font-size:13px; cursor:pointer; font-family:trebuchet ms;">
             Apply & Close
         </button>
     </div>
 </div>
-    
+    <div id="custom-context-menu">
+    <button class="ctx-item" data-action="undo">Undo</button>
+    <button class="ctx-item" data-action="redo">Redo</button>
+    <hr>
+    <button class="ctx-item" data-action="cut">Cut</button>
+    <button class="ctx-item" data-action="copy">Copy</button>
+    <button class="ctx-item" data-action="paste">Paste</button>
+    <button class="ctx-item" data-action="selectall">Select All</button>
+    <hr id="color-hr" style="display:none">
+    <button id="change-color-btn" class="ctx-item" style="display:none; color:#27ae60; font-weight:bold;">Change Color...</button>
+    <hr>
+    <button class="ctx-item" data-tool="goto-section" style="color:#27ae60; font-weight:bold;">Go to Section...</button>
+    <button class="ctx-item" data-tool="insert-script" style="color:#27ae60; font-weight:bold;">Insert Script...</button>
+    <button class="ctx-item" data-tool="code-optimizer" style="color:#27ae60; font-weight:bold;">Code Optimizer...</button>
+</div>
     <!-- Title bar - white text, Trebuchet MS, square corners -->
     
   <h1 id="top-bar">
@@ -1013,14 +1086,16 @@ display: none;
             <button class="sidebar-close-btn" id="close-sidebar-find-replace">&times;</button>
           </div>
           <form id="find-replace-form">
-            <input type="text" id="find-text" placeholder="Find...">
-            <input type="text" id="replace-text" placeholder="Replace with...">
-            <label><input type="checkbox" id="case-sensitive"> Case sensitive</label>
-            <label><input type="checkbox" id="whole-word"> Whole word</label>
-            <button type="button" id="find-next-btn">Find Next</button>
-            <button type="button" id="replace-btn">Replace</button>
-            <button type="button" id="replace-all-btn">Replace All</button>
-          </form>
+  <input type="text" id="find-text" placeholder="Find...">
+  <input type="text" id="replace-text" placeholder="Replace with...">
+  <label><input type="checkbox" id="case-sensitive"> Case sensitive</label>
+  <label><input type="checkbox" id="whole-word"> Whole word</label>
+  
+  <button type="button" id="find-previous-btn">Find Previous</button>
+  <button type="button" id="find-next-btn">Find Next</button>
+  <button type="button" id="replace-btn">Replace</button>
+  <button type="button" id="replace-all-btn">Replace All</button>
+</form>
         </div>
         <!-- Sidebar Language Panel -->
         <div id="sidebar-language" class="sidebar-panel">
@@ -1052,57 +1127,39 @@ display: none;
       </div>
       <!-- CUSTOM CONTEXT MENU (replaces browser + Ace default) -->
 <!-- CUSTOM CONTEXT MENU - Tools now directly inside -->
-<div id="custom-context-menu">
-    <button class="ctx-item" data-action="undo">Undo</button>
-    <button class="ctx-item" data-action="redo">Redo</button>
-    <hr>
-    <button class="ctx-item" data-action="cut">Cut</button>
-    <button class="ctx-item" data-action="copy">Copy</button>
-    <button class="ctx-item" data-action="paste">Paste</button>
-    <button class="ctx-item" data-action="selectall">Select All</button>
-    <hr id="color-hr" style="display:none">
-    <button id="change-color-btn" class="ctx-item" style="display:none; color:#27ae60; font-weight:bold;">
-        Change Color...
-    </button>
-    <hr>
-    <!-- TOOLS BUTTONS — directly in menu -->
-    <button class="ctx-item" data-tool="goto-section" style="color:#27ae60; font-weight:bold;">Go to Section...</button>
-    <button class="ctx-item" data-tool="insert-script" style="color:#27ae60; font-weight:bold;">Insert Script...</button>
-    
-</div>
-</div>
- 
-
-<!-- GO TO SECTION + SCRIPT INSERTER WINDOW (draggable) -->
-<div id="goto-window" class="draggable-window" style="display:none; width:420px; background:#2c3e50; color:white; border-radius:8px; box-shadow:0 10px 30px rgba(0,0,0,0.7); z-index:1000000; position:fixed;">
+<!-- CODE OPTIMIZER WINDOW -->
+<!-- CODE OPTIMIZER WINDOW (now with JS Functions support) -->
+<div id="optimizer-window" class="draggable-window" style="display:none; width:420px; background:#2c3e50; color:white; border-radius:8px; box-shadow:0 10px 30px rgba(0,0,0,0.7); z-index:1000000; position:fixed;">
     <div class="window-header" style="background:#34495e; padding:8px 12px; cursor:move; display:flex; justify-content:space-between; align-items:center;">
-        <span id="goto-title">Go to Section / Insert Script</span>
+        <span>Code Optimizer</span>
         <button class="close-window-btn" style="background:none; border:none; color:#e74c3c; font-size:20px; cursor:pointer;">×</button>
     </div>
     <div style="padding:15px;">
-        <!-- Go to Section -->
-        <div id="goto-section-part">
-            <button onclick="jumpToSection('style')" class="ctx-item" style="margin-bottom:5px;">Jump to &lt;style&gt; (CSS)</button>
-            <button onclick="jumpToSection('body')" class="ctx-item" style="margin-bottom:5px;">Jump to &lt;body&gt;</button>
-            <button onclick="jumpToSection('script')" class="ctx-item">Jump to &lt;script&gt; (JS)</button>
-        </div>
-        
-        <!-- Insert Script -->
-        <div id="insert-script-part" style="margin-top:15px; border-top:1px solid #444; padding-top:15px;">
-            <label style="display:block; margin-bottom:5px;">Target function (e.g. reload() or async function go())</label>
-            <input id="target-func" type="text" placeholder="reload()" style="width:96%; padding:8px; background:#34495e; color:white; border:none; border-radius:4px;">
-            
-            <div style="margin:10px 0; display:flex; gap:10px;">
-                <label><input type="radio" name="insert-pos" value="last" checked> At the end of function</label>
-                <label><input type="radio" name="insert-pos" value="top"> At the top of function</label>
-            </div>
-            
-            <label style="display:block; margin-bottom:5px;">Code to insert</label>
-            <textarea id="script-code" style="width:100%; height:90px; background:#34495e; color:white; border:none; border-radius:4px; resize:none;"></textarea>
-            
-            <button onclick="insertScriptIntoFunction()" style="margin-top:10px; width:100%; background:#27ae60; color:white; border:none; padding:10px; border-radius:4px;">Insert Code</button>
-            <div id="insert-error" style="color:#e74c3c; margin-top:8px; display:none;"></div>
-        </div>
+        <button onclick="cleanCurrentFile()" class="opt-btn">Clean & Beautify</button>
+        <button onclick="minifyCurrentFile()" class="opt-btn">Minify (remove whitespace)</button>
+        <button onclick="removeUnusedCSS()" class="opt-btn">Remove Unused CSS</button>
+        <button onclick="removeUnusedJSFunctions()" class="opt-btn">Remove Unused JS Functions</button>
+    </div>
+</div>
+ 
+</div>
+<!-- GO TO SECTION + SCRIPT INSERTER WINDOW (draggable) -->
+<!-- UPDATED GO TO / INSERT WINDOW WITH SMALL TABS -->
+<div id="goto-window" class="draggable-window" style="display:none; width:440px; background:#2c3e50; color:white; border-radius:8px; box-shadow:0 10px 30px rgba(0,0,0,0.7); z-index:1000000; position:fixed;">
+    <div class="window-header" style="background:#34495e; padding:8px 12px; cursor:move; display:flex; justify-content:space-between; align-items:center;">
+        <span id="goto-title">Go to / Insert</span>
+        <button class="close-window-btn" style="background:none; border:none; color:#e74c3c; font-size:20px; cursor:pointer;">×</button>
+    </div>
+
+    <!-- Tiny tabs -->
+    <div id="goto-tab-bar" style="display:flex; background:#2c3e50; padding:5px 10px; gap:6px; border-bottom:1px solid #444;">
+        <button id="tab1" class="goto-tab active" style="padding:6px 18px; background:#34495e; border:none; color:white; border-radius:4px; font-size:13px; cursor:pointer; font-family:trebuchet ms;">Sections</button>
+        <button id="tab2" class="goto-tab" style="padding:6px 18px; background:#34495e; border:none; color:white; border-radius:4px; font-size:13px; cursor:pointer; font-family:trebuchet ms;">Divs</button>
+    </div>
+
+    <div style="padding:15px;">
+        <div id="tab-content-1"></div>
+        <div id="tab-content-2" style="display:none;"></div>
     </div>
 </div>
 
@@ -2775,8 +2832,9 @@ let currentColorValue = null;
 const colorRegex = /(#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})|rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*(?:,\s*[\d.]+)?\s*\)|hsla?\(\s*\d{1,3}\s*,\s*\d+%?\s*,\s*\d+%?\s*(?:,\s*[\d.]+)?\s*\))/gi;
 
 // Show menu on right-click
+// ==================== SMART RIGHT-CLICK MENU (never goes off-screen) ====================
 editor.container.addEventListener('contextmenu', function(e) {
-    e.preventDefault();                    // ← KILLS browser + Ace default menu
+    e.preventDefault();
     e.stopImmediatePropagation();
 
     const coords = editor.renderer.screenToTextCoordinates(e.clientX, e.clientY);
@@ -2784,41 +2842,57 @@ editor.container.addEventListener('contextmenu', function(e) {
     const col = Math.max(0, coords.column);
     const line = editor.session.getLine(row) || "";
 
-    // Detect if we clicked on a color
-    currentColorRange = null;
-    currentColorValue = null;
+    // Color detection (kept exactly as before)
+    window.currentColorRange = null;
+    window.currentColorValue = null;
+    const colorRegex = /(#(?:[0-9a-fA-F]{3,8})|rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*(?:,\s*[\d.]+)?\s*\))/gi;
     colorRegex.lastIndex = 0;
     let match;
     while ((match = colorRegex.exec(line)) !== null) {
-        const start = match.index;
-        const end = start + match[0].length;
-        if (col >= start && col <= end) {
-            currentColorRange = new ace.Range(row, start, row, end);
-            currentColorValue = match[0];
+        if (col >= match.index && col <= match.index + match[0].length) {
+            window.currentColorRange = new ace.Range(row, match.index, row, match.index + match[0].length);
+            window.currentColorValue = match[0];
             break;
         }
     }
 
-    // Show/hide "Change Color" option
+    const contextMenu = document.getElementById('custom-context-menu');
+
+    // === SMART POSITIONING - never goes off screen ===
+    const MENU_WIDTH = 210;   // your min-width + padding
+    const MENU_HEIGHT = 340;  // safe max height (all items + hr)
+
+    let posX = e.clientX;
+    let posY = e.clientY;
+
+    // 1. Right edge → flip to LEFT of cursor
+    if (posX + MENU_WIDTH > window.innerWidth) {
+        posX = e.clientX - MENU_WIDTH - 8;
+    }
+
+    // 2. Bottom edge → flip ABOVE cursor
+    if (posY + MENU_HEIGHT > window.innerHeight) {
+        posY = e.clientY - MENU_HEIGHT - 8;
+    }
+
+    // 3. Safety clamps (never go off left or top)
+    if (posX < 10) posX = 10;
+    if (posY < 10) posY = 10;
+
+    contextMenu.style.left = posX + 'px';
+    contextMenu.style.top  = posY + 'px';
+    contextMenu.style.display = 'block';
+
+    // Show/hide Change Color option
     const changeBtn = document.getElementById('change-color-btn');
     const colorHr = document.getElementById('color-hr');
-    if (currentColorRange) {
+    if (window.currentColorRange) {
         changeBtn.style.display = 'block';
         colorHr.style.display = 'block';
     } else {
         changeBtn.style.display = 'none';
         colorHr.style.display = 'none';
     }
-
-    // Position menu (smart: don't go off-screen)
-    let menuX = e.clientX;
-    let menuY = e.clientY;
-    if (menuX + 200 > window.innerWidth) menuX = window.innerWidth - 210;
-    if (menuY + 300 > window.innerHeight) menuY = e.clientY - 280;
-
-    contextMenu.style.left = menuX + 'px';
-    contextMenu.style.top = menuY + 'px';
-    contextMenu.style.display = 'block';
 });
 
 // Hide menu when clicking anywhere else
@@ -2926,8 +3000,7 @@ document.querySelectorAll('#tools-submenu .ctx-item').forEach(btn => {
 
 // ==================== DRAGGABLE WINDOWS (reusable) ====================
 // FIXED DRAGGABLE – cannot go off-screen
-<!-- 3. DRAGGABLE WINDOWS – now work perfectly on TOUCH SCREENS (phones/tablets) -->
-<!-- Replace your entire makeDraggable function with this: -->
+
 function makeDraggable(win) {
     const header = win.querySelector('.window-header');
     let offsetX = 0, offsetY = 0;
@@ -3015,26 +3088,113 @@ function openOptimizerWindow() {
     win.style.display = 'block';
     makeDraggable(win);
 }
-
+function findFirstNonCommentedMatch(content, regex) {
+    regex.lastIndex = 0;
+    let match;
+    while ((match = regex.exec(content)) !== null) {
+        if (!isPositionInCommentOrString(match.index, content)) {
+            return match;
+        }
+    }
+    return null;
+}
 // ==================== GO TO SECTION (simple HTML sections) ====================
 function jumpToSection(section) {
     const content = editor.getValue();
-    let regex;
-    if (section === 'style') regex = /<style[^>]*>/i;
-    else if (section === 'body') regex = /<body[^>]*>/i;
-    else if (section === 'script') regex = /<script[^>]*>/i;
-    
-    const match = content.match(regex);
+    let regex, match;
+
+    if (section === 'style') {
+        regex = /<style[^>]*>/gi;
+        match = findFirstNonCommentedMatch(content, regex);
+    } else if (section === 'body') {
+        regex = /<body[^>]*>/gi;
+        match = findFirstNonCommentedMatch(content, regex);
+    } else if (section === 'script') {
+        // 1. Prefer real inline <script> (no src=)
+        regex = /<script(?![^>]*\ssrc=)[^>]*>/gi;
+        match = findFirstNonCommentedMatch(content, regex);
+
+        // 2. Fallback to any <script> if no inline one exists
+        if (!match) {
+            regex = /<script[^>]*>/gi;
+            match = findFirstNonCommentedMatch(content, regex);
+        }
+    }
+
     if (match) {
         const pos = editor.session.getDocument().indexToPosition(match.index);
         editor.gotoLine(pos.row + 1, pos.column);
-        editor.focus();
         document.getElementById('goto-window').style.display = 'none';
     } else {
-        alert(`No <${section}> section found in this file.`);
+        alert(`No <${section}> section found (non-commented).`);
+    }
+}
+// Checks if a position is inside HTML comment, JS comment, or string literal
+function isPositionInCommentOrString(pos, content) {
+    // HTML comment: <!-- ... -->
+    const htmlRegex = /<!--[\s\S]*?-->/g;
+    let m;
+    htmlRegex.lastIndex = 0;
+    while ((m = htmlRegex.exec(content)) !== null) {
+        if (pos >= m.index && pos < m.index + m[0].length) return true;
+    }
+
+    // JS multi-line: /* ... */
+    const multiJs = /\/\*[\s\S]*?\*\//g;
+    multiJs.lastIndex = 0;
+    while ((m = multiJs.exec(content)) !== null) {
+        if (pos >= m.index && pos < m.index + m[0].length) return true;
+    }
+
+    // JS single-line: // ...
+    const singleJs = /\/\/.*?(?=\n|$)/g;
+    singleJs.lastIndex = 0;
+    while ((m = singleJs.exec(content)) !== null) {
+        if (pos >= m.index && pos < m.index + m[0].length) return true;
+    }
+
+    // Strings: "..." and '...' (handles escaped quotes too)
+    const strRegex = /(["'])(?:(?=(\\?))\2.)*?\1/g;
+    strRegex.lastIndex = 0;
+    while ((m = strRegex.exec(content)) !== null) {
+        if (pos >= m.index && pos < m.index + m[0].length) return true;
+    }
+
+    return false;
+}
+// Jump to selected CDN script
+function jumpToCDNScript() {
+    const select = document.getElementById('cdn-script-select');
+    if (!select) return;
+    
+    const idx = parseInt(select.value);
+    if (isNaN(idx)) {
+        showToast('No CDN script selected', 'error');
+        return;
+    }
+
+    const cdns = getCDNScripts();
+    if (cdns[idx]) {
+        const pos = editor.session.getDocument().indexToPosition(cdns[idx].index);
+        editor.gotoLine(pos.row + 1, pos.column);
+        document.getElementById('goto-window').style.display = 'none';
+        showToast(`Jumped to CDN: ${cdns[idx].src.split('/').pop()}`);
     }
 }
 
+function getCDNScripts() {
+    const content = editor.getValue();
+    const regex = /<script\s+src=["']([^"']+)["'][^>]*>/gi;
+    let match;
+    const cdns = [];
+
+    while ((match = regex.exec(content)) !== null) {
+        if (!isPositionInCommentOrString(match.index, content)) {
+            cdns.push({ src: match[1], index: match.index });
+        }
+    }
+    return cdns;
+}
 // ==================== INSERT SCRIPT INTO FUNCTION (smart + error handling) ====================
 function insertScriptIntoFunction() {
     const funcInput = document.getElementById('target-func').value.trim();
@@ -3968,7 +4128,471 @@ window.closeColorPicker = function() {
     currentColorRange = null;
 };
 
+// ────────────────────────────────────────────────
+//   Color picker state & helpers
+// ────────────────────────────────────────────────
+ currentColorRange = null;
+ currentColorValue = null;
 
+let hue   = 0;
+let sat   = 100;
+let val   = 100;
+let alpha = 1;
+
+function hsvToRgb(h, s, v) {
+    h /= 360; s /= 100; v /= 100;
+    let r, g, b;
+    const i = Math.floor(h * 6);
+    const f = h * 6 - i;
+    const p = v * (1 - s);
+    const q = v * (1 - f * s);
+    const t = v * (1 - (1 - f) * s);
+    switch (i % 6) {
+        case 0: r=v; g=t; b=p; break;
+        case 1: r=q; g=v; b=p; break;
+        case 2: r=p; g=v; b=t; break;
+        case 3: r=p; g=q; b=v; break;
+        case 4: r=t; g=p; b=v; break;
+        case 5: r=v; g=p; b=q; break;
+    }
+    return {
+        r: Math.round(r*255),
+        g: Math.round(g*255),
+        b: Math.round(b*255)
+    };
+}
+
+function rgbToHex(r, g, b, a = 1) {
+    const hex = [r,g,b].map(x => x.toString(16).padStart(2,'0')).join('').toUpperCase();
+    if (a < 1) {
+        const aa = Math.round(a * 255).toString(16).padStart(2,'0').toUpperCase();
+        return '#' + hex + aa;
+    }
+    return '#' + hex;
+}
+
+function updateSlidersBackground() {
+    const hueVal = document.getElementById('hue-slider').value;
+
+    // Saturation gradient: gray → full hue at current value
+    const satBg = `linear-gradient(to right, #444, hsl(${hueVal},${sat}%,${val}%))`;
+    document.getElementById('sat-slider').style.background = satBg;
+
+    // Value gradient: black → current hue/sat
+    const valBg = `linear-gradient(to right, #000, hsl(${hueVal},${sat}%,${val}%))`;
+    document.getElementById('val-slider').style.background = valBg;
+}
+
+function updatePreviewAndHex() {
+    const rgb = hsvToRgb(hue, sat, val);
+    const hex = rgbToHex(rgb.r, rgb.g, rgb.b, alpha);
+
+    document.getElementById('live-color-swatch').style.backgroundColor = hex;
+    document.getElementById('hex-input').value = hex;
+}
+
+function initColorPickerListeners() {
+    const hSlider = document.getElementById('hue-slider');
+    const sSlider = document.getElementById('sat-slider');
+    const vSlider = document.getElementById('val-slider');
+    const aSlider = document.getElementById('alpha-slider');
+
+    hSlider.oninput = () => {
+        hue = parseFloat(hSlider.value);
+        updateSlidersBackground();
+        updatePreviewAndHex();
+    };
+
+    sSlider.oninput = () => {
+        sat = parseFloat(sSlider.value);
+        updateSlidersBackground();
+        updatePreviewAndHex();
+    };
+
+    vSlider.oninput = () => {
+        val = parseFloat(vSlider.value);
+        updateSlidersBackground();
+        updatePreviewAndHex();
+    };
+
+    aSlider.oninput = () => {
+        alpha = parseFloat(aSlider.value);
+        updatePreviewAndHex();
+    };
+}
+
+// Called when user clicks "Change Color..."
+document.getElementById('change-color-btn').onclick = function() {
+    hideContextMenu();
+
+    const modal = document.getElementById('custom-color-modal');
+
+    // Parse original color
+    const parsed = parseColorToHsv(currentColorValue || "#ff0000");
+    hue   = parsed.h;
+    sat   = parsed.s * 100;
+    val   = parsed.v * 100;
+    alpha = parsed.alpha ?? 1;
+
+    // Set sliders
+    document.getElementById('hue-slider').value   = hue;
+    document.getElementById('sat-slider').value   = sat;
+    document.getElementById('val-slider').value   = val;
+    document.getElementById('alpha-slider').value = alpha;
+
+    updateSlidersBackground();
+    updatePreviewAndHex();
+
+    modal.style.display = 'block';
+    makeDraggable(modal);
+};
+
+// Apply
+window.applyCustomColor = function() {
+    const hex = document.getElementById('hex-input').value.trim();
+    if (currentColorRange && hex) {
+        editor.session.replace(currentColorRange, hex);
+        editor.focus();
+    }
+    document.getElementById('custom-color-modal').style.display = 'none';
+    currentColorRange = null;
+};
+
+window.closeColorPicker = function() {
+    document.getElementById('custom-color-modal').style.display = 'none';
+    currentColorRange = null;
+};
+
+// Run once on load
+setTimeout(initColorPickerListeners, 300);
+// ────────────────────────────────────────────────
+//  LAST FOCUSED POSITION TRACKING
+// ────────────────────────────────────────────────
+let lastCursorPos = { row: 0, column: 0 };
+editor.selection.on('changeCursor', () => {
+  lastCursorPos = editor.getCursorPosition();
+});
+
+// ────────────────────────────────────────────────
+//  FIND PREVIOUS
+// ────────────────────────────────────────────────
+document.getElementById('find-previous-btn').addEventListener('click', () => {
+  const needle = document.getElementById('find-text').value;
+  if (needle) {
+    findRange = editor.find(needle, {
+      backwards: true,
+      wrap: true,
+      caseSensitive: document.getElementById('case-sensitive').checked,
+      wholeWord: document.getElementById('whole-word').checked,
+      regExp: false,
+      start: findRange || editor.getCursorPosition()
+    });
+  }
+});
+
+// ────────────────────────────────────────────────
+//  UPDATED openGotoWindow + TABS + NEW FEATURES
+// ────────────────────────────────────────────────
+function openGotoWindow(insertOnly = false) {
+  const win = document.getElementById('goto-window');
+  const titleEl = document.getElementById('goto-title');
+  const tab1 = document.getElementById('tab1');
+  const tab2 = document.getElementById('tab2');
+  const c1 = document.getElementById('tab-content-1');
+  const c2 = document.getElementById('tab-content-2');
+
+  titleEl.textContent = insertOnly ? 'Insert Code' : 'Go to Section';
+
+  // Set tab labels (small & clean)
+  if (!insertOnly) {
+    tab1.textContent = 'Sections';
+    tab2.textContent = 'Divs';
+    c1.innerHTML = `
+        <button onclick="jumpToSection('style')" class="ctx-item" style="margin-bottom:5px;">Jump to &lt;style&gt;</button>
+        <button onclick="jumpToSection('body')" class="ctx-item" style="margin-bottom:5px;">Jump to &lt;body&gt;</button>
+        <button onclick="jumpToSection('script')" class="ctx-item" style="margin-bottom:5px;">Jump to &lt;script&gt; (inline JS)</button>
+        <button onclick="jumpToLastFocused()" class="ctx-item" style="margin-bottom:5px; background:#27ae60; color:white;">Jump to last focused</button>
+        
+        <!-- NEW: CDN Script List -->
+        <label style="display:block; margin:15px 0 6px 0; color:#bbb; font-size:13px;">Go to CDN Script</label>
+        <select id="cdn-script-select" style="width:100%; padding:9px; background:#34495e; color:white; border:none; border-radius:4px; font-size:13px;">
+            <!-- Populated dynamically -->
+        </select>
+        <button onclick="jumpToCDNScript()" style="margin-top:8px; width:100%; background:#27ae60; color:white; border:none; padding:9px; border-radius:4px; font-size:13px;">Jump to Selected CDN</button>
+    `;
+// Populate CDN dropdown
+    const cdns = getCDNScripts();
+    const select = document.getElementById('cdn-script-select');
+    if (cdns.length === 0) {
+        select.innerHTML = '<option>No CDN scripts found in this file</option>';
+        select.disabled = true;
+    } else {
+        select.innerHTML = cdns.map((cdn, i) => {
+            const short = cdn.src.length > 55 ? cdn.src.substring(0,52) : cdn.src;
+            return `<option value="${i}">${short}</option>`;
+        }).join('');
+        select.disabled = false;
+    }
+
+    c2.innerHTML = `
+      <label style="display:block; margin-bottom:5px;">Div ID or class (e.g. main)</label>
+      <input id="goto-div-selector" type="text" placeholder="#myDiv" style="width:96%; padding:8px; background:#34495e; color:white; border:none; border-radius:4px;">
+      <button onclick="jumpToDiv()" style="margin-top:10px; background:#27ae60; color:white; border:none; padding:10px; border-radius:4px; width:100%">Jump to Div</button>
+    `;
+  } else {
+    tab1.textContent = 'Function';
+    tab2.textContent = 'Div';
+    c1.innerHTML = `
+      <label style="display:block; margin-bottom:5px;">Target function (e.g. reload())</label>
+      <input id="target-func" type="text" placeholder="reload()" style="width:96%; padding:8px; background:#34495e; color:white; border:none; border-radius:4px;">
+      <div style="margin:10px 0; display:flex; gap:10px;">
+        <label><input type="radio" name="insert-pos" value="last" checked> End of function</label>
+        <label><input type="radio" name="insert-pos" value="top"> Top of function</label>
+      </div>
+      <label style="display:block; margin-bottom:5px;">Code to insert</label>
+      <textarea id="script-code" style="width:100%; height:90px; background:#34495e; color:white; border:none; border-radius:4px; resize:none;"></textarea>
+      <button onclick="insertScriptIntoFunction()" style="margin-top:10px; width:100%; background:#27ae60; color:white; border:none; padding:10px; border-radius:4px;">Insert Code</button>
+      <div id="insert-error" style="color:#e74c3c; margin-top:8px; display:none;"></div>
+    `;
+    c2.innerHTML = `
+      <label style="display:block; margin-bottom:5px;">Target div (ID or class)</label>
+      <input id="div-selector" type="text" placeholder="#content" style="width:96%; padding:8px; background:#34495e; color:white; border:none; border-radius:4px;">
+      <div style="margin:10px 0; display:flex; gap:10px;">
+        <label><input type="radio" name="div-insert-pos" value="start" checked> At start of div</label>
+        <label><input type="radio" name="div-insert-pos" value="end"> At end of div</label>
+      </div>
+      <label style="display:block; margin-bottom:5px;">Code to insert</label>
+      <textarea id="div-insert-code" style="width:100%; height:90px; background:#34495e; color:white; border:none; border-radius:4px; resize:none;"></textarea>
+      <button onclick="insertIntoDiv()" style="margin-top:10px; width:100%; background:#27ae60; color:white; border:none; padding:10px; border-radius:4px;">Insert into Div</button>
+      <div id="div-insert-error" style="color:#e74c3c; margin-top:8px; display:none;"></div>
+    `;
+  }
+
+  // Default to first tab
+  c1.style.display = 'block';
+  c2.style.display = 'none';
+  tab1.classList.add('active');
+  tab2.classList.remove('active');
+
+  tab1.onclick = () => { switchGotoTab(1); };
+  tab2.onclick = () => { switchGotoTab(2); };
+
+  win.style.left = '35%';
+  win.style.top = '25%';
+  win.style.display = 'block';
+  makeDraggable(win);
+}
+
+function switchGotoTab(n) {
+  const c1 = document.getElementById('tab-content-1');
+  const c2 = document.getElementById('tab-content-2');
+  const t1 = document.getElementById('tab1');
+  const t2 = document.getElementById('tab2');
+
+  if (n === 1) {
+    c1.style.display = 'block'; c2.style.display = 'none';
+    t1.classList.add('active'); t2.classList.remove('active');
+  } else {
+    c1.style.display = 'none'; c2.style.display = 'block';
+    t1.classList.remove('active'); t2.classList.add('active');
+  }
+}
+
+// ────────────────────────────────────────────────
+//  NEW: Jump to last focused
+// ────────────────────────────────────────────────
+function jumpToLastFocused() {
+  editor.gotoLine(lastCursorPos.row + 1, lastCursorPos.column);
+  document.getElementById('goto-window').style.display = 'none';
+}
+
+// ────────────────────────────────────────────────
+//  NEW: Jump to Div (in Go To mode)
+// ────────────────────────────────────────────────
+function jumpToDiv() {
+  const selector = document.getElementById('goto-div-selector').value.trim();
+  if (!selector) return alert('Enter div ID or class');
+
+  const content = editor.getValue();
+  const regex = new RegExp(`<div[^>]*?(id|class)=["']?${selector.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}["']?[^>]*>`, 'i');
+  const match = content.match(regex);
+  if (match) {
+    const pos = editor.session.getDocument().indexToPosition(match.index);
+    editor.gotoLine(pos.row + 1, pos.column);
+    document.getElementById('goto-window').style.display = 'none';
+  } else {
+    alert('Div not found.');
+  }
+}
+
+// ────────────────────────────────────────────────
+//  NEW: Insert into Div (in Insert mode)
+// ────────────────────────────────────────────────
+function insertIntoDiv() {
+  const selector = document.getElementById('div-selector').value.trim();
+  const codeToInsert = document.getElementById('div-insert-code').value.trim();
+  const posType = document.querySelector('input[name="div-insert-pos"]:checked').value;
+  const err = document.getElementById('div-insert-error');
+
+  if (!selector || !codeToInsert) {
+    err.textContent = 'Both fields required.';
+    err.style.display = 'block';
+    return;
+  }
+
+  let content = editor.getValue();
+  const regex = new RegExp(`(<div[^>]*?(id|class)=["']?${selector.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}["']?[^>]*>)`, 'i');
+  const match = content.match(regex);
+
+  if (!match) {
+    err.textContent = `Div "${selector}" not found.`;
+    err.style.display = 'block';
+    return;
+  }
+
+  let insertPoint = match.index + match[0].length;
+
+  if (posType === 'end') {
+    const after = content.substring(insertPoint);
+    const close = after.match(/<\/div>/i);
+    if (close) insertPoint += close.index;
+  }
+
+  content = content.slice(0, insertPoint) + '\n' + codeToInsert + '\n' + content.slice(insertPoint);
+  editor.setValue(content);
+  editor.gotoLine(editor.session.getDocument().indexToPosition(insertPoint).row + 1);
+  document.getElementById('goto-window').style.display = 'none';
+}
+// ────────────────────────────────────────────────
+//  CODE OPTIMIZER (using js-beautify already loaded)
+// ────────────────────────────────────────────────
+function getCurrentMode() {
+    const mode = editor.session.getMode().$id || '';
+    const ext = (currentFile || '').split('.').pop().toLowerCase();
+    if (mode.includes('html') || ext === 'html' || ext === 'htm') return 'html';
+    if (mode.includes('javascript') || ext === 'js') return 'js';
+    if (mode.includes('css') || ext === 'css') return 'css';
+    return 'text';
+}
+
+function cleanCurrentFile() {
+    const mode = getCurrentMode();
+    let code = editor.getValue();
+    let cleaned = code;
+    if (mode === 'html') cleaned = html_beautify(code, { indent_size: 4 });
+    else if (mode === 'js') cleaned = js_beautify(code, { indent_size: 4 });
+    else if (mode === 'css') cleaned = css_beautify(code, { indent_size: 4 });
+    else cleaned = html_beautify(code, { indent_size: 4 });
+    editor.setValue(cleaned);
+    showToast('Code cleaned & beautified');
+}
+
+function minifyCurrentFile() {
+    const mode = getCurrentMode();
+    let code = editor.getValue();
+    let minified = code;
+    if (mode === 'html') minified = html_beautify(code, { indent_size: 0 }).replace(/\n\s*/g, ' ');
+    else if (mode === 'js') minified = js_beautify(code, { indent_size: 0 }).replace(/\n\s*/g, ' ');
+    else if (mode === 'css') minified = css_beautify(code, { indent_size: 0 }).replace(/\n\s*/g, ' ');
+    else minified = code.replace(/\s+/g, ' ').trim();
+    editor.setValue(minified);
+    showToast('Code minified');
+}
+
+function removeUnusedCSS() {
+    const ext = (currentFile || '').split('.').pop().toLowerCase();
+    if (!currentFile || (ext !== 'html' && ext !== 'htm')) {
+        showToast('Unused CSS removal works only on .html and .htm files', 'error');
+        return;
+    }
+    let code = editor.getValue();
+    const styleRegex = /(<style[^>]*>)([\s\S]*?)(<\/style>)/gi;
+    code = code.replace(styleRegex, (full, open, styleContent, close) => {
+        let cleaned = styleContent;
+        const ruleRegex = /([^{}]+?)\s*\{[\s\S]*?\}/g;
+        let match;
+        const kept = [];
+        while ((match = ruleRegex.exec(styleContent)) !== null) {
+            const selector = match[1].trim().split(',')[0].trim();
+            if (selector.startsWith('@')) { kept.push(match[0]); continue; }
+            const htmlWithoutStyle = code.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+            if (new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(htmlWithoutStyle)) {
+                kept.push(match[0]);
+            }
+        }
+        return open + kept.join('\n') + close;
+    });
+    editor.setValue(code);
+    showToast('Unused CSS removed');
+}
+
+// Open optimizer from context menu
+function openOptimizerWindow() {
+    const win = document.getElementById('optimizer-window');
+    win.style.left = '30%';
+    win.style.top = '20%';
+    win.style.display = 'block';
+    makeDraggable(win);
+}
+
+// Update context menu click handler (add this line inside your existing contextMenu.addEventListener('click', ...))
+/* Inside the existing contextMenu click handler, add this: */
+if (tool === 'code-optimizer') openOptimizerWindow();
+// ────────────────────────────────────────────────
+//  NEW: Remove Unused JS Functions
+// ────────────────────────────────────────────────
+function removeUnusedJSFunctions() {
+    const ext = (currentFile || '').split('.').pop().toLowerCase();
+    if (!currentFile || (ext !== 'js' && ext !== 'html' && ext !== 'htm')) {
+        showToast('This works on .js, .html and .htm files', 'error');
+        return;
+    }
+
+    let code = editor.getValue();
+    const funcRegex = /function\s+([a-zA-Z_$][0-9a-zA-Z_$]*)\s*\(/g;
+    let match;
+    const functions = [];
+
+    // Find all function names
+    while ((match = funcRegex.exec(code)) !== null) {
+        functions.push(match[1]);
+    }
+
+    let removedCount = 0;
+    functions.forEach(name => {
+        const callRegex = new RegExp('\\b' + name + '\\b', 'g');
+        const calls = (code.match(callRegex) || []).length;
+
+        // If function is defined but never called (or only self-called), remove it
+        if (calls <= 1) {
+            const fullFuncRegex = new RegExp('function\\s+' + name + '\\s*\\([^)]*\\)\\s*\\{[^}]*\\}', 'g');
+            code = code.replace(fullFuncRegex, '');
+            removedCount++;
+        }
+    });
+
+    editor.setValue(code.trim());
+    showToast(`Removed ${removedCount} unused JS function(s)`);
+}
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    
+    // Remove old classes
+    toast.classList.remove('success', 'error');
+    
+    // Add correct color
+    if (type === 'error') {
+        toast.classList.add('error');
+    } else {
+        toast.classList.add('success');
+    }
+    
+    toast.classList.add('show');
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 2500);
+}
 </script>
   
 </body>
