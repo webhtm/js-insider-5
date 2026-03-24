@@ -1233,22 +1233,28 @@ display: none;
     </div>
   
   <!-- Modal Dialog for Preview Code -->
-  <div id="preview-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title"><span id="preview-filename"></span></h3>
-        <button id="reload-preview-btn" class="header-btn" title="Reload Preview">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24" height="24">
-            <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
-          </svg>
-        </button>
-        <button id="close-preview-modal" class="close-btn">&times;</button>
-      </div>
-      <div class="modal-body">
-        <iframe id="code-preview"></iframe>
-      </div>
+  <!-- IMPROVED PREVIEW MODAL (paste this instead of the old one) -->
+<div id="preview-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header" style="padding:6px 12px; font-size:15px;"> <!-- thinner title bar -->
+      <h3 class="modal-title" style="margin:0; flex:1;">
+        <span id="preview-filename"></span>
+      </h3>
+      
+      <!-- Reload button RIGHT BEFORE X -->
+      <button id="reload-preview-btn" class="header-btn" title="Reload Preview" style="margin-right:8px;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="22" height="22">
+          <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+        </svg>
+      </button>
+      
+      <button id="close-preview-modal" class="close-btn" style="font-size:28px; padding:2px 10px;">×</button>
+    </div>
+    <div class="modal-body">
+      <iframe id="code-preview" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
     </div>
   </div>
+</div>
   <!-- Modal for DB Files -->
   <div id="db-files-modal" class="modal">
     <div class="modal-content">
@@ -1500,25 +1506,19 @@ display: none;
 function updateHeaderIconColors() {
   const topBar = document.getElementById('top-bar');
   const color = window.getComputedStyle(topBar).backgroundColor;
-  
-  // Parse RGB
   const rgb = color.match(/\d+/g);
   if (!rgb) return;
-  
-  const r = parseInt(rgb[0]), g = parseInt(rgb[1]), b = parseInt(rgb[2]);
-  const brightness = (r * 299 + g * 587 + b * 114) / 1000; // standard luminance
-  
+  const brightness = (parseInt(rgb[0])*299 + parseInt(rgb[1])*587 + parseInt(rgb[2])*114) / 1000;
   const newFill = brightness > 180 ? '#000000' : '#ffffff';
-  
   document.querySelectorAll('.header-btn svg').forEach(svg => {
     svg.setAttribute('fill', newFill);
-    // Also update any stroke inside the SVG
     svg.querySelectorAll('path, circle').forEach(el => {
       if (el.getAttribute('stroke')) el.setAttribute('stroke', newFill);
     });
   });
 }
-
+// Run once on load and after settings change
+setTimeout(updateHeaderIconColors, 500);
 // Run on color change + initial load + settings open
 document.getElementById('top-bar-color').addEventListener('input', () => {
   updateHeaderIconColors();
@@ -2097,45 +2097,31 @@ setTimeout(updateHeaderIconColors, 300); // initial
     document.getElementById("new-file-header-btn").onclick = document.getElementById("new-file-btn").onclick;
     // Event listener for rename file button
     document.getElementById("rename-file-btn").onclick = () => {
-      if (!currentFile) {
-        alert("No file selected!");
-        return;
-      }
-     
-      const newFilename = prompt("Enter new file name:", currentFile);
-      if (newFilename && newFilename.trim() && newFilename.trim() !== currentFile) {
-        const trimmedNewFilename = newFilename.trim();
-       
-        if (files.hasOwnProperty(trimmedNewFilename)) {
-          alert("File already exists!");
-          return;
-        }
-       
-        saveCurrentFile();
-       
-        files[trimmedNewFilename] = files[currentFile];
-        delete files[currentFile];
-       
-        if (savedFiles.has(currentFile)) {
-          removeFileFromIndexedDB(currentFile).then(() => {
-            if (autoSaveFiles.has(trimmedNewFilename)) {
-              autoSaveFile(trimmedNewFilename, files[trimmedNewFilename]);
-            }
-          });
-        }
-       
-        if (autoSaveFiles.has(currentFile)) {
-          autoSaveFiles.delete(currentFile);
-          autoSaveFiles.add(trimmedNewFilename);
-        }
-       
-        currentFile = trimmedNewFilename;
-       
-        updateFileExplorer();
-        highlightFile(trimmedNewFilename);
-        setEditorMode(trimmedNewFilename);
-      }
-    };
+  if (!currentFile) return alert("No file selected!");
+  const newFilename = prompt("Enter new file name", currentFile);
+  if (!newFilename || newFilename.trim() === currentFile) return;
+  const trimmed = newFilename.trim();
+  if (files.hasOwnProperty(trimmed)) return alert("File already exists!");
+
+  saveCurrentFile();
+  files[trimmed] = files[currentFile];
+  delete files[currentFile];
+
+  if (savedFiles.has(currentFile)) {
+    removeFileFromIndexedDB(currentFile).then(() => {
+      if (autoSaveFiles.has(trimmed)) autoSaveFile(trimmed, files[trimmed]);
+    });
+  }
+  if (autoSaveFiles.has(currentFile)) {
+    autoSaveFiles.delete(currentFile);
+    autoSaveFiles.add(trimmed);
+  }
+  savedFiles.delete(currentFile);           // ← fixed
+  currentFile = trimmed;
+  updateFileExplorer();
+  highlightFile(trimmed);
+  setEditorMode(trimmed);
+};
     // Event listener for delete file button
     // UPDATED SIDEBAR DELETE: permanent removal (no temporary leftover)
 document.getElementById("delete-file-btn").onclick = () => {
@@ -2661,32 +2647,99 @@ document.getElementById('remove-from-db-btn').addEventListener('click', function
       return titleMatch ? titleMatch[1].trim() : null;
     }
     // Modal handling
-    document.getElementById("preview-code-btn").onclick = () => {
-      if (!currentFile) {
-        alert("No file selected!");
-        return;
-      }
-     
-      saveCurrentFile();
-      const previewModal = document.getElementById("preview-modal");
-      const previewFrame = document.getElementById("code-preview");
-      const previewFilename = document.getElementById("preview-filename");
-     
-      const fileContent = files[currentFile];
-      const extension = currentFile.split('.').pop().toLowerCase();
-     
-      let previewTitle = currentFile;
-      if (extension === 'html') {
-        const htmlTitle = extractHtmlTitle(fileContent);
-        if (htmlTitle) {
-          previewTitle = htmlTitle;
-        }
-      }
-     
-      previewFilename.textContent = previewTitle;
-      previewFrame.srcdoc = fileContent;
-      previewModal.style.display = "block";
-    };
+    // ==================== SUPER CLEAN PREVIEW CLOSE + DYNAMIC TITLE ====================
+let previewInterval = null;
+
+document.getElementById("preview-code-btn").onclick = () => {
+    if (!currentFile) return alert("No file selected!");
+
+    saveCurrentFile();
+    const modal = document.getElementById("preview-modal");
+    const iframe = document.getElementById("code-preview");
+    const titleSpan = document.getElementById("preview-filename");
+
+    let content = files[currentFile];
+    const ext = currentFile.toLowerCase().split('.').pop();
+
+    // Support ALL HTML formats
+    const isHTML = ['html','htm','shtml','shtm','xhtml'].includes(ext);
+
+    if (isHTML) {
+        // Improved title extraction + dynamic JS title support
+        let detectedTitle = currentFile;
+        
+        // 1. Static <title> tag
+        const staticMatch = content.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+        if (staticMatch) detectedTitle = staticMatch[1].trim();
+
+        // 2. Also check <meta property="og:title"> etc. (bonus)
+        const ogMatch = content.match(/<meta[^>]*property=["']og:title["'][^>]*content=["']([^"']+)["']/i);
+        if (ogMatch) detectedTitle = ogMatch[1];
+
+        titleSpan.textContent = detectedTitle;
+
+        // LIVE title watching (JS document.title changes inside preview)
+        iframe.onload = () => {
+            if (previewInterval) clearInterval(previewInterval);
+            previewInterval = setInterval(() => {
+                try {
+                    const liveTitle = iframe.contentDocument.title;
+                    if (liveTitle && liveTitle !== detectedTitle) {
+                        titleSpan.textContent = liveTitle + " (live)";
+                    }
+                } catch(e) {}
+            }, 800);
+        };
+    } else {
+        titleSpan.textContent = currentFile;
+    }
+
+    iframe.srcdoc = content;           // ← use srcdoc so we can fully kill it
+    modal.style.display = "block";
+};
+
+// Reload (still works)
+document.getElementById("reload-preview-btn").onclick = () => {
+    const iframe = document.getElementById('code-preview');
+    iframe.contentWindow.location.reload();
+};
+
+// COMPLETE KILL on close (this is what you asked for)
+function closePreviewModal() {
+    const iframe = document.getElementById('code-preview');
+    
+    // 1. Stop all media
+    try {
+        iframe.contentDocument.querySelectorAll('audio, video, iframe, object, embed').forEach(el => {
+            if (el.pause) el.pause();
+            if (el.src) el.src = '';
+        });
+    } catch(e) {}
+
+    // 2. FULL TERMINATION (best way on phones)
+    iframe.srcdoc = '';           // clear everything
+    iframe.src = 'about:blank';   // force garbage collection
+    
+    // 3. Remove & recreate iframe (nuclear option - zero memory leak)
+    const parent = iframe.parentNode;
+    const newIframe = iframe.cloneNode();
+    parent.replaceChild(newIframe, iframe);
+
+    document.getElementById('preview-modal').style.display = 'none';
+    
+    if (previewInterval) {
+        clearInterval(previewInterval);
+        previewInterval = null;
+    }
+}
+
+document.getElementById("close-preview-modal").onclick = closePreviewModal;
+
+// Bonus: Also close on Escape + outside click already exists, but make sure
+window.onclick = function(e) {
+    const modal = document.getElementById("preview-modal");
+    if (e.target === modal) closePreviewModal();
+};
     document.getElementById("reload-preview-btn").onclick = () => {
       const previewFrame = document.getElementById('code-preview');
       previewFrame.contentWindow.location.reload();
@@ -3040,105 +3093,236 @@ contextMenu.addEventListener('click', function(e) {
     }
 });
 // CHANGE COLOR (exactly like old swatch)
-// CUSTOM COLOR PICKER (no focus loss, no browser dialog)
-// Click any tool = close BOTH menus + open window
-document.querySelectorAll('#tools-submenu .ctx-item').forEach(btn => {
-    btn.onclick = function() {
-        toolsSubmenu.style.display = 'none';
-        // main menu already closed above
-        const tool = this.dataset.tool;
-        if (tool === 'goto-section') openGotoWindow();
-        if (tool === 'insert-script') openGotoWindow(true);
-        if (tool === 'code-optimizer') openOptimizerWindow();
-    };
-});
-// ONE click-outside handler that closes BOTH menus (but NOT the windows)
-document.addEventListener('click', function(e) {
-    if (!contextMenu.contains(e.target)) {
-        contextMenu.style.display = 'none';
+// ==================== FIXED COLOR PICKER + RIGHT-CLICK ====================
+currentColorRange = null;
+currentColorValue = null;
+let isDraggingCanvas = false;
+let currentSat = 1;
+let currentVal = 1;
+let currentAlpha = 1;
+
+function parseColorToHsv(color) {
+  color = (color || "#ff0000").trim().toLowerCase();
+  let alpha = 1;
+  if (color.startsWith('rgba')) {
+    const m = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+    if (m) return { ...rgbToHsv(parseInt(m[1])/255, parseInt(m[2])/255, parseInt(m[3])/255), alpha: m[4] ? parseFloat(m[4]) : 1 };
+  }
+  if (color.startsWith('rgb')) {
+    const m = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+    if (m) return { ...rgbToHsv(parseInt(m[1])/255, parseInt(m[2])/255, parseInt(m[3])/255), alpha: 1 };
+  }
+  if (color.startsWith('#')) {
+    let hex = color.slice(1);
+    if (hex.length === 3) hex = hex.split('').map(c=>c+c).join('');
+    if (hex.length === 8) alpha = parseInt(hex.slice(6),16)/255;
+    return { ...hexToHsv('#'+hex.slice(0,6)), alpha };
+  }
+  return { h:0, s:1, v:1, alpha:1 };
+}
+
+function rgbToHsv(r,g,b) {
+  const max = Math.max(r,g,b), min = Math.min(r,g,b);
+  let h=0,s=0,v=max;
+  const d = max-min;
+  if (d) {
+    s = d/max;
+    if (max===r) h = (g-b)/d + (g<b?6:0);
+    else if (max===g) h = (b-r)/d + 2;
+    else h = (r-g)/d + 4;
+    h /= 6;
+  }
+  return {h:h*360, s, v};
+}
+
+function hexToHsv(hex) { return rgbToHsv(...hex.match(/\w\w/g).map(x=>parseInt(x,16)/255)); }
+
+function hsvToRgb(h,s,v) {
+  h /= 360; s /= 100; v /= 100;
+  let r,g,b;
+  const i = Math.floor(h*6), f = h*6-i;
+  const p = v*(1-s), q = v*(1-f*s), t = v*(1-(1-f)*s);
+  switch(i%6){
+    case 0:r=v;g=t;b=p;break; case 1:r=q;g=v;b=p;break; case 2:r=p;g=v;b=t;break;
+    case 3:r=p;g=q;b=v;break; case 4:r=t;g=p;b=v;break; case 5:r=v;g=p;b=q;break;
+  }
+  return {r:Math.round(r*255),g:Math.round(g*255),b:Math.round(b*255)};
+}
+
+function rgbToHex(r,g,b,a=1) {
+  const hex = [r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('').toUpperCase();
+  return a<1 ? '#' + hex + Math.round(a*255).toString(16).padStart(2,'0').toUpperCase() : '#' + hex;
+}
+
+// Draw canvas
+function drawColorCanvas() {
+  const canvas = document.getElementById('color-canvas');
+  const ctx = canvas.getContext('2d');
+  const hue = parseFloat(document.getElementById('hue-slider').value);
+  const w = canvas.width = 220, h = canvas.height = 220;
+  ctx.clearRect(0,0,w,h);
+  for (let x=0; x<w; x++) {
+    const sat = x/w;
+    const grad = ctx.createLinearGradient(0,0,0,h);
+    grad.addColorStop(0, `hsl(${hue},${sat*100}%,100%)`);
+    grad.addColorStop(1, `hsl(${hue},${sat*100}%,0%)`);
+    ctx.fillStyle = grad;
+    ctx.fillRect(x,0,1,h);
+  }
+  const px = currentSat * w;
+  const py = (1 - currentVal) * h;
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.arc(px,py,11,0,Math.PI*2); ctx.stroke();
+  ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.arc(px,py,5,0,Math.PI*2); ctx.fill();
+}
+
+// Live preview
+function updateLivePreview() {
+  const rgb = hsvToRgb(parseFloat(document.getElementById('hue-slider').value), currentSat*100, currentVal*100);
+  const hex = rgbToHex(rgb.r, rgb.g, rgb.b, currentAlpha);
+  document.getElementById('hex-input').value = hex;
+  document.getElementById('live-color-swatch').style.backgroundColor = hex;
+}
+
+// Drag handler
+function dragMove(e) {
+  if (!isDraggingCanvas) return;
+  const canvas = document.getElementById('color-canvas');
+  const rect = canvas.getBoundingClientRect();
+  currentSat = Math.max(0, Math.min(1, (e.clientX - rect.left) / canvas.width));
+  currentVal = 1 - Math.max(0, Math.min(1, (e.clientY - rect.top) / canvas.height));
+  drawColorCanvas();
+  updateLivePreview();
+}
+
+// SINGLE clean contextmenu listener (fixes wrong color bug)
+editor.container.addEventListener('contextmenu', function(e) {
+  e.preventDefault();
+  e.stopImmediatePropagation();
+
+  const coords = editor.renderer.screenToTextCoordinates(e.clientX, e.clientY);
+  const row = Math.max(0, coords.row);
+  const col = Math.max(0, coords.column);
+  const line = editor.session.getLine(row) || "";
+
+  currentColorRange = null;
+  currentColorValue = null;
+
+  const colorRegex = /(#(?:[0-9a-fA-F]{3,8})|rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*(?:,\s*[\d.]+)?\s*\)|hsla?\(\s*\d{1,3}\s*,\s*\d+%?\s*,\s*\d+%?\s*(?:,\s*[\d.]+)?\s*\))/gi;
+  let match;
+  colorRegex.lastIndex = 0;
+  while ((match = colorRegex.exec(line)) !== null) {
+    if (col >= match.index && col <= match.index + match[0].length) {
+      currentColorRange = new ace.Range(row, match.index, row, match.index + match[0].length);
+      currentColorValue = match[0];
+      break;
     }
+  }
+
+  // Show menu
+  const menu = document.getElementById('custom-context-menu');
+  let x = e.clientX, y = e.clientY;
+  if (x + 210 > window.innerWidth) x = window.innerWidth - 220;
+  if (y + 340 > window.innerHeight) y = e.clientY - 320;
+  menu.style.left = x + 'px';
+  menu.style.top = y + 'px';
+  menu.style.display = 'block';
+
+  const changeBtn = document.getElementById('change-color-btn');
+  changeBtn.style.display = currentColorRange ? 'block' : 'none';
+  document.getElementById('color-hr').style.display = currentColorRange ? 'block' : 'none';
 });
-// Escape key also closes both menus
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        contextMenu.style.display = 'none';
-        toolsSubmenu.style.display = 'none';
-    }
-    // ==================== TOOLS BUTTON – main menu stays open, submenu beside it ====================
-const toolsBtn = document.getElementById('tools-btn');
-const toolsSubmenu = document.getElementById('tools-submenu');
-toolsBtn.onclick = function(e) {
-    e.stopImmediatePropagation();
-    // ← MAIN MENU NO LONGER CLOSES
-    const rect = toolsBtn.getBoundingClientRect();
-    toolsSubmenu.style.left = (rect.right + 8) + 'px';
-    toolsSubmenu.style.top  = rect.top + 'px';
-    toolsSubmenu.style.display = 'block';
+
+// Open picker with correct color
+document.getElementById('change-color-btn').onclick = function() {
+  hideContextMenu();
+  const modal = document.getElementById('custom-color-modal');
+  const canvas = document.getElementById('color-canvas');
+  const hueSlider = document.getElementById('hue-slider');
+  const alphaSlider = document.getElementById('alpha-slider');
+
+  if (!canvas.dataset.setupDone) {
+    canvas.width = 220; canvas.height = 220;
+    hueSlider.oninput = () => { drawColorCanvas(); updateLivePreview(); };
+    alphaSlider.oninput = () => { currentAlpha = parseFloat(alphaSlider.value); updateLivePreview(); };
+    canvas.onmousedown = e => { isDraggingCanvas = true; dragMove(e); e.preventDefault(); };
+    document.onmousemove = e => { if(isDraggingCanvas) dragMove(e); };
+    document.onmouseup = () => { isDraggingCanvas = false; };
+    canvas.ontouchstart = e => { if(e.touches.length===1){ isDraggingCanvas=true; dragMove(e.touches[0]); e.preventDefault(); }};
+    document.ontouchmove = e => { if(isDraggingCanvas && e.touches.length===1) dragMove(e.touches[0]); };
+    document.ontouchend = () => { isDraggingCanvas = false; };
+    canvas.dataset.setupDone = "true";
+  }
+
+  const parsed = parseColorToHsv(currentColorValue || "#ff0000");
+  hueSlider.value = parsed.h;
+  currentSat = parsed.s;
+  currentVal = parsed.v;
+  currentAlpha = parsed.alpha || 1;
+  alphaSlider.value = currentAlpha;
+  drawColorCanvas();
+  updateLivePreview();
+
+  modal.style.display = 'block';
+  makeDraggable(modal);
 };
-// Tool clicks (closes only submenu)
-document.querySelectorAll('#tools-submenu .ctx-item').forEach(btn => {
-    btn.onclick = function() {
-        toolsSubmenu.style.display = 'none';
-        const tool = this.dataset.tool;
-        if (tool === 'goto-section') openGotoWindow();
-        if (tool === 'insert-script') openGotoWindow(true);
-        if (tool === 'code-optimizer') openOptimizerWindow();
-    };
-});
-});
+
+window.applyCustomColor = function() {
+  const hex = document.getElementById('hex-input').value.trim();
+  if (!hex || !currentColorRange) return;
+  editor.session.replace(currentColorRange, hex);
+  editor.focus();
+  document.getElementById('custom-color-modal').style.display = 'none';
+  currentColorRange = null;
+};
+
+window.closeColorPicker = function() {
+  document.getElementById('custom-color-modal').style.display = 'none';
+  currentColorRange = null;
+};
 // ==================== DRAGGABLE WINDOWS (reusable) ====================
 // FIXED DRAGGABLE – cannot go off-screen
 function makeDraggable(win) {
-    const header = win.querySelector('.window-header');
-    let offsetX = 0, offsetY = 0;
-    let isDragging = false;
+  const header = win.querySelector('.window-header');
+  let offsetX = 0, offsetY = 0;
+  let isDragging = false;
 
-    header.onmousedown = function(e) {
-        if (e.button !== 0) return;
-        startDrag(e.clientX, e.clientY);
-        e.preventDefault();
-    };
+  header.onmousedown = function(e) {
+    if (e.button !== 0) return;
+    startDrag(e.clientX, e.clientY);
+    e.preventDefault();
+  };
+  header.ontouchstart = function(e) {
+    if (e.touches.length !== 1) return;
+    if (e.target.closest('.close-window-btn')) return;
+    startDrag(e.touches[0].clientX, e.touches[0].clientY);
+    e.preventDefault();
+  };
 
-    header.ontouchstart = function(e) {
-        if (e.touches.length !== 1) return;
-        // FIX: Do NOT start drag if user touched the × close button
-        if (e.target.closest('.close-window-btn') || 
-            e.target.getAttribute('onclick')?.includes('closeColorPicker')) {
-            return; // let the close button work
-        }
-        startDrag(e.touches[0].clientX, e.touches[0].clientY);
-        e.preventDefault();
-    };
+  function startDrag(clientX, clientY) {
+    isDragging = true;
+    offsetX = clientX - win.offsetLeft;
+    offsetY = clientY - win.offsetTop;
+    document.onmousemove = mouseMove;
+    document.ontouchmove = touchMove;
+    document.onmouseup = stopDrag;
+    document.ontouchend = stopDrag;
+  }
 
-    function startDrag(clientX, clientY) {
-        isDragging = true;
-        offsetX = clientX - win.offsetLeft;
-        offsetY = clientY - win.offsetTop;
-        document.onmousemove = mouseMove;
-        document.ontouchmove = touchMove;
-        document.onmouseup = stopDrag;
-        document.ontouchend = stopDrag;
-    }
+  function mouseMove(e) { if (isDragging) moveWindow(e.clientX, e.clientY); }
+  function touchMove(e) { if (isDragging && e.touches.length===1) moveWindow(e.touches[0].clientX, e.touches[0].clientY); }
 
-    function mouseMove(e) { if (!isDragging) return; moveWindow(e.clientX, e.clientY); }
-    function touchMove(e) { 
-        if (!isDragging || e.touches.length !== 1) return; 
-        moveWindow(e.touches[0].clientX, e.touches[0].clientY); 
-        e.preventDefault(); 
-    }
-    function moveWindow(clientX, clientY) {
-        let newLeft = clientX - offsetX;
-        let newTop = clientY - offsetY;
-        newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - win.offsetWidth - 10));
-        newTop = Math.max(0, Math.min(newTop, window.innerHeight - win.offsetHeight - 10));
-        win.style.left = newLeft + 'px';
-        win.style.top = newTop + 'px';
-    }
-    function stopDrag() {
-        isDragging = false;
-        document.onmousemove = document.ontouchmove = null;
-        document.onmouseup = document.ontouchend = null;
-    }
+  function moveWindow(clientX, clientY) {
+    let newLeft = clientX - offsetX;
+    let newTop = clientY - offsetY;
+    newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - win.offsetWidth - 10));
+    newTop = Math.max(0, Math.min(newTop, window.innerHeight - win.offsetHeight - 10));
+    win.style.left = newLeft + 'px';
+    win.style.top = newTop + 'px';
+  }
+
+  function stopDrag() { isDragging = false; document.onmousemove = document.ontouchmove = null; }
 }
 // Close buttons
 document.querySelectorAll('.close-window-btn').forEach(btn => {
@@ -4681,51 +4865,28 @@ if (tool === 'code-optimizer') openOptimizerWindow();
 //  NEW: Remove Unused JS Functions
 // ────────────────────────────────────────────────
 function removeUnusedJSFunctions() {
-    const ext = (currentFile || '').split('.').pop().toLowerCase();
-    if (!currentFile || (ext !== 'js' && ext !== 'html' && ext !== 'htm')) {
-        showToast('This works on .js, .html and .htm files', 'error');
-        return;
+  let code = editor.getValue();
+  const funcRegex = /function\s+([a-zA-Z_$][0-9a-zA-Z_$]*)\s*\(/g;
+  let match;
+  const functions = [];
+  while ((match = funcRegex.exec(code)) !== null) functions.push(match[1]);
+
+  let removed = 0;
+  functions.forEach(name => {
+    const callRegex = new RegExp('\\b' + name + '\\b', 'g');
+    const calls = (code.match(callRegex) || []).length;
+    if (calls <= 1) {
+      const fullRegex = new RegExp('function\\s+' + name + '\\s*\\([^)]*\\)\\s*\\{[^}]*\\}', 'g');
+      code = code.replace(fullRegex, '');
+      removed++;
     }
-    let code = editor.getValue();
-    const funcRegex = /function\s+([a-zA-Z_$][0-9a-zA-Z_$]*)\s*\(/g;
-    let match;
-    const functions = [];
-    // Find all function names
-    while ((match = funcRegex.exec(code)) !== null) {
-        functions.push(match[1]);
-    }
-    let removedCount = 0;
-    functions.forEach(name => {
-        const callRegex = new RegExp('\\b' + name + '\\b', 'g');
-        const calls = (code.match(callRegex) || []).length;
-        // If function is defined but never called (or only self-called), remove it
-        if (calls <= 1) {
-            const fullFuncRegex = new RegExp('function\\s+' + name + '\\s*\\([^)]*\\)\\s*\\{[^}]*\\}', 'g');
-            code = code.replace(fullFuncRegex, '');
-            removedCount++;
-        }
-    });
-    editor.setValue(code.trim());
-    showToast(`Removed ${removedCount} unused JS function(s)`);
+  });
+  editor.setValue(code.trim());
+  showToast(`Removed ${removed} unused JS function(s)`);
 }
 function showToast(message, type = 'success') {
     const toast = document.getElementById('toast');
-    toast.textContent = message;
-    
-    // Remove old classes
-    toast.classList.remove('success', 'error');
-    
-    // Add correct color
-    if (type === 'error') {
-        toast.classList.add('error');
-    } else {
-        toast.classList.add('success');
-    }
-    
-    toast.classList.add('show');
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 2500);
+    alert(message)
 }
 // Extra safety for color picker close button on mobile
 const colorCloseBtn = document.querySelector('#custom-color-modal button[onclick*="closeColorPicker"]');
@@ -4784,6 +4945,18 @@ document.getElementById('change-color-btn').onclick = function() {
 editor.selection.on('changeCursor', () => {
     window.lastCursorPos = editor.getCursorPosition();
 });
+function updateFindCount() {
+  const needle = document.getElementById('find-text').value;
+  if (!needle) return;
+  const count = editor.findAll(needle, {
+    caseSensitive: document.getElementById('case-sensitive').checked,
+    wholeWord: document.getElementById('whole-word').checked
+  });
+  // Optional: show a small toast
+  if (count > 0) showToast(`${count} matches found`);
+}
+document.getElementById('find-next-btn').addEventListener('click', updateFindCount);
+document.getElementById('find-previous-btn').addEventListener('click', updateFindCount);
 </script>
   
 </body>
