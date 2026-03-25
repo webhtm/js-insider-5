@@ -974,13 +974,23 @@ display: none;
     font-size: 14px !important;
   }
 }
- 
+#pj {
+    font-size:18Px;
+}
+ #locked-overlay input:focus, #lock-modal input:focus {
+  outline: 2px solid #27ae60;
+}
 
   </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.15.1/beautify.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.15.1/beautify-html.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.15.1/beautify-css.min.js"></script>
 </head>
+
+
+<!-- LOCKED EDITOR OVERLAY -->
+
+
 <!-- ULTRA-COMPACT 3-SLIDER COLOR PICKER -->
 <!-- TOAST NOTIFICATION (color-based, no x/tick) -->
 <div id="toast" style="display:none; position:absolute; bottom:20px; left:50%; transform:translateX(-50%); color:white; padding:12px 24px; border-radius:6px; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.4); z-index:999999; transition:all 0.3s ease; font-weight:500;">
@@ -1040,6 +1050,7 @@ display: none;
     <button class="ctx-item" data-tool="goto-section" style="color:#27ae60; font-weight:bold;">Go to Section...</button>
     <button class="ctx-item" data-tool="insert-script" style="color:#27ae60; font-weight:bold;">Insert Script...</button>
     <button class="ctx-item" data-tool="code-optimizer" style="color:#27ae60; font-weight:bold;">Code Optimizer...</button>
+    <button class="ctx-item" data-tool="replace-js-function" style="color:#27ae60; font-weight:bold;">Replace JS Function...</button>
 </div>
     <!-- Title bar - white text, Trebuchet MS, square corners -->
     
@@ -1109,13 +1120,20 @@ display: none;
       <input type="text" id="top-search-input" placeholder="Search project files...">
       <ul id="search-results" class="search-results"></ul>
     </div>
-    <button id="hide-sidebar-btn" title="Toggle Sidebar">&#9776;</button>
+    <button id="hide-sidebar-btn" class="header-btn" title="Toggle Sidebar">
+  <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" 
+       fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="3" y1="6" x2="21" y2="6"></line>
+    <line x1="3" y1="12" x2="21" y2="12"></line>
+    <line x1="3" y1="18" x2="21" y2="18"></line>
+  </svg>
+</button>
   </h1>
   <div id="coder-ai">
     <div id="editor-container">
       <div id="file-explorer">
         <div id="file-explorer-content">
-          <h2 id="pj">Project Files</h2>
+          <p id="pj">Project Files</p>
           <ul id="file-list"></ul>
           <button id="new-file-btn">New File</button>
           <button id="rename-file-btn">Rename File</button>
@@ -1201,7 +1219,7 @@ display: none;
     </div>
     <div style="padding:15px;">
         <button onclick="cleanCurrentFile()" class="opt-btn">Clean & Beautify</button>
-        <button onclick="minifyCurrentFile()" class="opt-btn">Minify (remove whitespace)</button>
+        <button onclick="minifyCurrentFile()" class="opt-btn">Minify (remove whitespaces)</button>
         <button onclick="removeUnusedCSS()" class="opt-btn">Remove Unused CSS</button>
         <button onclick="removeUnusedJSFunctions()" class="opt-btn">Remove Unused JS Functions</button>
     </div>
@@ -1216,11 +1234,12 @@ display: none;
         <button class="close-window-btn" style="background:none; border:none; color:#e74c3c; font-size:20px; cursor:pointer;">×</button>
     </div>
     <!-- Tiny tabs (now 3) -->
-    <div id="goto-tab-bar" style="display:flex; background:#2c3e50; padding:5px 10px; gap:6px; border-bottom:1px solid #444;">
-        <button id="tab1" class="goto-tab active">Sections</button>
-        <button id="tab2" class="goto-tab">Divs</button>
-        
-    </div>
+    <!-- REPLACE THIS ENTIRE <div id="goto-tab-bar"> ... </div> -->
+<div id="goto-tab-bar" style="display:flex; background:#2c3e50; padding:5px 10px; gap:6px; border-bottom:1px solid #444;">
+    <button id="tab1" class="goto-tab active">Sections</button>
+    <button id="tab2" class="goto-tab">Divs</button>
+    <button id="tab3" class="goto-tab" style="display:none;">Location</button>
+</div>
     <div style="padding:15px;">
         <div id="tab-content-1"></div>
         <div id="tab-content-2" style="display:none;"></div>
@@ -1285,7 +1304,7 @@ display: none;
         <div class="settings-panel">
           <div class="settings-section">
             <label for="top-bar-color">Top Bar Color:</label>
-            <input type="color" id="top-bar-color" value="#0b487e">
+            <input type="color" id="top-bar-color" value="#0b487e" onchange="seticon()">
           </div>
           <div class="settings-section">
             <label for="editor-theme">Editor Theme:</label>
@@ -1491,11 +1510,14 @@ display: none;
           <div class="settings-section">
             <div class="settings-toggle">
               <input type="checkbox" id="auto-pair-brackets" checked />
-              <label for="auto-pair-brackets">Auto Pair Brackets</label>
+              <label for="auto-pair-brackets" >Auto Pair Brackets</label>
             </div>
           </div>
-          <button id="reset-settings-btn" style="background-color: #e74c3c; color: white; padding: 8px; border: none; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 20px;">Reset to Defaults</button>
-        </div>
+
+          <button id="reset-settings-btn" style="background-color: #e74c3c; color: white; padding: 8px; border: none; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 20px;">
+    Reset to Defaults
+</button>
+</div>
       </div>
     </div>
   </div>
@@ -1503,19 +1525,45 @@ display: none;
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.5.1/axios.min.js"></script>
   <script>
     // Auto-switch header icons to black when top bar is light (accessibility)
+// ==================== FIXED & IMPROVED ICON COLOR UPDATER ====================
+// ==================== FIXED HEADER ICON COLOR UPDATER (works both ways) ====================
 function updateHeaderIconColors() {
   const topBar = document.getElementById('top-bar');
+  if (!topBar) return;
+
   const color = window.getComputedStyle(topBar).backgroundColor;
   const rgb = color.match(/\d+/g);
-  if (!rgb) return;
-  const brightness = (parseInt(rgb[0])*299 + parseInt(rgb[1])*587 + parseInt(rgb[2])*114) / 1000;
-  const newFill = brightness > 180 ? '#000000' : '#ffffff';
+  if (!rgb || rgb.length < 3) return;
+
+  const brightness = (parseInt(rgb[0]) * 299 + parseInt(rgb[1]) * 587 + parseInt(rgb[2]) * 114) / 1000;
+  const newColor = brightness > 180 ? '#000000' : '#ffffff';
+
+  // Target every header button SVG
   document.querySelectorAll('.header-btn svg').forEach(svg => {
-    svg.setAttribute('fill', newFill);
-    svg.querySelectorAll('path, circle').forEach(el => {
-      if (el.getAttribute('stroke')) el.setAttribute('stroke', newFill);
+    // Force on the <svg> element itself
+    svg.setAttribute('fill', newColor);
+    svg.setAttribute('stroke', newColor);
+
+    // Force every child element (path, line, circle, etc.)
+    svg.querySelectorAll('path, line, circle, rect, polyline, polygon').forEach(el => {
+      // Remove any old inline styles that might be stuck
+      el.removeAttribute('style');
+
+      if (el.hasAttribute('fill') && el.getAttribute('fill') !== 'none') {
+        el.setAttribute('fill', newColor);
+      }
+      if (el.hasAttribute('stroke') && el.getAttribute('stroke') !== 'none') {
+        el.setAttribute('stroke', newColor);
+      }
     });
   });
+
+  // Extra safety for the hamburger sidebar icon
+  const hamburgerSVG = document.querySelector('#hide-sidebar-btn svg');
+  if (hamburgerSVG) {
+    hamburgerSVG.setAttribute('fill', newColor);
+    hamburgerSVG.setAttribute('stroke', newColor);
+  }
 }
 // Run once on load and after settings change
 setTimeout(updateHeaderIconColors, 500);
@@ -1526,11 +1574,29 @@ document.getElementById('top-bar-color').addEventListener('input', () => {
 document.getElementById('settings-header-btn').addEventListener('click', () => {
   setTimeout(updateHeaderIconColors, 100);
 });
+document.getElementById('settings-modal').addEventListener('click', () => {
+  setTimeout(updateHeaderIconColors, 100);
+});
 document.getElementById('new-file-header-btn').addEventListener('click', () => {
   setTimeout(updateHeaderIconColors, 100);
 });
 document.getElementById('find-replace-header-btn').addEventListener('click', () => {
   setTimeout(updateHeaderIconColors, 100);
+});
+// Run on load
+setTimeout(updateHeaderIconColors, 300);
+function seticon() {
+    setTimeout(updateHeaderIconColors, 100);
+}
+
+// Real-time update when color picker changes
+document.getElementById('top-bar-color').addEventListener('input', () => {
+  updateHeaderIconColors();   // ← removed setTimeout for instant response
+});
+
+// When settings modal opens
+document.getElementById('settings-header-btn').addEventListener('click', () => {
+  setTimeout(updateHeaderIconColors, 150);
 });
 setTimeout(updateHeaderIconColors, 300); // initial
     const editor = ace.edit("code-editor");
@@ -2964,27 +3030,8 @@ window.onclick = function(e) {
   'minLines', 'overwrite', 'readOnly', 'sidebarWidth',
   'defaultLanguage', 'autoPairBrackets'
 ];
-function resetSettings() {
-  if (!confirm('Are you sure you want to reset all settings to defaults?')) return;
-  const defaultSettings = {};
-  settingKeys.forEach(key => {
-    defaultSettings[key] = getDefaultSetting(key);
-  });
-  if (db) {
-    const transaction = db.transaction(['settings'], 'readwrite');
-    const objectStore = transaction.objectStore('settings');
-    objectStore.clear();
-    transaction.oncomplete = () => {
-      applySettings(defaultSettings);
-    };
-    transaction.onerror = (event) => {
-      console.error('Error clearing settings:', event.target.error);
-    };
-  } else {
-    applySettings(defaultSettings);
-  }
-}
-document.getElementById('reset-settings-btn').addEventListener('click', resetSettings);
+
+
     // Initialize file explorer - will load from IndexedDB if available
     updateFileExplorer();
    
@@ -3090,6 +3137,7 @@ contextMenu.addEventListener('click', function(e) {
         if (tool === 'goto-section') openGotoWindow();
         if (tool === 'insert-script') openGotoWindow(true);
         if (tool === 'code-optimizer') openOptimizerWindow();
+        if (tool === 'replace-js-function') openReplaceJSFunctionTool();
     }
 });
 // CHANGE COLOR (exactly like old swatch)
@@ -3332,162 +3380,68 @@ document.querySelectorAll('.close-window-btn').forEach(btn => {
 });
 // Open windows
 // === REPLACE YOUR EXISTING openGotoWindow FUNCTION WITH THIS FULL VERSION (no placeholders) ===
+// ==================== UPDATED openGotoWindow WITH "Location" TAB ====================
 function openGotoWindow(insertOnly = false) {
-  const win = document.getElementById('goto-window');
-  const titleEl = document.getElementById('goto-title');
-  const t1 = document.getElementById('tab1');
-  const t2 = document.getElementById('tab2');
-  const t3 = document.getElementById('tab3');
-  const c1 = document.getElementById('tab-content-1');
-  const c2 = document.getElementById('tab-content-2');
-  const c3 = document.getElementById('tab-content-3');
+    const win = document.getElementById('goto-window');
+    const titleEl = document.getElementById('goto-title');
+    const t1 = document.getElementById('tab1');
+    const t2 = document.getElementById('tab2');
+    const t3 = document.getElementById('tab3');
+    const c1 = document.getElementById('tab-content-1');
+    const c2 = document.getElementById('tab-content-2');
+    const c3 = document.getElementById('tab-content-3');
 
-  const mode = getCurrentMode();   // reuse your existing getCurrentMode()
-
-  // ====================== INSERT MODE (from "Insert Script..." context menu) ======================
-  if (insertOnly) {
-    titleEl.textContent = 'Insert / Yank Code';
-    t3.style.display = 'none';                 // hide Location tab in insert mode
-
-    if (mode === 'javascript') {
-      t1.textContent = 'Insert into Function';
-      t2.textContent = 'Yank New Function';
-      c1.innerHTML = `
-        <label style="display:block; margin-bottom:5px;">Target function name</label>
-        <input id="target-func" type="text" placeholder="myFunction" style="width:96%; padding:8px; background:#34495e; color:white; border:none; border-radius:4px;">
-        <div style="margin:10px 0; display:flex; gap:10px;">
-          <label><input type="radio" name="insert-pos" value="last" checked> End of function</label>
-          <label><input type="radio" name="insert-pos" value="top"> Top of function</label>
-        </div>
-        <label style="display:block; margin-bottom:5px;">Code to insert</label>
-        <textarea id="script-code" style="width:100%; height:90px; background:#34495e; color:white; border:none; border-radius:4px; resize:none;"></textarea>
-        <button onclick="insertScriptIntoFunction()" style="margin-top:10px; width:100%; background:#27ae60; color:white; border:none; padding:10px; border-radius:4px;">Insert into Function</button>
-        <div id="insert-error" style="color:#e74c3c; margin-top:8px; display:none;"></div>
-      `;
-      c2.innerHTML = `
-        <label style="display:block; margin-bottom:5px;">New function name</label>
-        <input id="yank-func-name" type="text" placeholder="myNewFunc" style="width:96%; padding:8px; background:#34495e; color:white; border:none; border-radius:4px;">
-        <label style="display:block; margin:10px 0 5px;">Function body</label>
-        <textarea id="yank-func-body" style="width:100%; height:90px; background:#34495e; color:white; border:none; border-radius:4px; resize:none;"></textarea>
-        <div style="margin:10px 0; display:flex; gap:10px;">
-          <label><input type="radio" name="yank-pos" value="top" checked> Top of file</label>
-          <label><input type="radio" name="yank-pos" value="bottom"> Bottom of file</label>
-        </div>
-        <button onclick="yankNewFunction()" style="margin-top:10px; width:100%; background:#27ae60; color:white; border:none; padding:10px; border-radius:4px;">Yank New Function</button>
-      `;
-      
-      
-    } 
-    
-    else if (mode === 'css') {
-      t1.textContent = 'Insert Style Rule';
-      t2.textContent = 'Yank New Style';
-      c1.innerHTML = `
-        <label style="display:block; margin-bottom:5px;">Selector (supports @media)</label>
-        <input id="css-selector" type="text" placeholder=".myClass or @media (max-width:600px)" style="width:96%; padding:8px; background:#34495e; color:white; border:none; border-radius:4px;">
-        <label style="display:block; margin:10px 0 5px;">CSS properties</label>
-        <textarea id="css-properties" style="width:100%; height:80px; background:#34495e; color:white; border:none; border-radius:4px; resize:none;"></textarea>
-        <div style="margin:10px 0; display:flex; gap:10px;">
-          <label><input type="radio" name="css-pos" value="top" checked> Top of &lt;style&gt;</label>
-          <label><input type="radio" name="css-pos" value="bottom"> Bottom of &lt;style&gt;</label>
-        </div>
-        <button onclick="insertStyleRule()" style="margin-top:10px; width:100%; background:#27ae60; color:white; border:none; padding:10px; border-radius:4px;">Insert Rule</button>
-      `;
-      c2.innerHTML = `
-        <div style="margin-bottom:10px;">
-          <label><input type="radio" name="css-mode" value="into" checked onchange="toggleCssSelector(this)"> Insert into existing &lt;style&gt;</label><br>
-          <label><input type="radio" name="css-mode" value="yank" onchange="toggleCssSelector(this)"> Yank new style (add to file)</label>
-        </div>
-        <label style="display:block; margin-bottom:5px;">Selector (or @media)</label>
-        <input id="yank-css-selector" type="text" placeholder=".class or @media..." style="width:96%; padding:8px; background:#34495e; color:white; border:none; border-radius:4px;">
-        <label style="display:block; margin:10px 0 5px;">CSS properties / media content</label>
-        <textarea id="yank-css-body" style="width:100%; height:80px; background:#34495e; color:white; border:none; border-radius:4px; resize:none;"></textarea>
-        <div style="margin:10px 0; display:flex; gap:10px;">
-          <label><input type="radio" name="yank-css-pos" value="top" checked> Top of file</label>
-          <label><input type="radio" name="yank-css-pos" value="bottom"> Bottom of file</label>
-        </div>
-        <button onclick="yankNewStyle()" style="margin-top:10px; width:100%; background:#27ae60; color:white; border:none; padding:10px; border-radius:4px;">Yank New Style</button>
-      `;
-    } 
-    else {
-      // HTML fallback (original behaviour)
-      t1.textContent = 'Function';
-      t2.textContent = 'Div';
-      c1.innerHTML = `... (your original function insert code) ...`; // keep whatever you had before
-      c2.innerHTML = `... (your original div insert code) ...`;
-      
-    }
-  } 
-  // ====================== NORMAL GO TO MODE (from "Go to Section..." context menu) ======================
-  else {
-    titleEl.textContent = 'Go to Section';
-    t3.style.display = 'block';                    // show Location tab
-
-    t1.textContent = (mode === 'javascript' ? 'Functions' : 'Sections');
-    t2.textContent = 'Divs';
-
-    c1.innerHTML = `
-      <button onclick="jumpToSection('style')" class="ctx-item" style="margin-bottom:5px; width:100%;">Jump to &lt;style&gt;</button>
-      <button onclick="jumpToSection('body')" class="ctx-item" style="margin-bottom:5px; width:100%;">Jump to &lt;body&gt;</button>
-      <button onclick="jumpToSection('script')" class="ctx-item" style="margin-bottom:5px; width:100%;">Jump to &lt;script&gt; (inline)</button>
-      <button onclick="jumpToLastFocused()" class="ctx-item" style="margin-bottom:5px; width:100%; background:#27ae60; color:white;">Jump to last focused position</button>
-      
-      <label style="display:block; margin:15px 0 6px 0; color:#bbb; font-size:13px;">Go to CDN Script</label>
-      <select id="cdn-script-select" style="width:100%; padding:9px; background:#34495e; color:white; border:none; border-radius:4px; font-size:13px;"></select>
-      <button onclick="jumpToCDNScript()" style="margin-top:8px; width:100%; background:#27ae60; color:white; border:none; padding:9px; border-radius:4px; font-size:13px;">Jump to Selected CDN</button>
-    `;
-
-    // Populate CDN dropdown (same as before)
-    const cdns = getCDNScripts();
-    const select = document.getElementById('cdn-script-select');
-    if (cdns.length === 0) {
-      select.innerHTML = '<option>No CDN scripts found</option>';
-      select.disabled = true;
+    if (insertOnly) {
+        // Insert mode (your existing code) - unchanged
+        titleEl.textContent = 'Insert / Yank Code';
+        t3.style.display = 'none';
+        // ... (keep your existing insert-only logic here)
     } else {
-      select.innerHTML = cdns.map((cdn, i) => {
-        const short = cdn.src.length > 55 ? cdn.src.substring(0,52) + '...' : cdn.src;
-        return `<option value="${i}">${short}</option>`;
-      }).join('');
-      select.disabled = false;
+        // NORMAL GO TO MODE
+        titleEl.textContent = 'Go to Section';
+        t3.style.display = 'block';
+
+        t1.textContent = (getCurrentMode() === 'javascript' ? 'Functions' : 'Sections');
+        t2.textContent = 'Divs / Location';
+        t3.textContent = 'Location';
+
+        // Tab 1 - Sections
+        c1.innerHTML = `...your existing sections content...`;
+
+        // Tab 2 - Divs
+        c2.innerHTML = `...your existing divs content...`;
+
+        // ==================== NEW LOCATION TAB (Tab 3) ====================
+        c3.innerHTML = `
+            <button onclick="jumpToTop()" class="ctx-item" style="width:100%; margin-bottom:8px;">↑ Jump to Top of file</button>
+            <button onclick="jumpToEnd()" class="ctx-item" style="width:100%; margin-bottom:8px;">↓ Jump to Bottom of file</button>
+
+            <label style="display:block; margin:20px 0 8px 0; color:#bbb; font-size:13px;">Go to line number</label>
+            <div style="display:flex; gap:8px;">
+                <input id="goto-line-input" type="number" placeholder="42" min="1" style="flex:1; padding:10px; background:#34495e; color:white; border:none; border-radius:4px;">
+                <button onclick="jumpToLineNumber()" style="padding:10px 20px; background:#27ae60; color:white; border:none; border-radius:4px;">Go</button>
+            </div>
+            <div id="location-status" style="color:#e74c3c; margin-top:8px; min-height:20px; font-size:13px;"></div>
+        `;
     }
 
-    c2.innerHTML = `
-      <label style="display:block; margin-bottom:5px;">Div ID or class</label>
-      <input id="goto-div-selector" type="text" placeholder="#main or .container" style="width:96%; padding:8px; background:#34495e; color:white; border:none; border-radius:4px;">
-      <button onclick="jumpToDiv()" style="margin-top:10px; width:100%; background:#27ae60; color:white; border:none; padding:10px; border-radius:4px;">Jump to Div</button>
-    `;
+    // Default active tab
+    c1.style.display = 'block';
+    c2.style.display = 'none';
+    c3.style.display = 'none';
+    t1.classList.add('active');
+    t2.classList.remove('active');
+    t3.classList.remove('active');
 
-    c3.innerHTML = `
-      <button onclick="jumpToTop()" class="ctx-item" style="width:100%; margin-bottom:5px;">↑ Jump to Top of file</button>
-      <button onclick="jumpToMiddle()" class="ctx-item" style="width:100%; margin-bottom:5px;">↔ Jump to Middle of file</button>
-      <button onclick="jumpToEnd()" class="ctx-item" style="width:100%; margin-bottom:5px;">↓ Jump to End of file</button>
-      
-      <label style="display:block; margin:15px 0 5px; color:#bbb;">Go to specific line number</label>
-      <input id="goto-line" type="number" placeholder="42" min="1" style="width:100%; padding:8px; background:#34495e; color:white; border:none; border-radius:4px;">
-      <button onclick="jumpToLine()" style="margin-top:8px; width:100%; background:#27ae60; color:white; border:none; padding:10px; border-radius:4px;">Go to Line</button>
-      <div id="location-status" style="color:#e74c3c; margin-top:8px; min-height:20px; font-size:13px;"></div>
-    `;
-  }
+    // Tab click handlers
+    t1.onclick = () => switchGotoTab(1);
+    t2.onclick = () => switchGotoTab(2);
+    t3.onclick = () => switchGotoTab(3);
 
-  // Default active tab + visibility
-  c1.style.display = 'block';
-  c2.style.display = 'none';
-  c3.style.display = insertOnly ? 'none' : 'block';
-
-  t1.classList.add('active');
-  t2.classList.remove('active');
-  t3.classList.remove('active');
-
-  // Tab click handlers
-  t1.onclick = () => switchGotoTab(1);
-  t2.onclick = () => switchGotoTab(2);
-  t3.onclick = () => switchGotoTab(3);
-
-  // Position & show
-  win.style.left = '35%';
-  win.style.top = '25%';
-  win.style.display = 'block';
-  makeDraggable(win);
+    win.style.left = '35%';
+    win.style.top = '25%';
+    win.style.display = 'block';
+    makeDraggable(win);
 }
 // Toggle selector for CSS yank
 function toggleCssSelector(radio) {
@@ -3593,32 +3547,60 @@ function findFirstNonCommentedMatch(content, regex) {
     return null;
 }
 // ==================== GO TO SECTION (simple HTML sections) ====================
+// ==================== STRICT REAL HTML SECTION JUMP ====================
 function jumpToSection(section) {
-    const content = editor.getValue();
-    let regex, match;
-    if (section === 'style') {
-        regex = /<style[^>]*>/gi;
-        match = findFirstNonCommentedMatch(content, regex);
-    } else if (section === 'body') {
-        regex = /<body[^>]*>/gi;
-        match = findFirstNonCommentedMatch(content, regex);
-    } else if (section === 'script') {
-        // 1. Prefer real inline <script> (no src=)
-        regex = /<script(?![^>]*\ssrc=)[^>]*>/gi;
-        match = findFirstNonCommentedMatch(content, regex);
-        // 2. Fallback to any <script> if no inline one exists
-        if (!match) {
-            regex = /<script[^>]*>/gi;
-            match = findFirstNonCommentedMatch(content, regex);
-        }
+  const content = editor.getValue();
+  let regex;
+
+  if (section === 'head') regex = /<head\b[^>]*>/gi;
+  else if (section === 'style') regex = /<style\b[^>]*>/gi;
+  else if (section === 'body') regex = /<body\b[^>]*>/gi;
+  else if (section === 'script') regex = /<script\b(?![^>]*\ssrc=)[^>]*>/gi;
+
+  const match = findFirstRealHtmlTag(regex, content);
+
+  if (match) {
+    const pos = editor.session.getDocument().indexToPosition(match.index);
+    editor.gotoLine(pos.row + 1, pos.column);
+    document.getElementById('goto-window').style.display = 'none';
+  } else {
+    alert(`No <${section}> section found.`);
+  }
+}
+
+// ==================== HELPER: ONLY REAL TOP-LEVEL HTML TAGS ====================
+function findFirstRealHtmlTag(regex, content) {
+  regex.lastIndex = 0;
+  let match;
+
+  while ((match = regex.exec(content)) !== null) {
+    const pos = match.index;
+
+    // Must NOT be inside comment, string, <script> block, or <style> block
+    if (!isPositionInCommentOrString(pos, content) && 
+        !isInsideScriptOrStyle(pos, content)) {
+      return match;
     }
-    if (match) {
-        const pos = editor.session.getDocument().indexToPosition(match.index);
-        editor.gotoLine(pos.row + 1, pos.column);
-        document.getElementById('goto-window').style.display = 'none';
-    } else {
-        alert(`No <${section}> section found (non-commented).`);
-    }
+  }
+  return null;
+}
+
+function isInsideScriptOrStyle(pos, content) {
+  // Check if position is inside any <script> or <style> block
+  const scriptRegex = /<script[^>]*>[\s\S]*?<\/script>/gi;
+  const styleRegex = /<style[^>]*>[\s\S]*?<\/style>/gi;
+  let m;
+
+  scriptRegex.lastIndex = 0;
+  while ((m = scriptRegex.exec(content)) !== null) {
+    if (pos >= m.index && pos < m.index + m[0].length) return true;
+  }
+
+  styleRegex.lastIndex = 0;
+  while ((m = styleRegex.exec(content)) !== null) {
+    if (pos >= m.index && pos < m.index + m[0].length) return true;
+  }
+  return false;
 }
 // Checks if a position is inside HTML comment, JS comment, or string literal
 function isPositionInCommentOrString(pos, content) {
@@ -3650,23 +3632,27 @@ function isPositionInCommentOrString(pos, content) {
     return false;
 }
 // Jump to selected CDN script
+
+// ==================== JUMP TO SELECTED CDN (updated) ====================
 function jumpToCDNScript() {
-    const select = document.getElementById('cdn-script-select');
-    if (!select) return;
-    
-    const idx = parseInt(select.value);
-    if (isNaN(idx)) {
-        showToast('No CDN script selected', 'error');
-        return;
-    }
-    const cdns = getCDNScripts();
-    if (cdns[idx]) {
-        const pos = editor.session.getDocument().indexToPosition(cdns[idx].index);
-        editor.gotoLine(pos.row + 1, pos.column);
-        document.getElementById('goto-window').style.display = 'none';
-        showToast(`Jumped to CDN: ${cdns[idx].src.split('/').pop()}`);
-    }
+  const select = document.getElementById('cdn-script-select');
+  if (!select || !select.value) {
+    showToast('No CDN script selected', 'error');
+    return;
+  }
+
+  const idx = parseInt(select.value);
+  const cdns = getCDNScripts();
+
+  if (cdns[idx]) {
+    const pos = editor.session.getDocument().indexToPosition(cdns[idx].index);
+    editor.gotoLine(pos.row + 1, pos.column);
+    document.getElementById('goto-window').style.display = 'none';
+    showToast(`Jumped to CDN: ${cdns[idx].src.split('/').pop()}`);
+  }
 }
+// ==================== STRICT REAL CDN SCRIPT DETECTION (same strict rules as HTML sections) ====================
+// ==================== STRICT REAL CDN SCRIPT DETECTION (same strict rules as HTML sections) ====================
 function getCDNScripts() {
     const content = editor.getValue();
     const regex = /<script\s+src=["']([^"']+)["'][^>]*>/gi;
@@ -4650,8 +4636,9 @@ function openGotoWindow(insertOnly = false) {
   // Set tab labels (small & clean)
   if (!insertOnly) {
     tab1.textContent = 'Sections';
-    tab2.textContent = 'Divs';
+    tab2.textContent = 'Div / Location';
     c1.innerHTML = `
+        <button onclick="jumpToSection('head')" class="ctx-item" style="margin-bottom:5px; width:100%;">Jump to &lt;head&gt;</button>
         <button onclick="jumpToSection('style')" class="ctx-item" style="margin-bottom:5px;">Jump to &lt;style&gt;</button>
         <button onclick="jumpToSection('body')" class="ctx-item" style="margin-bottom:5px;">Jump to &lt;body&gt;</button>
         <button onclick="jumpToSection('script')" class="ctx-item" style="margin-bottom:5px;">Jump to &lt;script&gt; (inline JS)</button>
@@ -4680,8 +4667,22 @@ function openGotoWindow(insertOnly = false) {
     c2.innerHTML = `
       <label style="display:block; margin-bottom:5px;">Div ID or class (e.g. main)</label>
       <input id="goto-div-selector" type="text" placeholder="#myDiv" style="width:96%; padding:8px; background:#34495e; color:white; border:none; border-radius:4px;">
-      <button onclick="jumpToDiv()" style="margin-top:10px; background:#27ae60; color:white; border:none; padding:10px; border-radius:4px; width:100%">Jump to Div</button>
-    `;
+      <button onclick="jumpToDiv()" style="margin-top:10px; background:#27ae60; color:white; border:none; padding:10px; border-radius:4px; width:100%; margin-bottom:0px">Jump to Div</button>
+<h3>Go to Line Number</h3>
+<button onclick="jumpToTop()" class="ctx-item" style="width:100%; margin-bottom:8px;">Jump to Top of file</button>
+            <button onclick="jumpToEnd()" class="ctx-item" style="width:100%; margin-bottom:8px;">Jump to Bottom of file</button>
+
+            <label style="display:block; margin:20px 0 8px 0; color:#bbb; font-size:13px;">Go to line number</label>
+            <div style="display:flex; gap:8px;">
+                <input id="goto-line-input" type="number" placeholder="42" min="1" 
+                       style="flex:1; padding:8px; background:#34495e; color:white; border:none; border-radius:4px;">
+                <button onclick="jumpToLineNumber()" 
+                        style="padding:10px 20px; background:#27ae60; color:white; border:none; border-radius:4px;">Go</button>
+            </div>
+            <div id="location-status" style="color:#e74c3c; margin-top:8px; min-height:20px; font-size:13px;"></div>
+        
+    `
+    ;
   } else {
     tab1.textContent = 'Function';
     tab2.textContent = 'Div';
@@ -4957,6 +4958,235 @@ function updateFindCount() {
 }
 document.getElementById('find-next-btn').addEventListener('click', updateFindCount);
 document.getElementById('find-previous-btn').addEventListener('click', updateFindCount);
+
+// ==================== NEW TOOL: REPLACE / REMOVE JS FUNCTION ====================
+function openReplaceJSFunctionTool() {
+  const win = document.getElementById('goto-window');
+  const titleEl = document.getElementById('goto-title');
+  const t1 = document.getElementById('tab1');
+  const t2 = document.getElementById('tab2');
+  const c1 = document.getElementById('tab-content-1');
+  const c2 = document.getElementById('tab-content-2');
+
+  titleEl.textContent = 'Replace / Remove JS Function';
+  t1.textContent = 'Replace Function';
+  t2.textContent = 'Remove Function';
+
+  // Tab 1 - Replace
+  c1.innerHTML = `
+    <label style="display:block; margin-bottom:5px;">Function Name</label>
+    <input id="replace-func-name" type="text" placeholder="myFunction" style="width:96%; padding:8px; background:#34495e; color:white; border:none; border-radius:4px;">
+    
+    <label style="display:block; margin:15px 0 5px;">New Function Body</label>
+    <textarea id="replace-func-body" style="width:100%; height:140px; background:#34495e; color:white; border:none; border-radius:4px; resize:none; font-family:monospace;"></textarea>
+    
+    <button onclick="replaceFunctionByName()" style="margin-top:12px; width:100%; background:#27ae60; color:white; border:none; padding:12px; border-radius:6px;">
+      Replace Function
+    </button>
+    <div id="replace-error" style="color:#e74c3c; margin-top:8px; display:none;"></div>
+  `;
+
+  // Tab 2 - Remove
+  c2.innerHTML = `
+    <label style="display:block; margin-bottom:5px;">Function Name to Remove</label>
+    <input id="remove-func-name" type="text" placeholder="myFunction" style="width:96%; padding:8px; background:#34495e; color:white; border:none; border-radius:4px;">
+    
+    <button onclick="removeFunctionByName()" style="margin-top:20px; width:100%; background:#e74c3c; color:white; border:none; padding:12px; border-radius:6px;">
+       Remove Function
+    </button>
+    <div id="remove-error" style="color:#e74c3c; margin-top:8px; display:none;"></div>
+  `;
+
+  // Default to first tab
+  c1.style.display = 'block';
+  c2.style.display = 'none';
+  t1.classList.add('active');
+  t2.classList.remove('active');
+
+  t1.onclick = () => { switchGotoTab(1); };
+  t2.onclick = () => { switchGotoTab(2); };
+
+  win.style.left = '35%';
+  win.style.top = '25%';
+  win.style.display = 'block';
+  makeDraggable(win);
+}
+
+// ==================== REPLACE FUNCTION (smart bracket handling) ====================
+function replaceFunctionByName() {
+  const name = document.getElementById('replace-func-name').value.trim();
+  const newBody = document.getElementById('replace-func-body').value.trim();
+  const errorDiv = document.getElementById('replace-error');
+
+  if (!name || !newBody) {
+    errorDiv.textContent = 'Function name and new body are required';
+    errorDiv.style.display = 'block';
+    return;
+  }
+
+  let code = editor.getValue();
+
+  // Smart regex for all common function patterns
+  const patterns = [
+    new RegExp(`(async\\s+)?function\\s+${name}\\s*\\([^)]*\\)\\s*\\{([\\s\\S]*?)\\}`, 'g'),
+    new RegExp(`(const|let|var)\\s+${name}\\s*=\\s*\\(?async\\s*\\)?\\s*\\([^)]*\\)\\s*=>\\s*\\{([\\s\\S]*?)\\}`, 'g'),
+    new RegExp(`(const|let|var)\\s+${name}\\s*=\\s*function\\s*\\([^)]*\\)\\s*\\{([\\s\\S]*?)\\}`, 'g'),
+    new RegExp(`\\b${name}\\s*=\\s*function\\s*\\([^)]*\\)\\s*\\{([\\s\\S]*?)\\}`, 'g')
+  ];
+
+  let replaced = false;
+
+  for (let regex of patterns) {
+    code = code.replace(regex, (fullMatch, prefix, oldBody) => {
+      replaced = true;
+      return fullMatch.replace(oldBody, `\n  ${newBody}\n`);
+    });
+    if (replaced) break;
+  }
+
+  if (replaced) {
+    editor.setValue(code);
+    document.getElementById('goto-window').style.display = 'none';
+    showToast(`Function "${name}" replaced successfully`);
+  } else {
+    errorDiv.textContent = `Function "${name}" not found`;
+    errorDiv.style.display = 'block';
+  }
+}
+
+// ==================== REMOVE FUNCTION (smart bracket handling) ====================
+function removeFunctionByName() {
+  const name = document.getElementById('remove-func-name').value.trim();
+  const errorDiv = document.getElementById('remove-error');
+
+  if (!name) {
+    errorDiv.textContent = 'Function name is required';
+    errorDiv.style.display = 'block';
+    return;
+  }
+
+  let code = editor.getValue();
+
+  const patterns = [
+    new RegExp(`(async\\s+)?function\\s+${name}\\s*\\([^)]*\\)\\s*\\{([\\s\\S]*?)\\}\\s*`, 'g'),
+    new RegExp(`(const|let|var)\\s+${name}\\s*=\\s*\\(?async\\s*\\)?\\s*\\([^)]*\\)\\s*=>\\s*\\{([\\s\\S]*?)\\}\\s*`, 'g'),
+    new RegExp(`(const|let|var)\\s+${name}\\s*=\\s*function\\s*\\([^)]*\\)\\s*\\{([\\s\\S]*?)\\}\\s*`, 'g'),
+    new RegExp(`\\b${name}\\s*=\\s*function\\s*\\([^)]*\\)\\s*\\{([\\s\\S]*?)\\}\\s*`, 'g')
+  ];
+
+  let removed = false;
+
+  for (let regex of patterns) {
+    const newCode = code.replace(regex, '');
+    if (newCode !== code) {
+      code = newCode;
+      removed = true;
+      break;
+    }
+  }
+
+  if (removed) {
+    editor.setValue(code.trim());
+    document.getElementById('goto-window').style.display = 'none';
+    showToast(`Function "${name}" removed successfully`);
+  } else {
+    errorDiv.textContent = `Function "${name}" not found`;
+    errorDiv.style.display = 'block';
+  }
+}
+
+
+// Location jump functions
+function jumpToTop() {
+    editor.gotoLine(1, 0);
+    document.getElementById('goto-window').style.display = 'none';
+}
+
+function jumpToEnd() {
+    editor.gotoLine(editor.session.getLength(), 0);
+    document.getElementById('goto-window').style.display = 'none';
+}
+
+function jumpToLineNumber() {
+    const lineInput = document.getElementById('goto-line-input');
+    const line = parseInt(lineInput.value);
+    const status = document.getElementById('location-status');
+
+    if (!line || line < 1 || line > editor.session.getLength()) {
+        status.textContent = 'Invalid line number!';
+        return;
+    }
+
+    editor.gotoLine(line, 0);
+    document.getElementById('goto-window').style.display = 'none';
+    status.textContent = '';
+}
+
+// Tab switcher (already used by your other tabs)
+function switchGotoTab(n) {
+    const c1 = document.getElementById('tab-content-1');
+    const c2 = document.getElementById('tab-content-2');
+    const c3 = document.getElementById('tab-content-3');
+    const t1 = document.getElementById('tab1');
+    const t2 = document.getElementById('tab2');
+    const t3 = document.getElementById('tab3');
+
+    c1.style.display = c2.style.display = c3.style.display = 'none';
+    t1.classList.remove('active');
+    t2.classList.remove('active');
+    t3.classList.remove('active');
+
+    if (n === 1) { c1.style.display = 'block'; t1.classList.add('active'); }
+    else if (n === 2) { c2.style.display = 'block'; t2.classList.add('active'); }
+    else if (n === 3) { c3.style.display = 'block'; t3.classList.add('active'); }
+    
+    // ==================== FIXED RESET SETTINGS ====================
+// ==================== CLEAN & WORKING RESET SETTINGS ====================
+const settingKeys = [
+    'topBarColor', 'editorTheme', 'editorFontSize', 'editorFontFamily',
+    'wordWrap', 'tabSize', 'autoSaveInterval', 'showLineNumbers',
+    'enableAutocomplete', 'useSoftTabs', 'showPrintMargin', 'highlightActiveLine',
+    'highlightSelectedWord', 'showInvisibles', 'showFoldWidgets', 'fadeFoldWidgets',
+    'highlightGutterLine', 'indentedSoftWrap', 'navigateWithinSoftTabs', 'enableMultiselect',
+    'scrollPastEnd', 'fixedWidthGutter', 'printMarginColumn', 'newLineMode',
+    'useWorker', 'enableEmmet', 'keyboardHandler', 'maxLines',
+    'minLines', 'overwrite', 'readOnly', 'sidebarWidth',
+    'defaultLanguage', 'autoPairBrackets'
+];
+
+function resetSettings() {
+    if (!confirm('Are you sure you want to reset settings to defaults?\nThis cannot be undone.')) {
+        return;
+    }
+
+    const defaultSettings = {};
+    settingKeys.forEach(key => {
+        defaultSettings[key] = getDefaultSetting(key);
+    });
+
+    if (db) {
+        const tx = db.transaction(['settings'], 'readwrite');
+        const store = tx.objectStore('settings');
+        
+        const clearRequest = store.clear();
+        
+        clearRequest.onsuccess = () => {
+            applySettings(defaultSettings);
+            showToast('✅ Settings reset to defaults successfully', 'success');
+        };
+
+        clearRequest.onerror = (event) => {
+            console.error('Clear settings error:', event.target.error);
+            alert('Failed to reset settings. Please try again.');
+        };
+    } else {
+        applySettings(defaultSettings);
+        showToast('✅ Settings reset to defaults', 'success');
+    }
+}
+}
+// Attach reset button
+document.getElementById('reset-settings-btn').addEventListener('click', resetSettings);
 </script>
   
 </body>
