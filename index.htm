@@ -70,7 +70,6 @@ h1 {
 .header-btn svg {
   width: 26px;
   height: 26px;
-  /* Color is driven by CSS var → instant change */
   color: var(--icon-color, #ffffff);
 }
 
@@ -132,14 +131,6 @@ h1 {
 @media (max-width: 768px) {
   .new-file-dropdown { padding: 10px; min-width: 210px; }
   .new-file-dropdown button { padding: 13px 14px; font-size: 15px; }
-}
-.header-btn svg path,
-.header-btn svg line,
-.header-btn svg circle,
-.header-btn svg rect,
-.header-btn svg polyline,
-.header-btn svg polygon {
-  /* let JS choose fill vs stroke via attribute, but fallback to var */
 }
 
 .header-left { display: flex; align-items: center; }
@@ -228,6 +219,7 @@ h1 {
   display: flex;
   height: 100%;
   overflow: hidden;
+  position: relative;
 }
 #coder-ai::-webkit-scrollbar { display: none; }
 body::-webkit-scrollbar { display: none; }
@@ -258,9 +250,9 @@ body::-webkit-scrollbar { display: none; }
   overflow: hidden;
   box-shadow: 2px 0 5px rgba(0,0,0,0.2);
   flex-shrink: 0;
-  /* Minimal-ease animation */
-  transition: width 0.25s ease, padding 0.25s ease, opacity 0.2s ease;
+  transition: width 0.25s ease, padding 0.25s ease, opacity 0.2s ease, transform 0.25s ease;
   opacity: 1;
+  box-sizing: border-box;
 }
 #file-explorer.hidden {
   width: 0 !important;
@@ -276,15 +268,18 @@ body::-webkit-scrollbar { display: none; }
 
 #file-explorer-content {
   flex: 1;
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
   padding-right: 5px;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: #1d68ad transparent;
+  min-height: 0;
 }
-#file-explorer-content::-webkit-scrollbar { display: none !important; width: 0 !important; }
+#file-explorer-content::-webkit-scrollbar { width: 6px; }
+#file-explorer-content::-webkit-scrollbar-track { background: transparent; }
+#file-explorer-content::-webkit-scrollbar-thumb { background: #1d68ad; border-radius: 4px; }
 
-#pj { font-size: 18px; margin-bottom: 10px; }
+#pj { font-size: 18px; margin-bottom: 10px; margin-top: 0; }
 
 #file-list {
   list-style-type: none;
@@ -337,6 +332,7 @@ body::-webkit-scrollbar { display: none; }
   border-radius: 6px;
   font-family: trebuchet ms;
   font-size: 14px;
+  box-sizing: border-box;
 }
 #new-file-btn, #rename-file-btn, #download-file-btn,
 #preview-code-btn, #change-language-btn, #sidebar-find-replace-btn, #open-file-btn, #db-files-btn {
@@ -349,7 +345,6 @@ body::-webkit-scrollbar { display: none; }
 }
 .delete-btn:hover { background-color: #c0392b; }
 
-/* Tools group gets extra breathing space from settings panel above */
 div[name="tools"] {
   margin-top: 18px;
   padding-top: 14px;
@@ -364,6 +359,7 @@ div[name="tools"] {
   border-radius: 8px;
   margin: 14px 0 6px 0;
   max-width: 400px;
+  box-sizing: border-box;
 }
 .settings-toggle {
   display: flex;
@@ -383,6 +379,7 @@ div[name="tools"] {
   padding: 8px; border-radius: 6px; cursor: pointer;
   width: 100%; margin-top: 5px;
   font-family: trebuchet ms;
+  box-sizing: border-box;
 }
 .save-to-db-btn:hover { background-color: #219A52; }
 .save-to-db-btn:disabled { background-color: #95A5A6; cursor: not-allowed; }
@@ -392,6 +389,7 @@ div[name="tools"] {
   padding: 8px; border-radius: 6px; cursor: pointer;
   width: 100%; margin-top: 5px;
   font-family: trebuchet ms;
+  box-sizing: border-box;
 }
 .remove-from-db-btn:hover { background-color: #D35400; }
 
@@ -483,6 +481,7 @@ div[name="tools"] {
   border-radius: 6px;
   background-color: #2980b9;
   font-family: trebuchet ms;
+  box-sizing: border-box;
 }
 .language-option:hover { background-color: #236590; }
 
@@ -494,7 +493,6 @@ div[name="tools"] {
   flex-direction: column;
 }
 
-/* Sticky toolbar in DB modal */
 .db-toolbar {
   position: sticky;
   top: 0;
@@ -521,7 +519,6 @@ div[name="tools"] {
   .db-toolbar-actions .selection-info { margin-left: auto; }
 }
 
-/* Floating search with icon */
 .search-with-icon {
   position: relative;
   flex: 1;
@@ -677,7 +674,6 @@ div[name="tools"] {
   flex-direction: column;
 }
 
-/* Floating sticky search at top of settings */
 .settings-toolbar {
   position: sticky;
   top: 0;
@@ -746,7 +742,7 @@ input[type="color"] {
 }
 #reset-settings-btn:hover { background-color: #c0392b; }
 
-/* ===== TOAST (real working notification) ===== */
+/* ===== TOAST ===== */
 #toast-container {
   position: fixed;
   bottom: 24px;
@@ -783,12 +779,13 @@ input[type="color"] {
 .toast.info { background: #3498db; }
 .toast.warning { background: #f39c12; }
 
-/* ===== SIDEBAR PANELS (Find/Replace, Language) ===== */
+/* ===== SIDEBAR PANELS ===== */
 .sidebar-panel {
   display: none;
   flex: 1;
   overflow-y: auto;
   padding: 12px;
+  box-sizing: border-box;
 }
 .sidebar-panel.active { display: block; }
 .sidebar-header {
@@ -821,6 +818,7 @@ input[type="color"] {
   border: 1px solid #3d556e;
   border-radius: 6px;
   font-size: 14px;
+  box-sizing: border-box;
 }
 #find-replace-form button {
   background-color: #3498db;
@@ -864,7 +862,6 @@ input[type="color"] {
   font-size: 14px;
   transition: background-color 0.15s ease;
 }
-/* Subtle hover — was an aggressive solid blue */
 .ctx-item:hover { background: rgba(255,255,255,0.06); }
 .ctx-item:disabled { color: #777; cursor: not-allowed; }
 .ctx-item:disabled:hover { background: none; }
@@ -879,6 +876,7 @@ input[type="color"] {
   position: fixed;
   user-select: none;
   border-radius: 8px;
+  box-sizing: border-box;
 }
 .window-header {
   user-select: none;
@@ -900,6 +898,7 @@ input[type="color"] {
   font-family: Trebuchet MS;
   font-size: 15px;
   transition: background-color 0.18s ease, transform 0.1s ease;
+  box-sizing: border-box;
 }
 .opt-btn:hover { background-color: #2980b9; }
 .opt-btn:active { transform: scale(0.97); }
@@ -925,47 +924,259 @@ input[type="color"] {
 
 #div-selector, #goto-div-selector { width: 96%; }
 
-/* ===== COLOR PICKER ===== */
-#custom-color-modal { width: 320px !important; }
-#color-canvas {
-  width: 220px !important;
-  height: 220px !important;
+/* =============================================================
+   COLOR PICKER — FULLY REWRITTEN SLIDER STYLES
+   Cross-browser (WebKit + Firefox), proper tracks, no overflow
+============================================================= */
+#custom-color-modal {
+  width: 300px !important;
+  max-width: calc(100vw - 24px) !important;
+  box-sizing: border-box;
 }
 
-#hue-slider, #sat-slider, #val-slider, #alpha-slider {
+.cp-slider-wrap {
+  margin: 4px 0 2px 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Base slider reset for ALL color picker sliders */
+.cp-slider {
   -webkit-appearance: none;
+  -moz-appearance: none;
   appearance: none;
   width: 100%;
-  height: 18px;
+  height: 14px;
   background: transparent;
   outline: none;
   margin: 4px 0;
   cursor: pointer;
+  padding: 0;
+  box-sizing: border-box;
 }
+
+/* ===== HUE SLIDER ===== */
 #hue-slider::-webkit-slider-runnable-track {
+  width: 100%;
   height: 12px;
   background: linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
   border-radius: 9999px;
+  border: 1px solid rgba(0,0,0,0.3);
+}
+#hue-slider::-moz-range-track {
+  width: 100%;
+  height: 12px;
+  background: linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+  border-radius: 9999px;
+  border: 1px solid rgba(0,0,0,0.3);
 }
 #hue-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 22px; height: 22px;
+  width: 18px; height: 18px;
   background: white;
   border: 2px solid #222;
   border-radius: 50%;
   margin-top: -5px;
   cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+#hue-slider::-moz-range-thumb {
+  width: 16px; height: 16px;
+  background: white;
+  border: 2px solid #222;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+/* ===== SATURATION SLIDER ===== */
+#sat-slider::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 12px;
+  background: var(--sat-grad, linear-gradient(to right, #888, #f00));
+  border-radius: 9999px;
+  border: 1px solid rgba(0,0,0,0.3);
+}
+#sat-slider::-moz-range-track {
+  width: 100%;
+  height: 12px;
+  background: var(--sat-grad, linear-gradient(to right, #888, #f00));
+  border-radius: 9999px;
+  border: 1px solid rgba(0,0,0,0.3);
+}
+#sat-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px; height: 18px;
+  background: white;
+  border: 2px solid #222;
+  border-radius: 50%;
+  margin-top: -5px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+#sat-slider::-moz-range-thumb {
+  width: 16px; height: 16px;
+  background: white;
+  border: 2px solid #222;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+/* ===== VALUE SLIDER ===== */
+#val-slider::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 12px;
+  background: var(--val-grad, linear-gradient(to right, #000, #f00));
+  border-radius: 9999px;
+  border: 1px solid rgba(0,0,0,0.3);
+}
+#val-slider::-moz-range-track {
+  width: 100%;
+  height: 12px;
+  background: var(--val-grad, linear-gradient(to right, #000, #f00));
+  border-radius: 9999px;
+  border: 1px solid rgba(0,0,0,0.3);
+}
+#val-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px; height: 18px;
+  background: white;
+  border: 2px solid #222;
+  border-radius: 50%;
+  margin-top: -5px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+#val-slider::-moz-range-thumb {
+  width: 16px; height: 16px;
+  background: white;
+  border: 2px solid #222;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+/* ===== ALPHA SLIDER (with checker + color overlay) ===== */
+#alpha-slider::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 12px;
+  background:
+    var(--alpha-grad, linear-gradient(to right, rgba(255,0,0,0), rgba(255,0,0,1))),
+    repeating-conic-gradient(#999 0% 25%, #ccc 0% 50%) 0 / 8px 8px;
+  border-radius: 9999px;
+  border: 1px solid rgba(0,0,0,0.3);
+}
+#alpha-slider::-moz-range-track {
+  width: 100%;
+  height: 12px;
+  background:
+    var(--alpha-grad, linear-gradient(to right, rgba(255,0,0,0), rgba(255,0,0,1))),
+    repeating-conic-gradient(#999 0% 25%, #ccc 0% 50%) 0 / 8px 8px;
+  border-radius: 9999px;
+  border: 1px solid rgba(0,0,0,0.3);
+}
+#alpha-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px; height: 18px;
+  background: white;
+  border: 2px solid #222;
+  border-radius: 50%;
+  margin-top: -5px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+#alpha-slider::-moz-range-thumb {
+  width: 16px; height: 16px;
+  background: white;
+  border: 2px solid #222;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+/* Checkered background behind swatch (so transparency is visible) */
+#live-color-swatch {
+  background-image:
+    repeating-conic-gradient(#999 0% 25%, #ccc 0% 50%);
+  background-size: 12px 12px;
+  position: relative;
+  overflow: hidden;
+}
+#live-color-swatch::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--swatch-color, #f00);
 }
 
 /* ===== MOBILE ===== */
 @media (max-width: 768px) {
+  /* ===== MOBILE SIDEBAR — slide-in overlay so it never overflows ===== */
+  #file-explorer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 84vw !important;
+    max-width: 320px;
+    z-index: 9999;
+    transform: translateX(0);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.6);
+    padding-top: 60px; /* avoid topbar overlap */
+  }
+  #file-explorer.hidden {
+    transform: translateX(-105%) !important;
+    width: 84vw !important;
+    max-width: 320px !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    padding-top: 60px !important;
+    opacity: 1 !important;
+    flex: initial !important;
+    pointer-events: none;
+  }
+  #file-explorer.hidden > * { visibility: visible; }
+
+  /* Mobile backdrop when sidebar open */
+  #sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 9998;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  #sidebar-backdrop.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Make file explorer content scroll naturally on mobile */
+  #file-explorer-content {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    max-height: calc(100vh - 80px);
+  }
+  #file-list {
+    flex-shrink: 0;
+    max-height: 130px;
+  }
+
+  /* Draggable windows — keep them inside the viewport */
   .draggable-window {
-    width: 86vw !important;
-    max-width: 340px !important;
+    width: 90vw !important;
+    max-width: 360px !important;
     border-radius: 10px !important;
   }
+  #custom-color-modal {
+    width: 92vw !important;
+    max-width: 340px !important;
+  }
   .draggable-window button,
-  .draggable-window input,
+  .draggable-window input[type="text"],
+  .draggable-window input[type="number"],
   .draggable-window select,
   .draggable-window textarea,
   .opt-btn, .ctx-item, .goto-tab, .language-option {
@@ -973,16 +1184,17 @@ input[type="color"] {
     font-size: 15px !important;
     min-height: 44px !important;
   }
-  /* No sidebar scroll on mobile - only file list scrolls */
-  #file-explorer-content {
-    overflow-y: hidden !important;
-    display: flex;
-    flex-direction: column;
+  /* Sliders should NOT inherit min-height: 44px or it bloats them */
+  .draggable-window input[type="range"],
+  .cp-slider {
+    min-height: 0 !important;
+    padding: 0 !important;
+    height: 16px !important;
   }
-  #file-list {
-    flex-shrink: 0;
-    max-height: 100px;
-  }
+}
+
+@media (min-width: 769px) {
+  #sidebar-backdrop { display: none !important; }
 }
 
 body.dark-mode { background-color: #1e1e1e; }
@@ -998,33 +1210,44 @@ body.dark-mode { background-color: #1e1e1e; }
 </head>
 <body>
 
-<!-- TOAST CONTAINER (real working stacking toasts) -->
+<!-- TOAST CONTAINER -->
 <div id="toast-container"></div>
+
+<!-- MOBILE BACKDROP for sidebar -->
+<div id="sidebar-backdrop"></div>
 
 <!-- COLOR PICKER -->
 <div id="custom-color-modal" class="draggable-window"
-     style="display:none; position:fixed; width:290px; background:#2c3e50; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.88); z-index:10000000; overflow:hidden; font-family:Trebuchet MS; color:#eee;">
+     style="display:none; position:fixed; width:300px; background:#2c3e50; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.88); z-index:10000000; overflow:hidden; font-family:Trebuchet MS; color:#eee;">
   <div class="window-header" style="background:#34495e; padding:8px 12px; cursor:move; display:flex; justify-content:space-between; align-items:center; font-size:13px; font-weight:bold;">
     Color Picker
     <button onclick="closeColorPicker()" style="background:none; border:none; color:#e74c3c; font-size:24px; line-height:1; cursor:pointer;">×</button>
   </div>
-  <div style="padding:14px 16px; font-size:13px;">
+  <div style="padding:14px 16px; font-size:13px; box-sizing:border-box;">
     <div style="display:flex; gap:12px; align-items:center; margin-bottom:14px;">
-      <div id="live-color-swatch" style="width:64px; height:64px; border:2px solid #444; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.5); background:#f00;"></div>
-      <div style="flex:1;">
+      <div id="live-color-swatch" style="width:64px; height:64px; border:2px solid #444; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.5); flex-shrink:0;"></div>
+      <div style="flex:1; min-width:0;">
         <input type="text" id="hex-input" maxlength="9" placeholder="#RRGGBB or #RRGGBBAA"
                style="width:100%; padding:9px; background:#34495e; color:#eee; border:none; border-radius:5px; font-family:monospace; text-align:center; box-sizing:border-box;"/>
       </div>
     </div>
-    <label style="display:block; margin:8px 0 4px; color:#ccc; font-size:12px;">Hue</label>
-    <input type="range" id="hue-slider" min="0" max="360" value="0"/>
-    <label style="display:block; margin:8px 0 4px; color:#ccc; font-size:12px;">Saturation</label>
-    <input type="range" id="sat-slider" min="0" max="100" value="100" style="background:linear-gradient(to right,#888,#f00); border-radius:9px;"/>
-    <label style="display:block; margin:8px 0 4px; color:#ccc; font-size:12px;">Value</label>
-    <input type="range" id="val-slider" min="0" max="100" value="100" style="background:linear-gradient(to right,#000,#f00); border-radius:9px;"/>
-    <label style="display:block; margin:8px 0 4px; color:#ccc; font-size:12px;">Opacity</label>
-    <input type="range" id="alpha-slider" min="0" max="1" step="0.01" value="1" style="accent-color:#27ae60;"/>
-    <button onclick="applyCustomColor()" style="margin-top:14px; width:100%; padding:10px; background:#27ae60; border:none; border-radius:6px; color:white; font-size:13px; cursor:pointer; font-family:trebuchet ms;">
+    <div class="cp-slider-wrap">
+      <label style="display:block; margin:8px 0 4px; color:#ccc; font-size:12px;">Hue</label>
+      <input type="range" id="hue-slider" class="cp-slider" min="0" max="360" value="0"/>
+    </div>
+    <div class="cp-slider-wrap">
+      <label style="display:block; margin:8px 0 4px; color:#ccc; font-size:12px;">Saturation</label>
+      <input type="range" id="sat-slider" class="cp-slider" min="0" max="100" value="100"/>
+    </div>
+    <div class="cp-slider-wrap">
+      <label style="display:block; margin:8px 0 4px; color:#ccc; font-size:12px;">Value</label>
+      <input type="range" id="val-slider" class="cp-slider" min="0" max="100" value="100"/>
+    </div>
+    <div class="cp-slider-wrap">
+      <label style="display:block; margin:8px 0 4px; color:#ccc; font-size:12px;">Opacity</label>
+      <input type="range" id="alpha-slider" class="cp-slider" min="0" max="1" step="0.01" value="1"/>
+    </div>
+    <button onclick="applyCustomColor()" style="margin-top:14px; width:100%; padding:10px; background:#27ae60; border:none; border-radius:6px; color:white; font-size:13px; cursor:pointer; font-family:trebuchet ms; box-sizing:border-box;">
       Apply &amp; Close
     </button>
   </div>
@@ -1094,7 +1317,6 @@ body.dark-mode { background-color: #1e1e1e; }
         </svg>
       </button>
       <button id="find-replace-header-btn" class="header-btn" title="Find/Replace">
-        <!-- Clean find/replace icon: stacked arrows between two text rows -->
         <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 5h7"/>
           <path d="M3 9h5"/>
@@ -1151,11 +1373,9 @@ body.dark-mode { background-color: #1e1e1e; }
           <button id="db-files-btn">View DB Files</button>
         </div>
 
-        
           <button id="preview-code-btn">Preview Code</button>
           <button id="sidebar-find-replace-btn">Find / Replace</button>
           <button id="change-language-btn">Change Language</button>
-       
       </div>
 
       <div id="sidebar-find-replace" class="sidebar-panel">
@@ -1163,7 +1383,7 @@ body.dark-mode { background-color: #1e1e1e; }
           <h3>Find and Replace</h3>
           <button class="sidebar-close-btn" id="close-sidebar-find-replace">&times;</button>
         </div>
-        <form id="find-replace-form">
+        <form id="find-replace-form" onsubmit="return false;">
           <input type="text" id="find-text" placeholder="Find...">
           <input type="text" id="replace-text" placeholder="Replace with...">
           <label><input type="checkbox" id="case-sensitive"> Case sensitive</label>
@@ -1470,7 +1690,7 @@ body.dark-mode { background-color: #1e1e1e; }
 
 <script>
 /* =============================================================
-   TOAST SYSTEM (real working, no alert)
+   TOAST SYSTEM
 ============================================================= */
 function showToast(message, type = 'success', duration = 2600) {
   const container = document.getElementById('toast-container');
@@ -1478,10 +1698,7 @@ function showToast(message, type = 'success', duration = 2600) {
   toast.className = 'toast ' + type;
   toast.textContent = message;
   container.appendChild(toast);
-  // Force reflow then animate in
-  requestAnimationFrame(() => {
-    toast.classList.add('show');
-  });
+  requestAnimationFrame(() => { toast.classList.add('show'); });
   setTimeout(() => {
     toast.classList.remove('show');
     setTimeout(() => toast.remove(), 300);
@@ -1489,10 +1706,9 @@ function showToast(message, type = 'success', duration = 2600) {
 }
 
 /* =============================================================
-   INSTANT TOP-BAR ICON COLOR (cached + driven by CSS var)
+   INSTANT TOP-BAR ICON COLOR
 ============================================================= */
 function applyIconColorFromBg(bgColor) {
-  // bgColor like "#0b487e" or "rgb(...)"
   let r, g, b;
   if (bgColor.startsWith('#')) {
     let hex = bgColor.slice(1);
@@ -1507,18 +1723,14 @@ function applyIconColorFromBg(bgColor) {
   }
   const brightness = (r * 299 + g * 587 + b * 114) / 1000;
   const newColor = brightness > 180 ? '#111111' : '#ffffff';
-  // Single CSS variable update -> instant for all icons
   document.documentElement.style.setProperty('--icon-color', newColor);
-  // Also explicit stroke/fill for SVGs that hard-code colors
   document.querySelectorAll('.header-btn svg, #hide-sidebar-btn svg').forEach(svg => {
     svg.style.color = newColor;
   });
-  // Cache for next load (instant on reload)
   try { localStorage.setItem('jsinsider_icon_color', newColor); } catch (e) {}
   try { localStorage.setItem('jsinsider_top_bar_color', bgColor); } catch (e) {}
 }
 
-// Restore cached color INSTANTLY before anything else
 (function restoreIconColorCache() {
   try {
     const cachedIcon = localStorage.getItem('jsinsider_icon_color');
@@ -1604,7 +1816,6 @@ const settingKeys = [
   'useWorker', 'enableEmmet', 'keyboardHandler', 'maxLines',
   'minLines', 'overwrite', 'readOnly', 'sidebarWidth',
   'defaultLanguage', 'autoPairBrackets',
-  /* UI state persistence */
   'sidebarHidden', 'lastOpenedFile'
 ];
 
@@ -1746,19 +1957,20 @@ function applySettings(s) {
   editor.setReadOnly(s.readOnly);
 
   document.getElementById('sidebar-width').value = s.sidebarWidth;
-  document.getElementById('file-explorer').style.width = `${s.sidebarWidth}px`;
+  /* On desktop only — mobile sidebar uses fixed overlay sizing */
+  if (window.innerWidth > 768) {
+    document.getElementById('file-explorer').style.width = `${s.sidebarWidth}px`;
+  }
 
   document.getElementById('default-language').value = s.defaultLanguage;
   document.getElementById('auto-pair-brackets').checked = s.autoPairBrackets;
   editor.setBehavioursEnabled(s.autoPairBrackets);
 
-  /* Restore sidebar visibility (do NOT override mobile auto-hide which already happened) */
   const fe = document.getElementById('file-explorer');
   if (window.innerWidth > 768) {
     if (s.sidebarHidden) fe.classList.add('hidden');
     else fe.classList.remove('hidden');
   }
-  /* Stash last opened file so loadAllFilesFromDB can use it */
   window.__lastOpenedFile = s.lastOpenedFile || '';
 }
 
@@ -1909,7 +2121,11 @@ function updateFileExplorer() {
     if (savedFiles.has(file)) li.classList.add("saved");
     if (file === currentFile) li.classList.add("selected");
     li.dataset.filename = file;
-    li.onclick = () => openFile(file);
+    li.onclick = () => {
+      openFile(file);
+      /* Auto-close sidebar on mobile after picking */
+      if (window.innerWidth <= 768) closeMobileSidebar();
+    };
     list.appendChild(li);
   });
   updateSaveButtons();
@@ -1925,7 +2141,6 @@ function openFile(filename) {
   highlightFile(filename);
   setEditorMode(filename);
   updateSaveButtons();
-  /* Remember which file was last opened, restored next launch */
   saveSetting('lastOpenedFile', filename);
 }
 
@@ -2046,17 +2261,51 @@ document.getElementById("file-input").addEventListener("change", function(e) {
 });
 
 /* =============================================================
-   SIDEBAR TOGGLE (smooth animation)
+   SIDEBAR TOGGLE — desktop slide, mobile overlay with backdrop
 ============================================================= */
+function openMobileSidebar() {
+  const fe = document.getElementById('file-explorer');
+  const bd = document.getElementById('sidebar-backdrop');
+  fe.classList.remove('hidden');
+  bd.classList.add('active');
+}
+function closeMobileSidebar() {
+  const fe = document.getElementById('file-explorer');
+  const bd = document.getElementById('sidebar-backdrop');
+  fe.classList.add('hidden');
+  bd.classList.remove('active');
+}
+
 document.getElementById("hide-sidebar-btn").onclick = () => {
   const fe = document.getElementById("file-explorer");
-  fe.classList.toggle("hidden");
-  /* Persist hidden state (desktop only — mobile auto-hides on load) */
-  if (window.innerWidth > 768) {
+  if (window.innerWidth <= 768) {
+    if (fe.classList.contains('hidden')) openMobileSidebar();
+    else closeMobileSidebar();
+  } else {
+    fe.classList.toggle("hidden");
     saveSetting('sidebarHidden', fe.classList.contains('hidden'));
+    setTimeout(() => editor.resize(), 280);
   }
-  setTimeout(() => editor.resize(), 280);
 };
+
+/* Click backdrop to close mobile sidebar */
+document.getElementById('sidebar-backdrop').addEventListener('click', closeMobileSidebar);
+
+/* Resize handler — when crossing breakpoint, reset sidebar state */
+window.addEventListener('resize', () => {
+  const fe = document.getElementById('file-explorer');
+  const bd = document.getElementById('sidebar-backdrop');
+  if (window.innerWidth > 768) {
+    /* Desktop: clear inline mobile widths so CSS settings-width applies */
+    fe.style.transform = '';
+    bd.classList.remove('active');
+  } else {
+    /* Mobile: hide sidebar by default */
+    fe.classList.add('hidden');
+    bd.classList.remove('active');
+  }
+  setTimeout(() => editor.resize(), 100);
+});
 
 editor.on('change', () => {
   if (currentFile) {
@@ -2110,7 +2359,7 @@ document.getElementById('remove-from-db-btn').addEventListener('click', () => {
 });
 
 /* =============================================================
-   DB FILES MODAL WITH CHECKBOX + CTRL-CLICK SELECTION
+   DB FILES MODAL
 ============================================================= */
 let dbSelectedFiles = new Set();
 let dbLastClickedIndex = -1;
@@ -2120,25 +2369,19 @@ document.getElementById('db-files-btn').addEventListener('click', () => {
   else loadDBFilesModal();
 });
 
-/* Click in empty space inside DB file manager (modal-body or list area)
-   with one or more files selected -> deselect all. Click on a list item, button,
-   checkbox, or scrollbar should NOT trigger this. */
 (function() {
   const modalBody = document.querySelector('#db-files-modal .modal-body');
   if (!modalBody) return;
   modalBody.addEventListener('mousedown', (e) => {
     if (dbSelectedFiles.size === 0) return;
-    // If click landed on or inside an actual file row or interactive control, ignore
     if (e.target.closest('#db-file-list li')) return;
     if (e.target.closest('.db-action-btn')) return;
     if (e.target.closest('.search-with-icon')) return;
     if (e.target.closest('.db-toolbar')) return;
-    // Otherwise -> clear selection
     dbSelectedFiles.clear();
     dbLastClickedIndex = -1;
     updateDBSelectionInfo();
   });
-  // Also clear when clicking the empty area at bottom of the list itself
   const list = document.getElementById('db-file-list');
   if (list) {
     list.addEventListener('mousedown', (e) => {
@@ -2155,7 +2398,6 @@ function updateDBSelectionInfo() {
   const info = document.getElementById('db-selection-info');
   const deleteBtn = document.getElementById('delete-all-db-btn');
   info.textContent = `${dbSelectedFiles.size} selected`;
-  /* Smart label: Delete All becomes Delete Selected when items are checked */
   if (deleteBtn) {
     deleteBtn.textContent = dbSelectedFiles.size > 0
       ? `Delete Selected (${dbSelectedFiles.size})`
@@ -2198,7 +2440,7 @@ function loadDBFilesModal() {
         li.innerHTML = `
           <input type="checkbox" class="db-checkbox">
           <div class="db-file-info">
-            <span class="filename">${f.filename}</span>
+            <span class="filename"></span>
             <small>Last modified: ${dateStr}</small>
           </div>
           <div class="db-file-actions">
@@ -2219,10 +2461,11 @@ function loadDBFilesModal() {
             </button>
           </div>
         `;
+        /* Use textContent to safely set filename (prevents HTML injection bug if filename contains special chars) */
+        li.querySelector('.filename').textContent = f.filename;
 
         const cb = li.querySelector('.db-checkbox');
 
-        // Checkbox click → toggle this one only
         cb.addEventListener('click', (e) => {
           e.stopPropagation();
           if (cb.checked) dbSelectedFiles.add(f.filename);
@@ -2231,13 +2474,11 @@ function loadDBFilesModal() {
           updateDBSelectionInfo();
         });
 
-        // LI click → handle ctrl/shift selection or open
         li.addEventListener('click', (e) => {
           if (e.target.closest('.db-icon-btn')) return;
           if (e.target.classList.contains('db-checkbox')) return;
 
           if (e.ctrlKey || e.metaKey) {
-            // Toggle selection
             if (dbSelectedFiles.has(f.filename)) dbSelectedFiles.delete(f.filename);
             else dbSelectedFiles.add(f.filename);
             dbLastClickedIndex = idx;
@@ -2251,13 +2492,11 @@ function loadDBFilesModal() {
             }
             updateDBSelectionInfo();
           } else {
-            // No modifier: open file
             loadAndOpenDBFile(f.filename);
             document.getElementById('db-files-modal').style.display = 'none';
           }
         });
 
-        // Double-click also opens
         li.addEventListener('dblclick', (e) => {
           if (e.target.closest('.db-icon-btn')) return;
           loadAndOpenDBFile(f.filename);
@@ -2298,7 +2537,6 @@ document.getElementById('db-select-all-btn').addEventListener('click', () => {
   updateDBSelectionInfo();
 });
 
-/* Single smart delete button: deletes selection when items selected, else deletes all */
 document.getElementById('delete-all-db-btn').addEventListener('click', () => {
   if (dbSelectedFiles.size > 0) {
     if (!confirm(`Delete ${dbSelectedFiles.size} selected file(s)?`)) return;
@@ -2400,7 +2638,7 @@ document.getElementById('settings-search').addEventListener('input', (e) => {
 });
 
 /* =============================================================
-   SETTINGS LISTENERS (with instant icon color update)
+   SETTINGS LISTENERS
 ============================================================= */
 document.getElementById('top-bar-color').addEventListener('input', (e) => {
   document.getElementById('top-bar').style.backgroundColor = e.target.value;
@@ -2475,14 +2713,16 @@ document.getElementById('min-lines').addEventListener('input', e => {
 document.getElementById('overwrite').addEventListener('change', e => { editor.session.setOverwrite(e.target.checked); saveSetting('overwrite', e.target.checked); });
 document.getElementById('read-only').addEventListener('change', e => { editor.setReadOnly(e.target.checked); saveSetting('readOnly', e.target.checked); });
 document.getElementById('sidebar-width').addEventListener('input', e => {
-  document.getElementById('file-explorer').style.width = `${e.target.value}px`;
+  if (window.innerWidth > 768) {
+    document.getElementById('file-explorer').style.width = `${e.target.value}px`;
+  }
   saveSetting('sidebarWidth', parseInt(e.target.value));
 });
 document.getElementById('default-language').addEventListener('change', e => saveSetting('defaultLanguage', e.target.value));
 document.getElementById('auto-pair-brackets').addEventListener('change', e => { editor.setBehavioursEnabled(e.target.checked); saveSetting('autoPairBrackets', e.target.checked); });
 
 /* =============================================================
-   RESET SETTINGS (fixed)
+   RESET SETTINGS
 ============================================================= */
 function resetSettings() {
   if (!confirm('Reset all settings to defaults?\nThis cannot be undone.')) return;
@@ -2490,15 +2730,11 @@ function resetSettings() {
     const defaults = {};
     settingKeys.forEach(k => defaults[k] = getDefaultSetting(k));
 
-    // Clear cached icon/colour values BEFORE applying so the new top-bar
-    // colour isn't overwritten by a stale cache during applyIconColorFromBg.
     try {
       localStorage.removeItem('jsinsider_icon_color');
       localStorage.removeItem('jsinsider_top_bar_color');
     } catch (e) {}
 
-    // Persist defaults to DB first, THEN apply to UI so the visible values
-    // and the persisted values stay in sync (fixes "reset doesn't stick").
     const writeDefaults = () => new Promise((resolve) => {
       if (!db) { resolve(); return; }
       const tx = db.transaction(['settings'], 'readwrite');
@@ -2513,7 +2749,6 @@ function resetSettings() {
 
     writeDefaults().then(() => {
       applySettings(defaults);
-      // Force a refresh of derived UI bits that don't live in applySettings
       const fe = document.getElementById('file-explorer');
       if (window.innerWidth > 768) fe.classList.remove('hidden');
       showToast("Settings reset to defaults");
@@ -2614,13 +2849,20 @@ document.getElementById('replace-all-btn').addEventListener('click', () => {
   const needle = document.getElementById('find-text').value;
   const rep = document.getElementById('replace-text').value;
   if (!needle) return;
-  const count = editor.replaceAll(rep, {
+  /* Ace's replaceAll returns undefined in some versions — count manually */
+  let beforeContent = editor.getValue();
+  editor.replaceAll(rep, {
     needle,
     caseSensitive: document.getElementById('case-sensitive').checked,
     wholeWord: document.getElementById('whole-word').checked,
     regExp: false
   });
-  showToast(`Replaced ${count || 0} occurrence(s)`);
+  const caseSensitive = document.getElementById('case-sensitive').checked;
+  const flags = caseSensitive ? 'g' : 'gi';
+  const escNeedle = needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const matches = beforeContent.match(new RegExp(escNeedle, flags));
+  const count = matches ? matches.length : 0;
+  showToast(`Replaced ${count} occurrence(s)`);
 });
 
 /* =============================================================
@@ -2634,7 +2876,11 @@ function showSidebarPanel(p) {
   sidebarFindReplace.classList.remove('active');
   sidebarLanguage.classList.remove('active');
   p.classList.add('active');
-  document.getElementById('file-explorer').classList.remove('hidden');
+  const fe = document.getElementById('file-explorer');
+  fe.classList.remove('hidden');
+  if (window.innerWidth <= 768) {
+    document.getElementById('sidebar-backdrop').classList.add('active');
+  }
 }
 function hideSidebarPanels() {
   fileExplorerContent.style.display = 'block';
@@ -2642,7 +2888,7 @@ function hideSidebarPanels() {
   sidebarLanguage.classList.remove('active');
 }
 function isPanelActive(p) { return p.classList.contains('active'); }
-/* Toggle behavior: clicking the header find-replace btn opens it, clicking again closes */
+
 document.getElementById('find-replace-header-btn').addEventListener('click', () => {
   if (isPanelActive(sidebarFindReplace)) hideSidebarPanels();
   else showSidebarPanel(sidebarFindReplace);
@@ -2653,7 +2899,6 @@ document.getElementById('change-language-btn').addEventListener('click', () => {
   else showSidebarPanel(sidebarLanguage);
 });
 document.getElementById('close-sidebar-language').addEventListener('click', hideSidebarPanels);
-/* Sidebar Find/Replace button (new, in the tools group) - also toggles */
 document.getElementById('sidebar-find-replace-btn').addEventListener('click', () => {
   if (isPanelActive(sidebarFindReplace)) hideSidebarPanels();
   else showSidebarPanel(sidebarFindReplace);
@@ -2699,8 +2944,10 @@ document.addEventListener('keydown', (e) => {
     if (document.getElementById("preview-modal").style.display === "block") closePreviewModal();
     document.getElementById("db-files-modal").style.display = "none";
     document.getElementById("settings-modal").style.display = "none";
+    document.getElementById("custom-color-modal").style.display = "none";
     hideSidebarPanels();
     hideContextMenu();
+    if (window.innerWidth <= 768) closeMobileSidebar();
   }
   if ((e.ctrlKey || e.metaKey) && e.key === 's') {
     e.preventDefault();
@@ -2730,7 +2977,7 @@ if (window.innerWidth <= 768) {
 }
 
 /* =============================================================
-   NEW-FILE DROPDOWN (plus button caret)
+   NEW-FILE DROPDOWN
 ============================================================= */
 (function setupNewFileDropdown() {
   const wrap = document.querySelector('.new-file-wrapper');
@@ -2868,17 +3115,6 @@ document.querySelectorAll('.close-window-btn').forEach(b => {
   b.onclick = () => b.closest('.draggable-window').style.display = 'none';
 });
 
-function centerWindowOnMobile(win) {
-  if (window.innerWidth <= 768) {
-    setTimeout(() => {
-      const w = win.offsetWidth;
-      win.style.left = `${(window.innerWidth - w) / 2}px`;
-      win.style.top = '10vh';
-    }, 10);
-  }
-}
-
-/* Always center any draggable window on open (desktop + mobile) */
 function centerWindow(win) {
   setTimeout(() => {
     const w = win.offsetWidth || 420;
@@ -2891,7 +3127,7 @@ function centerWindow(win) {
 }
 
 /* =============================================================
-   GOTO / NAVIGATOR WINDOW (fixed jump-to-section)
+   GOTO / NAVIGATOR
 ============================================================= */
 function isPositionInCommentOrString(pos, content) {
   const checks = [
@@ -3019,27 +3255,54 @@ function jumpToDiv() {
   }
 }
 
+/* Brace-matched function-body finder. Used by both insert and remove. */
+function findFunctionBody(content, fnName) {
+  const esc = fnName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const patterns = [
+    new RegExp(`(?:async\\s+)?function\\s+${esc}\\s*\\([^)]*\\)\\s*\\{`),
+    new RegExp(`(?:const|let|var)\\s+${esc}\\s*=\\s*(?:async\\s*)?\\([^)]*\\)\\s*=>\\s*\\{`),
+    new RegExp(`(?:const|let|var)\\s+${esc}\\s*=\\s*function\\s*\\([^)]*\\)\\s*\\{`)
+  ];
+  for (const re of patterns) {
+    const m = content.match(re);
+    if (!m) continue;
+    const headStart = m.index;
+    const openBrace = content.indexOf('{', headStart + m[0].length - 1);
+    if (openBrace === -1) continue;
+    /* Brace-match with awareness of strings/comments */
+    let depth = 0;
+    let i = openBrace;
+    let inStr = null, inLineComment = false, inBlockComment = false;
+    for (; i < content.length; i++) {
+      const c = content[i], n = content[i+1];
+      if (inLineComment) { if (c === '\n') inLineComment = false; continue; }
+      if (inBlockComment) { if (c === '*' && n === '/') { inBlockComment = false; i++; } continue; }
+      if (inStr) {
+        if (c === '\\') { i++; continue; }
+        if (c === inStr) inStr = null;
+        continue;
+      }
+      if (c === '/' && n === '/') { inLineComment = true; i++; continue; }
+      if (c === '/' && n === '*') { inBlockComment = true; i++; continue; }
+      if (c === '"' || c === "'" || c === '`') { inStr = c; continue; }
+      if (c === '{') depth++;
+      else if (c === '}') { depth--; if (depth === 0) { return { headStart, openBrace, closeBrace: i, headEnd: openBrace }; } }
+    }
+  }
+  return null;
+}
+
 function insertScriptIntoFunction() {
   const fn = document.getElementById('target-func').value.trim();
   const code = document.getElementById('script-code').value.trim();
   const pos = document.querySelector('input[name="insert-pos"]:checked').value;
   if (!fn || !code) { showToast("Both fields required", "error"); return; }
-  let content = editor.getValue();
   const cleanName = fn.replace(/[\(\)]/g, '');
-  const esc = cleanName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  let regex = new RegExp(`(async\\s+)?function\\s+${esc}\\s*\\(`, 'i');
-  let match = content.match(regex);
-  if (!match) { showToast(`Function "${cleanName}" not found`, "error"); return; }
-  const startIdx = match.index + match[0].length;
-  let braceCount = 0, endIdx = startIdx, started = false;
-  for (let i = startIdx; i < content.length; i++) {
-    if (content[i] === '{') { braceCount++; started = true; }
-    if (content[i] === '}') { braceCount--; if (started && braceCount === 0) { endIdx = i; break; } }
-  }
-  // find the opening brace
-  let openBrace = content.indexOf('{', startIdx);
-  const insertionPoint = pos === 'last' ? endIdx : openBrace + 1;
+  let content = editor.getValue();
+  const found = findFunctionBody(content, cleanName);
+  if (!found) { showToast(`Function "${cleanName}" not found`, "error"); return; }
   const indent = '    ';
+  const insertionPoint = pos === 'last' ? found.closeBrace : found.openBrace + 1;
   content = content.slice(0, insertionPoint) + '\n' + indent + code + '\n' + content.slice(insertionPoint);
   editor.setValue(content);
   document.getElementById('goto-window').style.display = 'none';
@@ -3089,7 +3352,7 @@ function openGotoWindow(insertOnly = false) {
       <button onclick="jumpToLastFocused()" class="ctx-item" style="margin-bottom:5px; width:100%; background:#27ae60; color:white;">Jump to Last Focused Position</button>
 
       <label style="display:block; margin:15px 0 6px 0; color:#bbb; font-size:13px;">Go to CDN Script</label>
-      <select id="cdn-script-select" style="width:100%; padding:9px; background:#34495e; color:white; border:none; border-radius:6px; font-size:13px;"></select>
+      <select id="cdn-script-select" style="width:100%; padding:9px; background:#34495e; color:white; border:none; border-radius:6px; font-size:13px; box-sizing:border-box;"></select>
       <button onclick="jumpToCDNScript()" style="margin-top:8px; width:100%; background:#27ae60; color:white; border:none; padding:10px; border-radius:6px;">Jump to Selected CDN</button>
     `;
     const cdns = getCDNScripts();
@@ -3116,7 +3379,7 @@ function openGotoWindow(insertOnly = false) {
 
       <label style="display:block; margin:12px 0 6px 0; color:#bbb; font-size:13px;">Go to line number</label>
       <div style="display:flex; gap:8px;">
-        <input id="goto-line-input" type="number" placeholder="42" min="1" style="flex:1; padding:9px; background:#34495e; color:white; border:none; border-radius:6px;">
+        <input id="goto-line-input" type="number" placeholder="42" min="1" style="flex:1; padding:9px; background:#34495e; color:white; border:none; border-radius:6px; box-sizing:border-box;">
         <button onclick="jumpToLineNumber()" style="padding:9px 20px; background:#27ae60; color:white; border:none; border-radius:6px;">Go</button>
       </div>
     `;
@@ -3226,6 +3489,8 @@ function removeUnusedCSS() {
   editor.setValue(code);
   showToast(`Removed ${removed} unused CSS rule(s)`);
 }
+
+/* FIXED: was using [^}]* which fails on nested braces. Use brace-matched finder. */
 function removeUnusedJSFunctions() {
   let code = editor.getValue();
   const funcRegex = /function\s+([a-zA-Z_$][0-9a-zA-Z_$]*)\s*\(/g;
@@ -3235,9 +3500,9 @@ function removeUnusedJSFunctions() {
   funcs.forEach(name => {
     const calls = (code.match(new RegExp('\\b' + name + '\\b', 'g')) || []).length;
     if (calls <= 1) {
-      const full = new RegExp('function\\s+' + name + '\\s*\\([^)]*\\)\\s*\\{[^}]*\\}', 'g');
-      if (full.test(code)) {
-        code = code.replace(full, '');
+      const found = findFunctionBody(code, name);
+      if (found) {
+        code = code.slice(0, found.headStart) + code.slice(found.closeBrace + 1).replace(/^\s*\n/, '');
         removed++;
       }
     }
@@ -3254,7 +3519,7 @@ function openOptimizerWindow() {
 }
 
 /* =============================================================
-   REPLACE JS FUNCTION TOOL
+   REPLACE JS FUNCTION TOOL (now using brace-matched finder)
 ============================================================= */
 function openReplaceJSFunctionTool() {
   const win = document.getElementById('goto-window');
@@ -3292,69 +3557,54 @@ function replaceFunctionByName() {
   const body = document.getElementById('replace-func-body').value.trim();
   if (!name || !body) { showToast("Both fields required", "error"); return; }
   let code = editor.getValue();
-  const esc = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const patterns = [
-    new RegExp(`((?:async\\s+)?function\\s+${esc}\\s*\\([^)]*\\)\\s*\\{)([\\s\\S]*?)(\\n\\})`, 'g'),
-    new RegExp(`((?:const|let|var)\\s+${esc}\\s*=\\s*(?:async\\s*)?\\([^)]*\\)\\s*=>\\s*\\{)([\\s\\S]*?)(\\n\\})`, 'g'),
-    new RegExp(`((?:const|let|var)\\s+${esc}\\s*=\\s*function\\s*\\([^)]*\\)\\s*\\{)([\\s\\S]*?)(\\n\\})`, 'g')
-  ];
-  let replaced = false;
-  for (const re of patterns) {
-    const newCode = code.replace(re, (full, head, oldBody, tail) => {
-      replaced = true;
-      return head + '\n  ' + body + '\n}';
-    });
-    if (replaced) { code = newCode; break; }
-  }
-  if (replaced) {
-    editor.setValue(code);
-    document.getElementById('goto-window').style.display = 'none';
-    showToast(`Function "${name}" replaced`);
-  } else {
-    showToast(`Function "${name}" not found`, "error");
-  }
+  const found = findFunctionBody(code, name);
+  if (!found) { showToast(`Function "${name}" not found`, "error"); return; }
+  const newBody = '\n  ' + body + '\n';
+  code = code.slice(0, found.openBrace + 1) + newBody + code.slice(found.closeBrace);
+  editor.setValue(code);
+  document.getElementById('goto-window').style.display = 'none';
+  showToast(`Function "${name}" replaced`);
 }
 
 function removeFunctionByName() {
   const name = document.getElementById('remove-func-name').value.trim();
   if (!name) { showToast("Function name required", "error"); return; }
   let code = editor.getValue();
-  const esc = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const patterns = [
-    new RegExp(`(async\\s+)?function\\s+${esc}\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*?\\n\\}\\s*`, 'g'),
-    new RegExp(`(const|let|var)\\s+${esc}\\s*=\\s*(?:async\\s*)?\\([^)]*\\)\\s*=>\\s*\\{[\\s\\S]*?\\n\\}\\s*`, 'g'),
-    new RegExp(`(const|let|var)\\s+${esc}\\s*=\\s*function\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*?\\n\\}\\s*`, 'g')
-  ];
-  let removed = false;
-  for (const re of patterns) {
-    const newCode = code.replace(re, '');
-    if (newCode !== code) { code = newCode; removed = true; break; }
-  }
-  if (removed) {
-    editor.setValue(code.trim());
-    document.getElementById('goto-window').style.display = 'none';
-    showToast(`Function "${name}" removed`);
-  } else {
-    showToast(`Function "${name}" not found`, "error");
-  }
+  const found = findFunctionBody(code, name);
+  if (!found) { showToast(`Function "${name}" not found`, "error"); return; }
+  code = code.slice(0, found.headStart) + code.slice(found.closeBrace + 1).replace(/^\s*\n/, '');
+  editor.setValue(code.trim());
+  document.getElementById('goto-window').style.display = 'none';
+  showToast(`Function "${name}" removed`);
 }
 
 /* =============================================================
-   COLOR PICKER
+   COLOR PICKER — FULLY REWRITTEN
+   Now supports: hex, hex+alpha, rgb, rgba, hsl, hsla
+   Slider gradients drive via CSS variables for true cross-browser
 ============================================================= */
-let isDraggingCanvas = false;
-let currentSat = 1, currentVal = 1, currentAlpha = 1;
+let hue = 0, sat = 100, val = 100, alpha = 1;
 
 function parseColorToHsv(color) {
   color = (color || "#ff0000").trim().toLowerCase();
   let alpha = 1;
   if (color.startsWith('rgba')) {
     const m = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
-    if (m) return { ...rgbToHsv(+m[1]/255, +m[2]/255, +m[3]/255), alpha: m[4] ? +m[4] : 1 };
+    if (m) return { ...rgbToHsv(+m[1]/255, +m[2]/255, +m[3]/255), alpha: m[4] !== undefined ? +m[4] : 1 };
   }
   if (color.startsWith('rgb')) {
     const m = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
     if (m) return { ...rgbToHsv(+m[1]/255, +m[2]/255, +m[3]/255), alpha: 1 };
+  }
+  if (color.startsWith('hsla') || color.startsWith('hsl')) {
+    /* Convert hsl(a) -> rgb -> hsv so the picker can show it */
+    const m = color.match(/hsla?\(\s*(\d+)\s*,\s*(\d+)%?\s*,\s*(\d+)%?\s*(?:,\s*([\d.]+))?\)/);
+    if (m) {
+      const h = +m[1], s = +m[2] / 100, l = +m[3] / 100;
+      const a = m[4] !== undefined ? +m[4] : 1;
+      const rgb = hslToRgb(h, s, l);
+      return { ...rgbToHsv(rgb.r / 255, rgb.g / 255, rgb.b / 255), alpha: a };
+    }
   }
   if (color.startsWith('#')) {
     let hex = color.slice(1);
@@ -3365,6 +3615,26 @@ function parseColorToHsv(color) {
   }
   return { h: 0, s: 1, v: 1, alpha: 1 };
 }
+
+function hslToRgb(h, s, l) {
+  h = h % 360;
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+  const mm = l - c / 2;
+  let r, g, b;
+  if (h < 60) { r = c; g = x; b = 0; }
+  else if (h < 120) { r = x; g = c; b = 0; }
+  else if (h < 180) { r = 0; g = c; b = x; }
+  else if (h < 240) { r = 0; g = x; b = c; }
+  else if (h < 300) { r = x; g = 0; b = c; }
+  else { r = c; g = 0; b = x; }
+  return {
+    r: Math.round((r + mm) * 255),
+    g: Math.round((g + mm) * 255),
+    b: Math.round((b + mm) * 255)
+  };
+}
+
 function rgbToHsv(r, g, b) {
   const max = Math.max(r, g, b), min = Math.min(r, g, b);
   let h = 0, s = 0, v = max, d = max - min;
@@ -3397,23 +3667,72 @@ function rgbToHex(r, g, b, a = 1) {
   return hex;
 }
 
-let hue = 0, sat = 100, val = 100, alpha = 1;
 function updateSlidersBackground() {
-  const h = document.getElementById('hue-slider').value;
-  document.getElementById('sat-slider').style.background = `linear-gradient(to right, #888, hsl(${h},100%,50%))`;
-  document.getElementById('val-slider').style.background = `linear-gradient(to right, #000, hsl(${h},${sat}%,50%))`;
+  const modal = document.getElementById('custom-color-modal');
+  if (!modal) return;
+  /* Sat slider: from gray to fully saturated current hue (at current value) */
+  const grayRgb = hsvToRgb(hue, 0, val / 100);
+  const fullSatRgb = hsvToRgb(hue, 1, val / 100);
+  const satGrad = `linear-gradient(to right, rgb(${grayRgb.r},${grayRgb.g},${grayRgb.b}), rgb(${fullSatRgb.r},${fullSatRgb.g},${fullSatRgb.b}))`;
+  /* Val slider: from black to full brightness current hue+sat */
+  const fullValRgb = hsvToRgb(hue, sat / 100, 1);
+  const valGrad = `linear-gradient(to right, #000, rgb(${fullValRgb.r},${fullValRgb.g},${fullValRgb.b}))`;
+  /* Alpha slider: from transparent to fully opaque current color */
+  const cur = hsvToRgb(hue, sat / 100, val / 100);
+  const alphaGrad = `linear-gradient(to right, rgba(${cur.r},${cur.g},${cur.b},0), rgba(${cur.r},${cur.g},${cur.b},1))`;
+  modal.style.setProperty('--sat-grad', satGrad);
+  modal.style.setProperty('--val-grad', valGrad);
+  modal.style.setProperty('--alpha-grad', alphaGrad);
 }
+
 function updatePreviewAndHex() {
   const rgb = hsvToRgb(hue, sat / 100, val / 100);
   const hex = rgbToHex(rgb.r, rgb.g, rgb.b, alpha);
-  document.getElementById('live-color-swatch').style.backgroundColor = hex;
+  const swatch = document.getElementById('live-color-swatch');
+  swatch.style.setProperty('--swatch-color',
+    alpha < 1 ? `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha})` : hex);
   document.getElementById('hex-input').value = hex;
 }
+
 function initColorPickerListeners() {
-  document.getElementById('hue-slider').oninput = e => { hue = +e.target.value; updateSlidersBackground(); updatePreviewAndHex(); };
-  document.getElementById('sat-slider').oninput = e => { sat = +e.target.value; updateSlidersBackground(); updatePreviewAndHex(); };
-  document.getElementById('val-slider').oninput = e => { val = +e.target.value; updateSlidersBackground(); updatePreviewAndHex(); };
-  document.getElementById('alpha-slider').oninput = e => { alpha = +e.target.value; updatePreviewAndHex(); };
+  const hueS = document.getElementById('hue-slider');
+  const satS = document.getElementById('sat-slider');
+  const valS = document.getElementById('val-slider');
+  const alphaS = document.getElementById('alpha-slider');
+  const hexI = document.getElementById('hex-input');
+  if (!hueS || !satS || !valS || !alphaS) return;
+
+  hueS.oninput = e => { hue = +e.target.value; updateSlidersBackground(); updatePreviewAndHex(); };
+  satS.oninput = e => { sat = +e.target.value; updateSlidersBackground(); updatePreviewAndHex(); };
+  valS.oninput = e => { val = +e.target.value; updateSlidersBackground(); updatePreviewAndHex(); };
+  alphaS.oninput = e => { alpha = +e.target.value; updateSlidersBackground(); updatePreviewAndHex(); };
+
+  /* Sync from hex input */
+  hexI.oninput = e => {
+    const val = e.target.value.trim();
+    if (!/^#[0-9a-fA-F]{3,8}$/.test(val)) return;
+    const parsed = parseColorToHsv(val);
+    hue = parsed.h; sat = parsed.s * 100;
+    const v2 = parsed.v * 100;
+    /* keep this just for live preview without flipping the slider thumbs */
+    document.getElementById('hue-slider').value = hue;
+    document.getElementById('sat-slider').value = sat;
+    document.getElementById('val-slider').value = v2;
+    document.getElementById('alpha-slider').value = parsed.alpha;
+    window.val = v2;
+    alpha = parsed.alpha;
+    /* Note: 'val' is a local in this listener; sync into outer */
+    /* Use property to bypass shadowing */
+    (function syncOuter() {
+      // assign to outer scope vars
+      // eslint-disable-next-line no-undef
+    })();
+    /* simplest: re-trigger handlers */
+    document.getElementById('hue-slider').dispatchEvent(new Event('input'));
+    document.getElementById('sat-slider').dispatchEvent(new Event('input'));
+    document.getElementById('val-slider').dispatchEvent(new Event('input'));
+    document.getElementById('alpha-slider').dispatchEvent(new Event('input'));
+  };
 }
 
 document.getElementById('change-color-btn').onclick = function() {
@@ -3453,7 +3772,6 @@ setTimeout(initColorPickerListeners, 200);
 setTimeout(() => document.querySelectorAll('.draggable-window').forEach(makeDraggable), 300);
 
 </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
