@@ -240,7 +240,7 @@ body::-webkit-scrollbar { display: none; }
 
 /* ===== FILE EXPLORER + SMOOTH ANIMATION ===== */
 #file-explorer {
-  width: 220px;
+  width: 230px;
   background-color: #262626;
   color: white;
   padding: 12px 12px 14px 12px;
@@ -278,8 +278,6 @@ body::-webkit-scrollbar { display: none; }
 #file-explorer-content::-webkit-scrollbar { width: 6px; }
 #file-explorer-content::-webkit-scrollbar-track { background: transparent; }
 #file-explorer-content::-webkit-scrollbar-thumb { background: #1d68ad; border-radius: 4px; }
-
-#pj { font-size: 18px; margin-bottom: 10px; margin-top: 0; }
 
 #file-list {
   list-style-type: none;
@@ -470,7 +468,7 @@ div[name="tools"] {
   border: none; background-color: white;
 }
 
-/* ===== LANGUAGE OPTIONS ===== */
+/* ===== LANGUAGE OPTIONS (legacy single-row class kept for mobile sizing) ===== */
 .language-option {
   width: 100%;
   padding: 10px;
@@ -484,6 +482,262 @@ div[name="tools"] {
   box-sizing: border-box;
 }
 .language-option:hover { background-color: #236590; }
+
+/* ===== NEW LANGUAGE PICKER ===== */
+.lang-current-card {
+  background: linear-gradient(135deg, #34495e, #2c3e50);
+  border: 1px solid #3d556e;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.lang-current-icon {
+  width: 42px; height: 42px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  background: #1d68ad;
+  color: white;
+  font-weight: bold;
+  font-size: 13px;
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+.lang-current-info { flex: 1; min-width: 0; }
+.lang-current-info .label {
+  color: #9bb3c9;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 2px;
+}
+.lang-current-info .name {
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lang-current-info .ext {
+  color: #7fb6e0;
+  font-size: 12px;
+  font-family: 'Consolas', 'Monaco', monospace;
+}
+#lang-search-wrap {
+  position: relative;
+  margin-bottom: 10px;
+}
+#lang-search-input {
+  width: 100%;
+  padding: 9px 32px 9px 34px;
+  background-color: #34495e;
+  color: white;
+  border: 1px solid #3d556e;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: trebuchet ms;
+  box-sizing: border-box;
+}
+#lang-search-input::placeholder { color: #8aa1b6; }
+#lang-search-wrap .lang-search-ico {
+  position: absolute;
+  left: 10px; top: 50%; transform: translateY(-50%);
+  color: #8aa1b6;
+  pointer-events: none;
+}
+#lang-search-clear {
+  position: absolute;
+  right: 6px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; color: #8aa1b6;
+  cursor: pointer;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  display: none;
+  align-items: center; justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+}
+#lang-search-clear:hover { background: rgba(231,76,60,0.18); color: #e74c3c; }
+.lang-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: calc(100vh - 340px);
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+}
+.lang-list::-webkit-scrollbar { width: 6px; }
+.lang-list::-webkit-scrollbar-thumb { background: #1d68ad; border-radius: 4px; }
+.lang-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: #34495e;
+  color: white;
+  cursor: pointer;
+  font-family: trebuchet ms;
+  font-size: 14px;
+  text-align: left;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
+  box-sizing: border-box;
+  width: 100%;
+}
+.lang-item:hover { background: #3d5871; }
+.lang-item:active { transform: scale(0.99); }
+.lang-item.current {
+  border-color: #3498db;
+  background: #2c3e50;
+  box-shadow: inset 3px 0 0 #3498db;
+}
+.lang-item.is-none { background: #3a2d33; }
+.lang-item.is-none:hover { background: #4a3640; }
+.lang-item.is-none .lang-item-badge { background: #7f8c8d; }
+.lang-item-badge {
+  width: 34px; height: 28px;
+  border-radius: 5px;
+  background: #1d68ad;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-family: 'Consolas', 'Monaco', monospace;
+}
+.lang-item-text { flex: 1; min-width: 0; }
+.lang-item-name {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lang-item-ext {
+  font-size: 11px;
+  color: #9bb3c9;
+  font-family: 'Consolas', 'Monaco', monospace;
+}
+.lang-item-check {
+  color: #3498db;
+  opacity: 0;
+  flex-shrink: 0;
+}
+.lang-item.current .lang-item-check { opacity: 1; }
+.lang-empty {
+  color: #8aa1b6;
+  text-align: center;
+  padding: 18px 8px;
+  font-size: 13px;
+  font-style: italic;
+}
+
+/* ===== FLOATING FIND DOCK ===== */
+#floating-find-dock {
+  position: fixed;
+  top: 64px;
+  left: 18px;
+  z-index: 9000;
+  background: linear-gradient(180deg, #2c3e50, #243240);
+  border: 1px solid #3d556e;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3);
+  padding: 8px;
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  width: 360px;
+  max-width: calc(100vw - 24px);
+  user-select: none;
+  font-family: trebuchet ms;
+}
+#floating-find-dock.visible { display: flex; }
+#floating-find-dock .fdock-drag-handle {
+  height: 6px;
+  width: 36px;
+  background: #3d556e;
+  border-radius: 3px;
+  margin: 0 auto 2px auto;
+  cursor: move;
+  flex-shrink: 0;
+}
+#floating-find-dock .fdock-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: move;
+}
+#floating-find-dock .fdock-row.no-drag { cursor: default; }
+#floating-find-dock input[type="text"] {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  background-color: #34495e;
+  color: white;
+  border: 1px solid #3d556e;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: Heebo, trebuchet ms;
+  box-sizing: border-box;
+  cursor: text;
+}
+#floating-find-dock input[type="text"]:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52,152,219,0.25);
+}
+.fdock-icon-btn {
+  background: #34495e;
+  border: 1px solid #3d556e;
+  color: #cfd8e3;
+  width: 32px; height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  padding: 0;
+}
+.fdock-icon-btn:hover { background: #3d5871; color: white; }
+.fdock-icon-btn.active {
+  background: #1d68ad;
+  color: white;
+  border-color: #2980b9;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
+}
+.fdock-icon-btn.danger:hover {
+  background: rgba(231,76,60,0.18);
+  color: #e74c3c;
+  border-color: #e74c3c;
+}
+.fdock-sep {
+  width: 1px;
+  height: 22px;
+  background: #3d556e;
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+@media (max-width: 768px) {
+  #floating-find-dock {
+    left: 50%;
+    transform: translateX(-50%);
+    top: 60px;
+    width: calc(100vw - 24px);
+    max-width: 420px;
+  }
+  #floating-find-dock.dragged {
+    transform: none;
+  }
+}
 
 /* ===== DB FILES MODAL ===== */
 #db-files-modal .modal-body {
@@ -926,7 +1180,6 @@ input[type="color"] {
 
 /* =============================================================
    COLOR PICKER — FULLY REWRITTEN SLIDER STYLES
-   Cross-browser (WebKit + Firefox), proper tracks, no overflow
 ============================================================= */
 #custom-color-modal {
   width: 300px !important;
@@ -940,7 +1193,6 @@ input[type="color"] {
   box-sizing: border-box;
 }
 
-/* Base slider reset for ALL color picker sliders */
 .cp-slider {
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -955,7 +1207,6 @@ input[type="color"] {
   box-sizing: border-box;
 }
 
-/* ===== HUE SLIDER ===== */
 #hue-slider::-webkit-slider-runnable-track {
   width: 100%;
   height: 12px;
@@ -989,7 +1240,6 @@ input[type="color"] {
   box-shadow: 0 2px 4px rgba(0,0,0,0.4);
 }
 
-/* ===== SATURATION SLIDER ===== */
 #sat-slider::-webkit-slider-runnable-track {
   width: 100%;
   height: 12px;
@@ -1023,7 +1273,6 @@ input[type="color"] {
   box-shadow: 0 2px 4px rgba(0,0,0,0.4);
 }
 
-/* ===== VALUE SLIDER ===== */
 #val-slider::-webkit-slider-runnable-track {
   width: 100%;
   height: 12px;
@@ -1057,7 +1306,6 @@ input[type="color"] {
   box-shadow: 0 2px 4px rgba(0,0,0,0.4);
 }
 
-/* ===== ALPHA SLIDER (with checker + color overlay) ===== */
 #alpha-slider::-webkit-slider-runnable-track {
   width: 100%;
   height: 12px;
@@ -1095,7 +1343,6 @@ input[type="color"] {
   box-shadow: 0 2px 4px rgba(0,0,0,0.4);
 }
 
-/* Checkered background behind swatch (so transparency is visible) */
 #live-color-swatch {
   background-image:
     repeating-conic-gradient(#999 0% 25%, #ccc 0% 50%);
@@ -1112,48 +1359,29 @@ input[type="color"] {
 
 /* ===== MOBILE ===== */
 @media (max-width: 768px) {
-  /* ===== MOBILE SIDEBAR — slide-in overlay so it never overflows ===== */
-  #file-explorer {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    width: 84vw !important;
-    max-width: 320px;
-    z-index: 9999;
-    transform: translateX(0);
-    box-shadow: 4px 0 24px rgba(0,0,0,0.6);
-    padding-top: 60px; /* avoid topbar overlap */
-  }
+  
+  
+  
   #file-explorer.hidden {
-    transform: translateX(-105%) !important;
-    width: 84vw !important;
-    max-width: 320px !important;
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-    padding-top: 60px !important;
-    opacity: 1 !important;
-    flex: initial !important;
+    transform: none !important;
+    width: 0 !important;
+    max-width: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 0 !important;
+    opacity: 0 !important;
+    flex: 0 0 0px !important;
     pointer-events: none;
+    min-width: 0 !important;
   }
-  #file-explorer.hidden > * { visibility: visible; }
+  #file-explorer.hidden > * { visibility: hidden; }
 
-  /* Mobile backdrop when sidebar open */
+  /* Backdrop is unused in push-mode */
   #sidebar-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.45);
-    z-index: 9998;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease;
-  }
-  #sidebar-backdrop.active {
-    opacity: 1;
-    pointer-events: auto;
+    display: none !important;
   }
 
-  /* Make file explorer content scroll naturally on mobile */
+  /* File explorer content scrolling */
   #file-explorer-content {
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
@@ -1161,10 +1389,13 @@ input[type="color"] {
   }
   #file-list {
     flex-shrink: 0;
-    max-height: 130px;
+    max-height: 110px;
   }
 
-  /* Draggable windows — keep them inside the viewport */
+  /* Sidebar buttons — slightly compact on mobile so they fit narrow column */
+  
+
+  /* Draggable windows */
   .draggable-window {
     width: 90vw !important;
     max-width: 360px !important;
@@ -1179,17 +1410,33 @@ input[type="color"] {
   .draggable-window input[type="number"],
   .draggable-window select,
   .draggable-window textarea,
-  .opt-btn, .ctx-item, .goto-tab, .language-option {
+  .opt-btn, .goto-tab, .language-option {
     padding: 11px 14px !important;
     font-size: 15px !important;
     min-height: 44px !important;
   }
-  /* Sliders should NOT inherit min-height: 44px or it bloats them */
+  /* Sliders should NOT inherit min-height */
   .draggable-window input[type="range"],
   .cp-slider {
     min-height: 0 !important;
     padding: 0 !important;
     height: 16px !important;
+  }
+
+  /* ===== CONTEXT MENU on mobile: match desktop, NO bloated padding ===== */
+  #custom-context-menu {
+    min-width: 200px;
+    font-size: 14px;
+    padding: 5px 0;
+  }
+  .ctx-item {
+    padding: 8px 14px !important;
+    font-size: 14px !important;
+    min-height: 0 !important;
+    margin: 1px 4px !important;
+  }
+  #custom-context-menu hr {
+    margin: 5px 12px;
   }
 }
 
@@ -1213,7 +1460,7 @@ body.dark-mode { background-color: #1e1e1e; }
 <!-- TOAST CONTAINER -->
 <div id="toast-container"></div>
 
-<!-- MOBILE BACKDROP for sidebar -->
+<!-- MOBILE BACKDROP (kept for compatibility but unused in push-mode) -->
 <div id="sidebar-backdrop"></div>
 
 <!-- COLOR PICKER -->
@@ -1349,11 +1596,38 @@ body.dark-mode { background-color: #1e1e1e; }
   </button>
 </h1>
 
+<!-- FLOATING FIND/REPLACE DOCK (used when sidebar is closed) -->
+<div id="floating-find-dock" aria-hidden="true">
+  <div class="fdock-drag-handle" title="Drag"></div>
+  <div class="fdock-row">
+    <input type="text" id="fdock-find-input" placeholder="Find" autocomplete="off" spellcheck="false">
+    <button class="fdock-icon-btn" id="fdock-prev" type="button" title="Find previous">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+    </button>
+    <button class="fdock-icon-btn" id="fdock-next" type="button" title="Find next">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="fdock-sep"></div>
+    <button class="fdock-icon-btn" id="fdock-case" type="button" title="Match case (Aa)">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18l5-12 5 12"/><path d="M6 14h6"/><path d="M16 18v-6a3 3 0 0 1 6 0v6"/><path d="M16 15h6"/></svg>
+    </button>
+    <button class="fdock-icon-btn" id="fdock-word" type="button" title="Whole word">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8v8"/><path d="M22 8v8"/><rect x="5" y="9" width="14" height="7" rx="1.5"/><path d="M5 19h14"/></svg>
+    </button>
+    <button class="fdock-icon-btn" id="fdock-highlight" type="button" title="Highlight all matches">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.6 6.4L21 9l-5 4.4L17.5 20 12 16.7 6.5 20 8 13.4 3 9l6.4-.6L12 2z"/></svg>
+    </button>
+    <div class="fdock-sep"></div>
+    <button class="fdock-icon-btn danger" id="fdock-close" type="button" title="Close">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+</div>
+
 <div id="coder-ai">
   <div id="editor-container">
     <div id="file-explorer">
       <div id="file-explorer-content">
-        <p id="pj">Project Files</p>
         <ul id="file-list"></ul>
         <button id="new-file-btn">New File</button>
         <button id="rename-file-btn">Rename File</button>
@@ -1400,25 +1674,24 @@ body.dark-mode { background-color: #1e1e1e; }
           <h3>Change Language</h3>
           <button class="sidebar-close-btn" id="close-sidebar-language">&times;</button>
         </div>
-        <div class="language-list">
-          <button class="language-option" data-lang="javascript" data-ext="js">JavaScript</button>
-          <button class="language-option" data-lang="typescript" data-ext="ts">TypeScript</button>
-          <button class="language-option" data-lang="html" data-ext="html">HTML</button>
-          <button class="language-option" data-lang="css" data-ext="css">CSS</button>
-          <button class="language-option" data-lang="json" data-ext="json">JSON</button>
-          <button class="language-option" data-lang="xml" data-ext="xml">XML</button>
-          <button class="language-option" data-lang="markdown" data-ext="md">Markdown</button>
-          <button class="language-option" data-lang="python" data-ext="py">Python</button>
-          <button class="language-option" data-lang="java" data-ext="java">Java</button>
-          <button class="language-option" data-lang="c_cpp" data-ext="c">C/C++</button>
-          <button class="language-option" data-lang="php" data-ext="php">PHP</button>
-          <button class="language-option" data-lang="ruby" data-ext="rb">Ruby</button>
-          <button class="language-option" data-lang="golang" data-ext="go">Go</button>
-          <button class="language-option" data-lang="rust" data-ext="rs">Rust</button>
-          <button class="language-option" data-lang="sql" data-ext="sql">SQL</button>
-          <button class="language-option" data-lang="sh" data-ext="sh">Shell/Bash</button>
-          <button class="language-option" data-lang="yaml" data-ext="yaml">YAML</button>
-          <button class="language-option" data-lang="text" data-ext="txt">Plain Text</button>
+
+        <div class="lang-current-card" id="lang-current-card">
+          <div class="lang-current-icon" id="lang-current-icon">?</div>
+          <div class="lang-current-info">
+            <div class="label">Current file type</div>
+            <div class="name" id="lang-current-name">No file open</div>
+            <div class="ext" id="lang-current-ext">&mdash;</div>
+          </div>
+        </div>
+
+        <div id="lang-search-wrap">
+          <svg class="lang-search-ico" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+          <input type="text" id="lang-search-input" placeholder="Search languages..." autocomplete="off" spellcheck="false">
+          <button id="lang-search-clear" type="button" title="Clear">&times;</button>
+        </div>
+
+        <div class="lang-list" id="lang-list">
+          <!-- populated by JS -->
         </div>
       </div>
     </div>
@@ -1957,7 +2230,7 @@ function applySettings(s) {
   editor.setReadOnly(s.readOnly);
 
   document.getElementById('sidebar-width').value = s.sidebarWidth;
-  /* On desktop only — mobile sidebar uses fixed overlay sizing */
+  /* On desktop only — mobile uses fixed narrow width for push layout */
   if (window.innerWidth > 768) {
     document.getElementById('file-explorer').style.width = `${s.sidebarWidth}px`;
   }
@@ -1967,11 +2240,13 @@ function applySettings(s) {
   editor.setBehavioursEnabled(s.autoPairBrackets);
 
   const fe = document.getElementById('file-explorer');
-  if (window.innerWidth > 768) {
-    if (s.sidebarHidden) fe.classList.add('hidden');
-    else fe.classList.remove('hidden');
-  }
+  if (s.sidebarHidden) fe.classList.add('hidden');
+  else fe.classList.remove('hidden');
+
   window.__lastOpenedFile = s.lastOpenedFile || '';
+
+  /* Resize editor after sidebar settings applied */
+  setTimeout(() => editor.resize(), 50);
 }
 
 function loadAllFilesFromDB() {
@@ -2123,8 +2398,7 @@ function updateFileExplorer() {
     li.dataset.filename = file;
     li.onclick = () => {
       openFile(file);
-      /* Auto-close sidebar on mobile after picking */
-      if (window.innerWidth <= 768) closeMobileSidebar();
+      /* On mobile in push-mode: keep sidebar open so user can keep navigating */
     };
     list.appendChild(li);
   });
@@ -2261,49 +2535,34 @@ document.getElementById("file-input").addEventListener("change", function(e) {
 });
 
 /* =============================================================
-   SIDEBAR TOGGLE — desktop slide, mobile overlay with backdrop
+   SIDEBAR TOGGLE — unified push behavior on desktop AND mobile
 ============================================================= */
-function openMobileSidebar() {
-  const fe = document.getElementById('file-explorer');
-  const bd = document.getElementById('sidebar-backdrop');
-  fe.classList.remove('hidden');
-  bd.classList.add('active');
-}
-function closeMobileSidebar() {
-  const fe = document.getElementById('file-explorer');
-  const bd = document.getElementById('sidebar-backdrop');
-  fe.classList.add('hidden');
-  bd.classList.remove('active');
-}
-
 document.getElementById("hide-sidebar-btn").onclick = () => {
   const fe = document.getElementById("file-explorer");
-  if (window.innerWidth <= 768) {
-    if (fe.classList.contains('hidden')) openMobileSidebar();
-    else closeMobileSidebar();
+  fe.classList.toggle("hidden");
+  saveSetting('sidebarHidden', fe.classList.contains('hidden'));
+  // If sidebar just became visible and the floating dock is also visible, hide the dock
+  // (the user will get the sidebar find/replace instead). The reverse is also handled:
+  // if the sidebar closes and a find panel is open, nothing extra to do — user can
+  // reopen via the header button to spawn the floating dock.
+  if (!fe.classList.contains('hidden')) {
+    const dock = document.getElementById('floating-find-dock');
+    if (dock && dock.classList.contains('visible')) {
+      dock.classList.remove('visible');
+      dock.setAttribute('aria-hidden', 'true');
+      clearFdockHighlights();
+    }
   } else {
-    fe.classList.toggle("hidden");
-    saveSetting('sidebarHidden', fe.classList.contains('hidden'));
-    setTimeout(() => editor.resize(), 280);
+    // Sidebar just got hidden -- if the dock is visible, re-clamp so it can
+    // reclaim the newly-freed space and never sits past the left edge.
+    setTimeout(clampFloatingFindDock, 30);
+    setTimeout(clampFloatingFindDock, 300);
   }
+  setTimeout(() => editor.resize(), 280);
 };
 
-/* Click backdrop to close mobile sidebar */
-document.getElementById('sidebar-backdrop').addEventListener('click', closeMobileSidebar);
-
-/* Resize handler — when crossing breakpoint, reset sidebar state */
+/* Resize handler — recompute editor size when crossing breakpoint */
 window.addEventListener('resize', () => {
-  const fe = document.getElementById('file-explorer');
-  const bd = document.getElementById('sidebar-backdrop');
-  if (window.innerWidth > 768) {
-    /* Desktop: clear inline mobile widths so CSS settings-width applies */
-    fe.style.transform = '';
-    bd.classList.remove('active');
-  } else {
-    /* Mobile: hide sidebar by default */
-    fe.classList.add('hidden');
-    bd.classList.remove('active');
-  }
   setTimeout(() => editor.resize(), 100);
 });
 
@@ -2461,7 +2720,6 @@ function loadDBFilesModal() {
             </button>
           </div>
         `;
-        /* Use textContent to safely set filename (prevents HTML injection bug if filename contains special chars) */
         li.querySelector('.filename').textContent = f.filename;
 
         const cb = li.querySelector('.db-checkbox');
@@ -2750,7 +3008,7 @@ function resetSettings() {
     writeDefaults().then(() => {
       applySettings(defaults);
       const fe = document.getElementById('file-explorer');
-      if (window.innerWidth > 768) fe.classList.remove('hidden');
+      fe.classList.remove('hidden');
       showToast("Settings reset to defaults");
     });
   };
@@ -2849,7 +3107,6 @@ document.getElementById('replace-all-btn').addEventListener('click', () => {
   const needle = document.getElementById('find-text').value;
   const rep = document.getElementById('replace-text').value;
   if (!needle) return;
-  /* Ace's replaceAll returns undefined in some versions — count manually */
   let beforeContent = editor.getValue();
   editor.replaceAll(rep, {
     needle,
@@ -2878,9 +3135,7 @@ function showSidebarPanel(p) {
   p.classList.add('active');
   const fe = document.getElementById('file-explorer');
   fe.classList.remove('hidden');
-  if (window.innerWidth <= 768) {
-    document.getElementById('sidebar-backdrop').classList.add('active');
-  }
+  setTimeout(() => editor.resize(), 280);
 }
 function hideSidebarPanels() {
   fileExplorerContent.style.display = 'block';
@@ -2889,14 +3144,26 @@ function hideSidebarPanels() {
 }
 function isPanelActive(p) { return p.classList.contains('active'); }
 
-document.getElementById('find-replace-header-btn').addEventListener('click', () => {
-  if (isPanelActive(sidebarFindReplace)) hideSidebarPanels();
-  else showSidebarPanel(sidebarFindReplace);
-});
+/* ---- Sidebar open helpers ---- */
+function isSidebarOpen() {
+  const fe = document.getElementById('file-explorer');
+  return fe && !fe.classList.contains('hidden');
+}
+
+/* ---- Find/Replace: route to sidebar OR floating dock ---- */
+function openFindReplace() {
+  if (isSidebarOpen()) {
+    if (isPanelActive(sidebarFindReplace)) hideSidebarPanels();
+    else showSidebarPanel(sidebarFindReplace);
+  } else {
+    toggleFloatingFindDock();
+  }
+}
+document.getElementById('find-replace-header-btn').addEventListener('click', openFindReplace);
 document.getElementById('close-sidebar-find-replace').addEventListener('click', hideSidebarPanels);
 document.getElementById('change-language-btn').addEventListener('click', () => {
   if (isPanelActive(sidebarLanguage)) hideSidebarPanels();
-  else showSidebarPanel(sidebarLanguage);
+  else { showSidebarPanel(sidebarLanguage); refreshLanguagePicker(); }
 });
 document.getElementById('close-sidebar-language').addEventListener('click', hideSidebarPanels);
 document.getElementById('sidebar-find-replace-btn').addEventListener('click', () => {
@@ -2904,37 +3171,448 @@ document.getElementById('sidebar-find-replace-btn').addEventListener('click', ()
   else showSidebarPanel(sidebarFindReplace);
 });
 
-document.querySelectorAll("#sidebar-language .language-option").forEach(btn => {
-  btn.onclick = function() {
-    if (!currentFile) { showToast("No file selected", "error"); return; }
-    editor.session.setMode("ace/mode/" + this.dataset.lang);
-    let newName = currentFile;
-    const ext = this.dataset.ext;
-    const dot = currentFile.lastIndexOf('.');
-    if (dot !== -1) newName = currentFile.substring(0, dot) + '.' + ext;
-    else newName += '.' + ext;
-    if (newName === currentFile) { hideSidebarPanels(); return; }
-    if (files.hasOwnProperty(newName)) { showToast("File already exists", "error"); return; }
-    saveCurrentFile();
-    files[newName] = files[currentFile];
-    delete files[currentFile];
-    if (savedFiles.has(currentFile)) {
-      removeFileFromIndexedDB(currentFile).then(() => {
-        if (autoSaveFiles.has(newName)) autoSaveFile(newName, files[newName]);
-      });
-    }
-    if (autoSaveFiles.has(currentFile)) {
-      autoSaveFiles.delete(currentFile);
-      autoSaveFiles.add(newName);
-    }
-    currentFile = newName;
-    updateFileExplorer();
-    highlightFile(newName);
-    setEditorMode(newName);
+/* =============================================================
+   NEW LANGUAGE PICKER (searchable, with current file type + None)
+============================================================= */
+const LANGUAGES = [
+  { lang: 'javascript', ext: 'js',   name: 'JavaScript',  exts: ['js','jsx','mjs','cjs'] },
+  { lang: 'typescript', ext: 'ts',   name: 'TypeScript',  exts: ['ts','tsx'] },
+  { lang: 'html',       ext: 'html', name: 'HTML',        exts: ['html','htm'] },
+  { lang: 'css',        ext: 'css',  name: 'CSS',         exts: ['css'] },
+  { lang: 'json',       ext: 'json', name: 'JSON',        exts: ['json'] },
+  { lang: 'xml',        ext: 'xml',  name: 'XML',         exts: ['xml','svg'] },
+  { lang: 'markdown',   ext: 'md',   name: 'Markdown',    exts: ['md','markdown'] },
+  { lang: 'python',     ext: 'py',   name: 'Python',      exts: ['py'] },
+  { lang: 'java',       ext: 'java', name: 'Java',        exts: ['java'] },
+  { lang: 'c_cpp',      ext: 'c',    name: 'C / C++',     exts: ['c','cpp','cc','cxx','h','hpp'] },
+  { lang: 'php',        ext: 'php',  name: 'PHP',         exts: ['php'] },
+  { lang: 'ruby',       ext: 'rb',   name: 'Ruby',        exts: ['rb'] },
+  { lang: 'golang',     ext: 'go',   name: 'Go',          exts: ['go'] },
+  { lang: 'rust',       ext: 'rs',   name: 'Rust',        exts: ['rs'] },
+  { lang: 'sql',        ext: 'sql',  name: 'SQL',         exts: ['sql'] },
+  { lang: 'sh',         ext: 'sh',   name: 'Shell / Bash',exts: ['sh','bash'] },
+  { lang: 'yaml',       ext: 'yaml', name: 'YAML',        exts: ['yaml','yml'] },
+  { lang: 'text',       ext: 'txt',  name: 'Plain Text',  exts: ['txt'] }
+];
+
+function getLanguageMetaForFile(filename) {
+  if (!filename) return null;
+  const dot = filename.lastIndexOf('.');
+  if (dot === -1 || dot === filename.length - 1) {
+    return { isNone: true, name: 'No extension', ext: '' };
+  }
+  const ext = filename.substring(dot + 1).toLowerCase();
+  const meta = LANGUAGES.find(l => l.exts.includes(ext));
+  if (meta) return { ...meta, currentExt: ext };
+  return { lang: 'text', ext: ext, name: ext.toUpperCase() + ' file', exts: [ext], currentExt: ext, isUnknown: true };
+}
+
+function refreshLanguagePicker() {
+  const meta = currentFile ? getLanguageMetaForFile(currentFile) : null;
+  const iconEl = document.getElementById('lang-current-icon');
+  const nameEl = document.getElementById('lang-current-name');
+  const extEl  = document.getElementById('lang-current-ext');
+  if (!currentFile) {
+    iconEl.textContent = '?';
+    nameEl.textContent = 'No file open';
+    extEl.textContent  = '—';
+  } else if (meta.isNone) {
+    iconEl.textContent = '∅';
+    iconEl.style.background = '#7f8c8d';
+    nameEl.textContent = 'No extension';
+    extEl.textContent  = '(none)';
+  } else {
+    iconEl.textContent = (meta.currentExt || meta.ext).slice(0, 4);
+    iconEl.style.background = '#1d68ad';
+    nameEl.textContent = meta.name;
+    extEl.textContent  = '.' + (meta.currentExt || meta.ext);
+  }
+  renderLanguageList(document.getElementById('lang-search-input').value || '');
+}
+
+function renderLanguageList(filter) {
+  const list = document.getElementById('lang-list');
+  const q = (filter || '').trim().toLowerCase();
+  const meta = currentFile ? getLanguageMetaForFile(currentFile) : null;
+  const currentLang = meta && !meta.isNone ? meta.lang : null;
+  const currentExt  = meta ? (meta.currentExt || meta.ext || '') : '';
+
+  const noneItem = { _none: true, name: 'None (no extension)', ext: '' };
+  const items = [noneItem, ...LANGUAGES];
+  const filtered = items.filter(it => {
+    if (!q) return true;
+    return (
+      it.name.toLowerCase().includes(q) ||
+      (it.ext && it.ext.toLowerCase().includes(q)) ||
+      (it.exts && it.exts.some(e => e.toLowerCase().includes(q))) ||
+      (it.lang && it.lang.toLowerCase().includes(q))
+    );
+  });
+
+  list.innerHTML = '';
+  if (filtered.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'lang-empty';
+    empty.textContent = 'No languages match "' + filter + '"';
+    list.appendChild(empty);
+    return;
+  }
+
+  filtered.forEach(it => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'lang-item';
+    if (it._none) btn.classList.add('is-none');
+    const isCurrent = it._none
+      ? (meta && meta.isNone)
+      : (currentLang === it.lang);
+    if (isCurrent) btn.classList.add('current');
+
+    const badge = document.createElement('div');
+    badge.className = 'lang-item-badge';
+    badge.textContent = it._none ? '∅' : (it.ext || '?').toUpperCase();
+
+    const txt = document.createElement('div');
+    txt.className = 'lang-item-text';
+    const n = document.createElement('div');
+    n.className = 'lang-item-name';
+    n.textContent = it.name;
+    const e = document.createElement('div');
+    e.className = 'lang-item-ext';
+    e.textContent = it._none ? '(no extension)' : '.' + it.ext;
+    txt.appendChild(n); txt.appendChild(e);
+
+    const check = document.createElement('div');
+    check.className = 'lang-item-check';
+    check.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
+    btn.appendChild(badge); btn.appendChild(txt); btn.appendChild(check);
+    btn.addEventListener('click', () => applyLanguageChange(it));
+    list.appendChild(btn);
+  });
+}
+
+function applyLanguageChange(item) {
+  if (!currentFile) { showToast("No file selected", "error"); return; }
+  const dot = currentFile.lastIndexOf('.');
+  const base = dot === -1 ? currentFile : currentFile.substring(0, dot);
+  let newName;
+  if (item._none) {
+    newName = base; // remove extension entirely
+  } else {
+    newName = base + '.' + item.ext;
+  }
+  if (newName === '') { showToast("Filename cannot be empty", "error"); return; }
+  if (newName === currentFile) {
+    // Same filename — still update editor mode in case the picker was used to re-assert it
+    if (!item._none) editor.session.setMode("ace/mode/" + item.lang);
+    else editor.session.setMode("ace/mode/text");
+    refreshLanguagePicker();
     hideSidebarPanels();
-    showToast("Language changed to " + this.textContent);
+    return;
+  }
+  if (files.hasOwnProperty(newName)) { showToast("File already exists", "error"); return; }
+
+  saveCurrentFile();
+  files[newName] = files[currentFile];
+  delete files[currentFile];
+  if (savedFiles.has(currentFile)) {
+    removeFileFromIndexedDB(currentFile).then(() => {
+      if (autoSaveFiles.has(newName)) autoSaveFile(newName, files[newName]);
+    });
+  }
+  if (autoSaveFiles.has(currentFile)) {
+    autoSaveFiles.delete(currentFile);
+    autoSaveFiles.add(newName);
+  }
+  const oldFile = currentFile;
+  currentFile = newName;
+  updateFileExplorer();
+  highlightFile(newName);
+  if (item._none) editor.session.setMode("ace/mode/text");
+  else editor.session.setMode("ace/mode/" + item.lang);
+
+  refreshLanguagePicker();
+  hideSidebarPanels();
+  showToast(item._none
+    ? `Removed extension (${oldFile} → ${newName})`
+    : `Language changed to ${item.name}`);
+}
+
+/* Language search box wiring */
+(function initLanguagePickerSearch(){
+  const input = document.getElementById('lang-search-input');
+  const clearBtn = document.getElementById('lang-search-clear');
+  input.addEventListener('input', () => {
+    clearBtn.style.display = input.value ? 'flex' : 'none';
+    renderLanguageList(input.value);
+  });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { input.value = ''; clearBtn.style.display = 'none'; renderLanguageList(''); }
+    if (e.key === 'Enter') {
+      const first = document.querySelector('#lang-list .lang-item');
+      if (first) first.click();
+    }
+  });
+  clearBtn.addEventListener('click', () => {
+    input.value = '';
+    clearBtn.style.display = 'none';
+    renderLanguageList('');
+    input.focus();
+  });
+  // Initial render so the list is populated on load
+  renderLanguageList('');
+})();
+
+/* =============================================================
+   FLOATING FIND/REPLACE DOCK
+============================================================= */
+const floatingFindDock     = document.getElementById('floating-find-dock');
+const fdockFindInput       = document.getElementById('fdock-find-input');
+const fdockPrevBtn         = document.getElementById('fdock-prev');
+const fdockNextBtn         = document.getElementById('fdock-next');
+const fdockCaseBtn         = document.getElementById('fdock-case');
+const fdockWordBtn         = document.getElementById('fdock-word');
+const fdockHighlightBtn    = document.getElementById('fdock-highlight');
+const fdockCloseBtn        = document.getElementById('fdock-close');
+
+let fdockFindRange = null;
+let fdockHighlightOn = false;
+let fdockHighlightMarkers = [];
+
+function fdockGetOpts() {
+  return {
+    caseSensitive: fdockCaseBtn.classList.contains('active'),
+    wholeWord:     fdockWordBtn.classList.contains('active'),
+    regExp: false
   };
+}
+
+function clearFdockHighlights() {
+  const session = editor.getSession();
+  fdockHighlightMarkers.forEach(id => session.removeMarker(id));
+  fdockHighlightMarkers = [];
+}
+
+function applyFdockHighlights() {
+  clearFdockHighlights();
+  if (!fdockHighlightOn) return;
+  const needle = fdockFindInput.value;
+  if (!needle) return;
+  const session = editor.getSession();
+  const opts = fdockGetOpts();
+  let flags = 'g';
+  if (!opts.caseSensitive) flags += 'i';
+  let pattern = needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  if (opts.wholeWord) pattern = '\\b' + pattern + '\\b';
+  let re;
+  try { re = new RegExp(pattern, flags); } catch(_) { return; }
+  const Range = ace.require('ace/range').Range;
+  const lines = session.getDocument().getAllLines();
+  for (let row = 0; row < lines.length; row++) {
+    const line = lines[row];
+    let m;
+    re.lastIndex = 0;
+    while ((m = re.exec(line)) !== null) {
+      const r = new Range(row, m.index, row, m.index + m[0].length);
+      const id = session.addMarker(r, 'fdock-match-highlight', 'text', false);
+      fdockHighlightMarkers.push(id);
+      if (m.index === re.lastIndex) re.lastIndex++; // avoid zero-length loop
+    }
+  }
+}
+
+// Inject a small style for the highlight class
+(function injectFdockHighlightStyle(){
+  const s = document.createElement('style');
+  s.textContent = `
+    .fdock-match-highlight {
+      position: absolute;
+      background: rgba(241, 196, 15, 0.35);
+      border: 1px solid rgba(241, 196, 15, 0.7);
+      border-radius: 2px;
+      z-index: 5;
+    }
+  `;
+  document.head.appendChild(s);
+})();
+
+function fdockFind(backwards) {
+  const needle = fdockFindInput.value;
+  if (!needle) return;
+  const opts = fdockGetOpts();
+  fdockFindRange = editor.find(needle, {
+    backwards: !!backwards,
+    caseSensitive: opts.caseSensitive,
+    wholeWord:     opts.wholeWord,
+    regExp: false,
+    start: fdockFindRange || editor.getCursorPosition(),
+    wrap: true
+  });
+}
+
+fdockNextBtn.addEventListener('click', () => fdockFind(false));
+fdockPrevBtn.addEventListener('click', () => fdockFind(true));
+
+[fdockCaseBtn, fdockWordBtn].forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.classList.toggle('active');
+    applyFdockHighlights();
+  });
 });
+
+fdockHighlightBtn.addEventListener('click', () => {
+  fdockHighlightOn = !fdockHighlightOn;
+  fdockHighlightBtn.classList.toggle('active', fdockHighlightOn);
+  applyFdockHighlights();
+});
+
+fdockFindInput.addEventListener('input', () => {
+  fdockFindRange = null;
+  applyFdockHighlights();
+});
+fdockFindInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { e.preventDefault(); fdockFind(e.shiftKey); }
+  if (e.key === 'Escape') { e.preventDefault(); hideFloatingFindDock(); }
+});
+
+fdockCloseBtn.addEventListener('click', hideFloatingFindDock);
+
+function showFloatingFindDock() {
+  floatingFindDock.classList.add('visible');
+  floatingFindDock.setAttribute('aria-hidden', 'false');
+  // Pre-fill from current selection if any
+  const sel = editor.getSelectedText();
+  if (sel && sel.length < 200 && !fdockFindInput.value) fdockFindInput.value = sel;
+  applyFdockHighlights();
+  setTimeout(() => { fdockFindInput.focus(); fdockFindInput.select(); }, 30);
+  clampFloatingFindDock();
+}
+function hideFloatingFindDock() {
+  floatingFindDock.classList.remove('visible');
+  floatingFindDock.setAttribute('aria-hidden', 'true');
+  clearFdockHighlights();
+  editor.focus();
+}
+function toggleFloatingFindDock() {
+  if (floatingFindDock.classList.contains('visible')) hideFloatingFindDock();
+  else showFloatingFindDock();
+}
+
+/* Compute the safe rectangle the dock is allowed to live in.
+   We avoid the top bar (h1) and the visible sidebar (#file-explorer)
+   so the dock can't get lost under chrome or off-screen. */
+function getFloatingDockBounds() {
+  const PAD = 6;
+  const topBar = document.querySelector('h1');
+  const sidebar = document.getElementById('file-explorer');
+  const topBarBottom = topBar ? topBar.getBoundingClientRect().bottom : 0;
+  let sidebarRight = 0;
+  if (sidebar && !sidebar.classList.contains('hidden')) {
+    const r = sidebar.getBoundingClientRect();
+    // Only treat the sidebar as a wall if it's actually on screen and visible.
+    if (r.width > 0 && r.right > 0) sidebarRight = r.right;
+  }
+  return {
+    minLeft: Math.max(PAD, sidebarRight + PAD),
+    minTop:  Math.max(PAD, topBarBottom + PAD),
+    maxRight:  window.innerWidth  - PAD,
+    maxBottom: window.innerHeight - PAD
+  };
+}
+
+/* Keep the dock inside the safe rectangle without resizing the editor.
+   The dock just floats over the IDE -- no margin/padding is added to the editor. */
+function clampFloatingFindDock() {
+  if (!floatingFindDock.classList.contains('visible')) return;
+  const b = getFloatingDockBounds();
+  // If the dock has never been dragged, it still relies on its CSS-defined
+  // position. Snap it into the bounds explicitly so the initial placement
+  // is also guaranteed safe.
+  const rect = floatingFindDock.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  let left = rect.left;
+  let top  = rect.top;
+  // Clear mobile transform-based centering so left/top are authoritative.
+  floatingFindDock.style.transform = 'none';
+  left = Math.min(Math.max(left, b.minLeft), Math.max(b.minLeft, b.maxRight  - w));
+  top  = Math.min(Math.max(top,  b.minTop),  Math.max(b.minTop,  b.maxBottom - h));
+  floatingFindDock.style.left = left + 'px';
+  floatingFindDock.style.top  = top  + 'px';
+}
+window.addEventListener('resize', clampFloatingFindDock);
+// Re-clamp when the sidebar is toggled (CSS transitions ~250ms).
+document.addEventListener('click', (e) => {
+  if (e.target.closest('#hide-sidebar-btn')) {
+    setTimeout(clampFloatingFindDock, 30);
+    setTimeout(clampFloatingFindDock, 300);
+  }
+});
+
+/* Drag the floating dock */
+(function makeFloatingFindDockDraggable(){
+  let dragging = false, sx = 0, sy = 0, startLeft = 0, startTop = 0;
+  const handles = [floatingFindDock.querySelector('.fdock-drag-handle'), floatingFindDock.querySelector('.fdock-row')];
+  function onDown(e) {
+    // Don't start drag from interactive elements
+    const t = e.target;
+    if (t.closest('button') || t.closest('input')) return;
+    dragging = true;
+    floatingFindDock.classList.add('dragged');
+    const rect = floatingFindDock.getBoundingClientRect();
+    // Lock current rect into left/top so transform-based mobile centering doesn't interfere
+    floatingFindDock.style.left = rect.left + 'px';
+    floatingFindDock.style.top  = rect.top + 'px';
+    floatingFindDock.style.transform = 'none';
+    const point = e.touches ? e.touches[0] : e;
+    sx = point.clientX; sy = point.clientY;
+    startLeft = rect.left; startTop = rect.top;
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup',   onUp);
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('touchend',  onUp);
+    e.preventDefault();
+  }
+  function onMove(e) {
+    if (!dragging) return;
+    const point = e.touches ? e.touches[0] : e;
+    const dx = point.clientX - sx;
+    const dy = point.clientY - sy;
+    let newLeft = startLeft + dx;
+    let newTop  = startTop + dy;
+    const w = floatingFindDock.offsetWidth;
+    const h = floatingFindDock.offsetHeight;
+    const b = getFloatingDockBounds();
+    newLeft = Math.min(Math.max(newLeft, b.minLeft), Math.max(b.minLeft, b.maxRight  - w));
+    newTop  = Math.min(Math.max(newTop,  b.minTop),  Math.max(b.minTop,  b.maxBottom - h));
+    floatingFindDock.style.left = newLeft + 'px';
+    floatingFindDock.style.top  = newTop + 'px';
+    if (e.cancelable) e.preventDefault();
+  }
+  function onUp() {
+    dragging = false;
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup',   onUp);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend',  onUp);
+  }
+  handles.forEach(h => {
+    if (!h) return;
+    h.addEventListener('mousedown',  onDown);
+    h.addEventListener('touchstart', onDown, { passive: false });
+  });
+})();
+
+/* Refresh language picker whenever a file becomes current */
+(function hookFileChangeForLangPicker(){
+  // Patch setEditorMode so picker stays in sync
+  const origSet = window.setEditorMode;
+  window.setEditorMode = function(filename) {
+    if (typeof origSet === 'function') origSet(filename);
+    else editor.session.setMode(`ace/mode/${getEditorModeFromExtension(filename)}`);
+    try { refreshLanguagePicker(); } catch(_) {}
+  };
+})();
 
 /* =============================================================
    KEYBOARD SHORTCUTS & ESCAPE
@@ -2947,7 +3625,6 @@ document.addEventListener('keydown', (e) => {
     document.getElementById("custom-color-modal").style.display = "none";
     hideSidebarPanels();
     hideContextMenu();
-    if (window.innerWidth <= 768) closeMobileSidebar();
   }
   if ((e.ctrlKey || e.metaKey) && e.key === 's') {
     e.preventDefault();
@@ -2962,7 +3639,10 @@ document.addEventListener('keydown', (e) => {
   }
   if ((e.ctrlKey || e.metaKey) && e.key === 'n') { e.preventDefault(); document.getElementById("new-file-btn").click(); }
   if ((e.ctrlKey || e.metaKey) && e.key === 'o') { e.preventDefault(); document.getElementById("open-file-btn").click(); }
-  if ((e.ctrlKey || e.metaKey) && e.key === 'f') { e.preventDefault(); showSidebarPanel(sidebarFindReplace); }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+    e.preventDefault();
+    openFindReplace();
+  }
 });
 
 window.addEventListener('beforeunload', () => {
@@ -2972,6 +3652,7 @@ window.addEventListener('beforeunload', () => {
   }
 });
 
+/* On mobile load: keep sidebar hidden by default to maximize editor space */
 if (window.innerWidth <= 768) {
   document.getElementById('file-explorer').classList.add('hidden');
 }
@@ -3255,7 +3936,6 @@ function jumpToDiv() {
   }
 }
 
-/* Brace-matched function-body finder. Used by both insert and remove. */
 function findFunctionBody(content, fnName) {
   const esc = fnName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const patterns = [
@@ -3269,7 +3949,6 @@ function findFunctionBody(content, fnName) {
     const headStart = m.index;
     const openBrace = content.indexOf('{', headStart + m[0].length - 1);
     if (openBrace === -1) continue;
-    /* Brace-match with awareness of strings/comments */
     let depth = 0;
     let i = openBrace;
     let inStr = null, inLineComment = false, inBlockComment = false;
@@ -3490,7 +4169,6 @@ function removeUnusedCSS() {
   showToast(`Removed ${removed} unused CSS rule(s)`);
 }
 
-/* FIXED: was using [^}]* which fails on nested braces. Use brace-matched finder. */
 function removeUnusedJSFunctions() {
   let code = editor.getValue();
   const funcRegex = /function\s+([a-zA-Z_$][0-9a-zA-Z_$]*)\s*\(/g;
@@ -3519,7 +4197,7 @@ function openOptimizerWindow() {
 }
 
 /* =============================================================
-   REPLACE JS FUNCTION TOOL (now using brace-matched finder)
+   REPLACE JS FUNCTION TOOL
 ============================================================= */
 function openReplaceJSFunctionTool() {
   const win = document.getElementById('goto-window');
@@ -3579,9 +4257,7 @@ function removeFunctionByName() {
 }
 
 /* =============================================================
-   COLOR PICKER — FULLY REWRITTEN
-   Now supports: hex, hex+alpha, rgb, rgba, hsl, hsla
-   Slider gradients drive via CSS variables for true cross-browser
+   COLOR PICKER
 ============================================================= */
 let hue = 0, sat = 100, val = 100, alpha = 1;
 
@@ -3597,7 +4273,6 @@ function parseColorToHsv(color) {
     if (m) return { ...rgbToHsv(+m[1]/255, +m[2]/255, +m[3]/255), alpha: 1 };
   }
   if (color.startsWith('hsla') || color.startsWith('hsl')) {
-    /* Convert hsl(a) -> rgb -> hsv so the picker can show it */
     const m = color.match(/hsla?\(\s*(\d+)\s*,\s*(\d+)%?\s*,\s*(\d+)%?\s*(?:,\s*([\d.]+))?\)/);
     if (m) {
       const h = +m[1], s = +m[2] / 100, l = +m[3] / 100;
@@ -3670,14 +4345,11 @@ function rgbToHex(r, g, b, a = 1) {
 function updateSlidersBackground() {
   const modal = document.getElementById('custom-color-modal');
   if (!modal) return;
-  /* Sat slider: from gray to fully saturated current hue (at current value) */
   const grayRgb = hsvToRgb(hue, 0, val / 100);
   const fullSatRgb = hsvToRgb(hue, 1, val / 100);
   const satGrad = `linear-gradient(to right, rgb(${grayRgb.r},${grayRgb.g},${grayRgb.b}), rgb(${fullSatRgb.r},${fullSatRgb.g},${fullSatRgb.b}))`;
-  /* Val slider: from black to full brightness current hue+sat */
   const fullValRgb = hsvToRgb(hue, sat / 100, 1);
   const valGrad = `linear-gradient(to right, #000, rgb(${fullValRgb.r},${fullValRgb.g},${fullValRgb.b}))`;
-  /* Alpha slider: from transparent to fully opaque current color */
   const cur = hsvToRgb(hue, sat / 100, val / 100);
   const alphaGrad = `linear-gradient(to right, rgba(${cur.r},${cur.g},${cur.b},0), rgba(${cur.r},${cur.g},${cur.b},1))`;
   modal.style.setProperty('--sat-grad', satGrad);
@@ -3707,31 +4379,19 @@ function initColorPickerListeners() {
   valS.oninput = e => { val = +e.target.value; updateSlidersBackground(); updatePreviewAndHex(); };
   alphaS.oninput = e => { alpha = +e.target.value; updateSlidersBackground(); updatePreviewAndHex(); };
 
-  /* Sync from hex input */
   hexI.oninput = e => {
-    const val = e.target.value.trim();
-    if (!/^#[0-9a-fA-F]{3,8}$/.test(val)) return;
-    const parsed = parseColorToHsv(val);
+    const value = e.target.value.trim();
+    if (!/^#[0-9a-fA-F]{3,8}$/.test(value)) return;
+    const parsed = parseColorToHsv(value);
     hue = parsed.h; sat = parsed.s * 100;
-    const v2 = parsed.v * 100;
-    /* keep this just for live preview without flipping the slider thumbs */
+    val = parsed.v * 100;
+    alpha = parsed.alpha;
     document.getElementById('hue-slider').value = hue;
     document.getElementById('sat-slider').value = sat;
-    document.getElementById('val-slider').value = v2;
-    document.getElementById('alpha-slider').value = parsed.alpha;
-    window.val = v2;
-    alpha = parsed.alpha;
-    /* Note: 'val' is a local in this listener; sync into outer */
-    /* Use property to bypass shadowing */
-    (function syncOuter() {
-      // assign to outer scope vars
-      // eslint-disable-next-line no-undef
-    })();
-    /* simplest: re-trigger handlers */
-    document.getElementById('hue-slider').dispatchEvent(new Event('input'));
-    document.getElementById('sat-slider').dispatchEvent(new Event('input'));
-    document.getElementById('val-slider').dispatchEvent(new Event('input'));
-    document.getElementById('alpha-slider').dispatchEvent(new Event('input'));
+    document.getElementById('val-slider').value = val;
+    document.getElementById('alpha-slider').value = alpha;
+    updateSlidersBackground();
+    updatePreviewAndHex();
   };
 }
 
@@ -3772,6 +4432,7 @@ setTimeout(initColorPickerListeners, 200);
 setTimeout(() => document.querySelectorAll('.draggable-window').forEach(makeDraggable), 300);
 
 </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
