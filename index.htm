@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JS Insider</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 /* ===== BASE ===== */
 input { font-family: Heebo; }
@@ -913,11 +914,168 @@ div[name="tools"] {
 .db-icon-btn.download svg { color: #3498db; }
 .db-icon-btn.delete:hover { background: rgba(231,76,60,0.25); }
 .db-icon-btn.delete svg { color: #e74c3c; }
+.db-icon-btn.rename svg { color: #f39c12; }
+.db-icon-btn.rename:hover { background: rgba(243,156,18,0.22); }
+.db-icon-btn.rename:hover svg { color: #ffb733; }
+.db-icon-btn.set-editor svg { color: #2ecc71; }
+.db-icon-btn.set-editor:hover { background: rgba(46,204,113,0.22); }
+.db-icon-btn.set-editor:hover svg { color: #4ee089; }
+.db-icon-btn:active { transform: scale(0.92); }
 
 .selection-info {
   color: #bdc3c7;
   font-size: 13px;
   margin-left: auto;
+}
+
+/* DB folder navigation */
+.db-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 4px 6px 4px;
+  border-bottom: 1px solid #3d556e;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.db-nav-btn {
+  background: #34495e;
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, opacity 0.15s ease;
+  flex-shrink: 0;
+}
+.db-nav-btn svg { width: 18px; height: 18px; color: #ecf0f1; }
+.db-nav-btn:hover { background: #4a6278; }
+.db-nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.db-breadcrumb {
+  flex: 1;
+  min-width: 120px;
+  color: #ecf0f1;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: thin;
+  padding: 4px 8px;
+  background: rgba(0,0,0,0.15);
+  border-radius: 6px;
+  min-height: 32px;
+  box-sizing: border-box;
+}
+.db-breadcrumb .crumb {
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #3498db;
+}
+.db-breadcrumb .crumb:hover { background: rgba(52,152,219,0.15); text-decoration: underline; }
+.db-breadcrumb .crumb.active { color: #ecf0f1; cursor: default; font-weight: 600; }
+.db-breadcrumb .crumb.active:hover { background: transparent; text-decoration: none; }
+.db-breadcrumb .sep { color: #7f8c8d; }
+
+/* Folder / file item styling */
+#db-file-list li.folder-item .folder-icon,
+#db-file-list li.file-item .file-icon {
+  width: 22px; height: 22px;
+  color: #3498db;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+#db-file-list li.file-item .file-icon { color: #95a5a6; }
+#db-file-list li.folder-item .filename { color: #ecf0f1; font-weight: 600; }
+#db-file-list li .db-editor-badge {
+  display: inline-block;
+  font-size: 10px;
+  background: #27ae60;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+  vertical-align: middle;
+  letter-spacing: 0.3px;
+}
+
+/* Folder dropdown (editor folder selector in settings) */
+.folder-select-wrap {
+  position: relative;
+  width: 100%;
+}
+.folder-select-toggle {
+  width: 100%;
+  padding: 8px 10px;
+  background-color: #34495e;
+  color: white;
+  border: 1px solid #3d556e;
+  border-radius: 6px;
+  font-family: trebuchet ms;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.folder-select-toggle:hover { background-color: #3d5a73; }
+.folder-select-toggle .fst-caret { opacity: 0.7; }
+.folder-select-dropdown {
+  display: none;
+  position: absolute;
+  left: 0; right: 0;
+  top: calc(100% + 4px);
+  background: #2c3e50;
+  border: 1px solid #3d556e;
+  border-radius: 8px;
+  z-index: 1000070;
+  padding: 6px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  max-height: 300px;
+  overflow-y: auto;
+}
+.folder-select-dropdown.open { display: block; }
+.folder-select-dropdown .fs-search-wrap {
+  position: sticky;
+  top: 0;
+  background: #2c3e50;
+  padding: 4px 4px 6px 4px;
+}
+.folder-select-dropdown .fs-search {
+  width: 100%;
+  padding: 6px 10px;
+  background: #34495e;
+  border: 1px solid #3d556e;
+  color: white;
+  border-radius: 6px;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+.folder-select-dropdown .fs-opt {
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.folder-select-dropdown .fs-opt:hover { background: rgba(255,255,255,0.08); }
+.folder-select-dropdown .fs-opt.selected { background: rgba(52,152,219,0.28); font-weight: 600; }
+.folder-select-dropdown .fs-empty {
+  padding: 10px;
+  color: #95a5a6;
+  text-align: center;
+  font-size: 13px;
 }
 
 /* ===== SETTINGS MODAL ===== */
@@ -1449,6 +1607,550 @@ body.dark-mode { background-color: #1e1e1e; }
 #file-list{
     max-height:100px;
 }
+
+/* ==========================================================
+   TABS  (Desktop toolbar mode + Mobile dropdown)
+========================================================== */
+.tabs-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+}
+#tabs-toggle-btn {
+  position: relative;
+  background: none;
+  border: 2px solid rgba(255,255,255,0.6);
+  color: white;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Trebuchet MS;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 0;
+  opacity: 0.85;
+  transition: background-color 0.18s ease, opacity 0.18s ease, border-color 0.18s ease;
+  flex-shrink: 0;
+  margin-right: 6px;
+}
+#top-bar:not(.tabs-visible) #tabs-toggle-btn { margin-left: auto; }
+#tabs-toggle-btn:hover { background: rgba(255,255,255,0.14); opacity: 1; border-color: #fff; }
+#tabs-toggle-btn .tabs-count-inline {
+  font-size: 13px;
+  line-height: 1;
+  color: #fff;
+  font-family: Trebuchet MS, sans-serif;
+  font-weight: 700;
+  display: inline-block;
+  min-width: 12px;
+  text-align: center;
+}
+/* Desktop toolbar tab strip — sleek Firefox-style tab buttons */
+#tabs-bar {
+  display: none;
+  flex: 1 1 auto;
+  overflow-x: auto;
+  overflow-y: hidden;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px;
+  margin: 0 6px;
+  scrollbar-width: thin;
+  min-width: 0;
+}
+#tabs-bar::-webkit-scrollbar { height: 6px; }
+#tabs-bar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.35); border-radius: 3px; }
+#top-bar.tabs-visible #tabs-bar { display: flex; }
+#top-bar.tabs-visible.search-active #tabs-bar { display: none; }
+.tab-item {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 6px 5px 12px;
+  background: rgba(255,255,255,0.10);
+  color: white;
+  font-size: 13px;
+  border-radius: 8px;
+  cursor: pointer;
+  max-width: 200px;
+  border: 1px solid rgba(255,255,255,0.10);
+  user-select: none;
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  height: 30px;
+  box-sizing: border-box;
+}
+.tab-item:hover { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.22); }
+.tab-item.active {
+  background: rgba(255,255,255,0.26);
+  border-color: rgba(255,255,255,0.35);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  font-weight: 600;
+}
+.tab-item.dirty .tab-title::after { content: " •"; color: #f1c40f; }
+.tab-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+.tab-close {
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  width: 20px; height: 20px;
+  margin-left: 4px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0.7;
+  font-size: 15px;
+  line-height: 1;
+  padding: 0;
+  flex-shrink: 0;
+}
+.tab-close:hover { background: rgba(231,76,60,0.75); color: #fff; opacity: 1; }
+
+/* Tabs context-menu dropdown (fixed position, never cut off) */
+#tabs-dropdown {
+  display: none;
+  position: fixed;
+  min-width: 260px;
+  max-width: 90vw;
+  max-height: 70vh;
+  overflow-y: auto;
+  background: #2c3e50;
+  color: white;
+  border-radius: 8px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  z-index: 1000060;
+  padding: 6px;
+}
+#tabs-dropdown.open { display: block; }
+#tabs-dropdown .tabs-dd-empty {
+  padding: 12px;
+  color: #95a5a6;
+  text-align: center;
+  font-size: 13px;
+}
+#tabs-dropdown .tabs-dd-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 6px 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+#tabs-dropdown .tabs-dd-item:hover { background: rgba(255,255,255,0.08); }
+#tabs-dropdown .tabs-dd-item.active { background: rgba(52,152,219,0.35); font-weight: 600; }
+#tabs-dropdown .tabs-dd-item .tab-title { flex: 1; max-width: none; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#tabs-dropdown .tabs-dd-item .tab-close { margin-left: 8px; }
+
+/* ===== Folder picker (Copy / Move destination) — polished ===== */
+#folder-picker-modal .modal-content {
+  background: #243342;
+  color: white;
+  max-width: 560px;
+  height: auto;
+  max-height: 86vh;
+  border: 1px solid #3a4b5c;
+}
+#folder-picker-modal .modal-header {
+  background: #1c2a37;
+  padding: 14px 20px;
+  border-bottom: 1px solid #3a4b5c;
+}
+#folder-picker-modal .modal-body {
+  padding: 18px 20px 20px 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+#folder-picker-modal .search-with-icon input { color: white; }
+
+/* Selection preview card (single or multi) */
+.fp-selection-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, #2f4258 0%, #2a3b4f 100%);
+  border: 1px solid #3d556e;
+  border-radius: 10px;
+  margin: 0;
+}
+.fp-selection-card .fp-sc-icon {
+  width: 42px; height: 42px;
+  border-radius: 9px;
+  background: rgba(52,152,219,0.18);
+  display: flex; align-items: center; justify-content: center;
+  color: #3498db;
+  flex-shrink: 0;
+}
+.fp-selection-card .fp-sc-icon svg { width: 22px; height: 22px; }
+.fp-selection-card.multi .fp-sc-icon { background: rgba(155,89,182,0.18); color: #b072dd; }
+.fp-selection-card.folder .fp-sc-icon { background: rgba(241,196,15,0.18); color: #f1c40f; }
+.fp-selection-card .fp-sc-body { flex: 1; min-width: 0; }
+.fp-selection-card .fp-sc-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #ecf0f1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fp-selection-card .fp-sc-meta {
+  margin-top: 3px;
+  font-size: 11.5px;
+  color: #a8b8c7;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.fp-selection-card .fp-sc-chip {
+  padding: 2px 7px;
+  background: rgba(0,0,0,0.25);
+  border-radius: 10px;
+  font-size: 10.5px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: #cdd6df;
+}
+
+/* Path breadcrumb inside the picker (destination path) */
+.fp-path-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background: rgba(0,0,0,0.22);
+  border: 1px solid #3a4b5c;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #ecf0f1;
+  overflow-x: auto;
+  white-space: nowrap;
+  min-height: 20px;
+  scrollbar-width: thin;
+}
+.fp-path-bar .fp-crumb {
+  cursor: pointer;
+  padding: 3px 8px;
+  border-radius: 5px;
+  color: #3498db;
+  transition: background 0.12s ease;
+}
+.fp-path-bar .fp-crumb:hover { background: rgba(52,152,219,0.18); }
+.fp-path-bar .fp-crumb.active { color: #ecf0f1; font-weight: 600; cursor: default; }
+.fp-path-bar .fp-crumb.active:hover { background: transparent; }
+.fp-path-bar .fp-sep { color: #6b7c8f; padding: 0 2px; }
+
+#folder-picker-list {
+  list-style: none;
+  padding: 4px;
+  margin: 0;
+  max-height: 320px;
+  overflow-y: auto;
+  border: 1px solid #3a4b5c;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.18);
+}
+#folder-picker-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  border-radius: 6px;
+  color: #ecf0f1;
+  font-size: 13.5px;
+  margin: 2px 0;
+  transition: background 0.12s ease, transform 0.08s ease;
+  border: 1px solid transparent;
+}
+#folder-picker-list li:hover { background: rgba(52,152,219,0.16); }
+#folder-picker-list li.current-dest {
+  background: rgba(46,204,113,0.16);
+  border-color: rgba(46,204,113,0.45);
+}
+#folder-picker-list li.current-dest:hover { background: rgba(46,204,113,0.24); }
+#folder-picker-list li .fp-folder-icon {
+  width: 20px; height: 20px;
+  color: #f1c40f;
+  flex: 0 0 auto;
+}
+#folder-picker-list li .fp-path { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#folder-picker-list li .fp-count {
+  font-size: 11px;
+  color: #95a5a6;
+  padding: 2px 7px;
+  background: rgba(0,0,0,0.28);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+#folder-picker-list li .fp-open {
+  flex: 0 0 auto;
+  color: #7f8c8d;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.12s ease, background 0.12s ease, transform 0.12s ease;
+}
+#folder-picker-list li:hover .fp-open { color: #ecf0f1; }
+#folder-picker-list li .fp-open:hover { background: rgba(255,255,255,0.1); transform: translateX(2px); }
+#folder-picker-list li.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+#folder-picker-list li.disabled:hover { background: transparent; }
+#folder-picker-list li .fp-badge {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: #2c3e50;
+  color: #bdc3c7;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+#folder-picker-list li.empty {
+  justify-content: center;
+  color: #95a5a6;
+  cursor: default;
+  font-style: italic;
+}
+#folder-picker-list li.empty:hover { background: transparent; }
+
+.fp-footer {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  align-items: center;
+  padding-top: 4px;
+  border-top: 1px solid #3a4b5c;
+  margin-top: 2px;
+  padding-top: 14px;
+}
+.fp-footer .fp-spacer { flex: 1; }
+.fp-footer .db-action-btn { padding: 10px 18px; font-size: 13.5px; }
+/* Confirm button on folder picker: use blue-brand action color, not red-destructive */
+#folder-picker-confirm {
+  background: #3498db;
+}
+#folder-picker-confirm:hover { background: #2f8ecf; }
+#folder-picker-confirm:disabled { background: #4a6278; cursor: not-allowed; opacity: 0.6; }
+
+/* ===== DB dialog: search/path toggle ===== */
+.db-search-toggle-btn {
+  background: #34495e;
+  border: none;
+  color: #ecf0f1;
+  width: 34px; height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+  margin-left: 4px;
+}
+.db-search-toggle-btn svg { width: 16px; height: 16px; }
+.db-search-toggle-btn:hover { background: #4a6278; }
+.db-search-toggle-btn.active {
+  background: #3498db;
+  color: white;
+  box-shadow: 0 0 0 2px rgba(52,152,219,0.25);
+}
+.db-search-toggle-btn.active:hover { background: #2f8ecf; }
+
+/* Nav-embedded search input, replaces breadcrumb when active */
+.db-nav-search {
+  flex: 1;
+  min-width: 120px;
+  display: none;
+  position: relative;
+  align-items: center;
+}
+.db-nav-search.active { display: flex; }
+.db-nav-search svg {
+  position: absolute;
+  left: 10px;
+  width: 15px; height: 15px;
+  color: #95a5a6;
+  pointer-events: none;
+}
+.db-nav-search input {
+  width: 100%;
+  padding: 7px 10px 7px 32px;
+  background: rgba(0,0,0,0.28);
+  color: white;
+  border: 1px solid #3d556e;
+  border-radius: 6px;
+  font-size: 13px;
+  box-sizing: border-box;
+  min-height: 32px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.db-nav-search input:focus {
+  border-color: #3498db;
+  background: rgba(0,0,0,0.35);
+  outline: none;
+}
+.db-breadcrumb.hidden { display: none; }
+
+/* When search is active, hide the old toolbar search bar */
+.db-toolbar.search-in-nav .search-with-icon { display: none; }
+.db-toolbar.search-in-nav .db-toolbar-actions {
+  margin-right: auto;   /* left-align the buttons */
+  flex: 1;
+}
+
+/* Contextual toolbar: hide "creation" buttons while a selection is active */
+.db-toolbar.has-selection .btn-create,
+.db-toolbar.has-selection #db-set-editor-folder-btn { display: none !important; }
+.db-nav.has-selection #db-set-editor-folder-btn { display: none !important; }
+
+/* Preview button dropdown split — caret INSIDE the button, seamless, no sticking-out.
+   FIX: the outer .preview-split now owns the sidebar-button margin/width so the caret
+   sits flush with (and at the exact height of) the main "Preview Code" button.       */
+.preview-split {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  margin-top: 8px;
+  border-radius: 6px;
+  overflow: hidden;               /* clip the caret's rounded outside corners cleanly */
+  box-sizing: border-box;
+}
+.preview-split #preview-code-btn {
+  flex: 1 1 auto;
+  width: auto !important;         /* neutralise the sidebar rule's width:100% */
+  margin-top: 0 !important;       /* margin now belongs to the wrapper */
+  border-radius: 0 !important;    /* wrapper handles the outer radius */
+  padding-right: 12px;
+  min-width: 0;                    /* allow flex shrink */
+}
+#preview-caret-btn {
+  background: #2f455a;             /* same family as #3498db but darker for the split cue */
+  color: white;
+  border: none;
+  cursor: pointer;
+  padding: 0 10px;
+  min-width: 34px;
+  flex: 0 0 auto;
+  border-radius: 0;                /* wrapper handles the outer radius */
+  border-left: 1px solid rgba(255,255,255,0.22);
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s ease;
+  align-self: stretch;             /* match the main button's height exactly */
+  box-sizing: border-box;
+  line-height: 1;
+}
+#preview-caret-btn svg { display: block; }
+#preview-caret-btn:hover { background: #3d5a73; }
+#preview-caret-btn:focus-visible { outline: 2px solid #7fbfff; outline-offset: -2px; }
+#preview-code-btn.running {
+  background: #c0392b !important;
+}
+#preview-code-btn.running:hover { background: #a93226 !important; }
+#preview-dropdown {
+  display: none;
+  position: fixed;
+  z-index: 1000050;
+  background: #2c3e50;
+  color: white;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  min-width: 240px;
+  max-width: 90vw;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 6px;
+}
+#preview-dropdown.open { display: block; }
+#preview-dropdown button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: transparent;
+  color: white;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  text-align: left;
+}
+#preview-dropdown button:hover { background: rgba(255,255,255,0.1); }
+#preview-dropdown .pd-desc {
+  display: block;
+  font-size: 11px;
+  color: #b0bec5;
+  margin-top: 2px;
+}
+
+/* Permission modal */
+#permission-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 100020;
+  align-items: center;
+  justify-content: center;
+}
+#permission-modal.open { display: flex; }
+#permission-modal .perm-card {
+  background: #2c3e50;
+  color: white;
+  border-radius: 10px;
+  min-width: 320px;
+  max-width: 460px;
+  padding: 20px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+}
+#permission-modal h3 { margin: 0 0 8px; color: #fff; }
+#permission-modal p { margin: 0 0 14px; color: #ecf0f1; font-size: 14px; line-height: 1.4; }
+#permission-modal .perm-actions {
+  display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end;
+}
+#permission-modal button {
+  background: #34495e; color: white; border: none;
+  padding: 8px 14px; border-radius: 6px; cursor: pointer;
+  font-size: 13px;
+}
+#permission-modal button.primary { background: #27ae60; }
+#permission-modal button.primary:hover { background: #229954; }
+#permission-modal button.secondary { background: #3498db; }
+#permission-modal button.secondary:hover { background: #2980b9; }
+#permission-modal button.danger { background: #c0392b; }
+#permission-modal button.danger:hover { background: #a93226; }
+#permission-modal .perm-remember {
+  display: flex; align-items: center; gap: 6px;
+  color: #bdc3c7; font-size: 12px; margin: 8px 0 14px;
+}
+
+/* Search-btn highlight when search bar open (classic desktop) */
+#top-bar.search-active #search-project-header-btn {
+  background: rgba(255,255,255,0.22);
+  opacity: 1;
+}
+
+/* Mobile: hide desktop tab strip; toggle btn opens dropdown regardless */
+@media (max-width: 768px) {
+  #top-bar.tabs-visible #tabs-bar { display: none; }
+}
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.15.1/beautify.min.js"></script>
@@ -1583,8 +2285,13 @@ body.dark-mode { background-color: #1e1e1e; }
       </button>
     </div>
   </div>
+  <div id="tabs-bar" role="tablist" aria-label="Open files"></div>
+  <button id="tabs-toggle-btn" title="Tabs" aria-label="Tabs">
+    <span class="tabs-count-inline" id="tabs-count-badge">0</span>
+  </button>
+  <div id="tabs-dropdown"></div>
   <div class="search-container">
-    <input type="text" id="top-search-input" placeholder="Search project files...">
+    <input type="text" id="top-search-input" placeholder="Search files in editor folder...">
     <ul id="search-results" class="search-results"></ul>
   </div>
   <button id="hide-sidebar-btn" title="Toggle Sidebar">
@@ -1647,7 +2354,44 @@ body.dark-mode { background-color: #1e1e1e; }
           <button id="db-files-btn">View DB Files</button>
         </div>
 
-          <button id="preview-code-btn">Preview Code</button>
+          <div class="preview-split">
+            <button id="preview-code-btn">Preview Code</button>
+            <button id="preview-caret-btn" title="Preview options" aria-label="Preview options">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+          </div>
+          <div id="preview-dropdown">
+            <button data-mode="preview">
+              <span>
+                <strong>Preview Code</strong>
+                <span class="pd-desc">Opens the preview modal</span>
+              </span>
+            </button>
+            <button data-mode="bg">
+              <span>
+                <strong>Preview + Run in Background</strong>
+                <span class="pd-desc">Opens the preview modal; closing keeps it running headlessly</span>
+              </span>
+            </button>
+            <button data-mode="newtab">
+              <span>
+                <strong>Open in New Tab</strong>
+                <span class="pd-desc">Opens the preview in a new browser tab</span>
+              </span>
+            </button>
+            <button data-mode="headless">
+              <span>
+                <strong>Headless (background only)</strong>
+                <span class="pd-desc">Runs without opening a window</span>
+              </span>
+            </button>
+            <button data-mode="stop" id="preview-dd-stop" style="display:none; color:#e74c3c;">
+              <span>
+                <strong>Stop Preview</strong>
+                <span class="pd-desc">Terminates the current run</span>
+              </span>
+            </button>
+          </div>
           <button id="sidebar-find-replace-btn">Find / Replace</button>
           <button id="change-language-btn">Change Language</button>
       </div>
@@ -1737,6 +2481,14 @@ body.dark-mode { background-color: #1e1e1e; }
         <h3 class="modal-title" style="margin:0; flex:1;">
           <span id="preview-filename"></span>
         </h3>
+        <span id="preview-bg-hint" style="display:none; color:#f1c40f; font-size:12px; margin-right:10px;">Closes to background</span>
+        <button id="open-in-newtab-btn" class="header-btn" title="Open in new browser tab" style="margin-right:6px;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+        </button>
         <button id="reload-preview-btn" class="header-btn" title="Reload Preview" style="margin-right:8px;">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="22" height="22">
             <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
@@ -1758,21 +2510,83 @@ body.dark-mode { background-color: #1e1e1e; }
         <button id="close-db-modal" class="close-btn">&times;</button>
       </div>
       <div class="modal-body">
-        <div class="db-toolbar">
-          <div class="search-with-icon">
+        <div class="db-nav">
+          <button id="db-nav-back" class="db-nav-btn" title="Back" aria-label="Back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <button id="db-nav-forward" class="db-nav-btn" title="Forward" aria-label="Forward">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+          <button id="db-nav-up" class="db-nav-btn" title="Up one folder" aria-label="Up">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+          </button>
+          <div id="db-breadcrumb" class="db-breadcrumb"></div>
+          <div id="db-nav-search" class="db-nav-search">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
               <circle cx="11" cy="11" r="7"/>
               <path d="M21 21l-4-4"/>
             </svg>
-            <input type="text" id="db-search-input" placeholder="Search files...">
+            <input type="text" id="db-search-input" placeholder="Search files &amp; folders...">
           </div>
+          <button id="db-search-toggle-btn" class="db-search-toggle-btn" title="Search files &amp; folders" aria-label="Toggle search">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+          </button>
+          <button id="db-set-editor-folder-btn" class="db-action-btn secondary" title="Set current folder as editor folder">Set as editor folder</button>
+        </div>
+        <div class="db-toolbar search-in-nav">
           <div class="db-toolbar-actions">
+            <button id="db-new-folder-btn" class="db-action-btn secondary btn-create" title="New Folder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-3px;margin-right:4px;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>New Folder</button>
+            <button id="db-upload-here-btn" class="db-action-btn secondary btn-create" title="Upload file(s) into this folder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-3px;margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload Here</button>
+            <input type="file" id="db-upload-input" multiple style="display:none;">
+            <button id="db-copy-selected-btn" class="db-action-btn secondary" style="display:none;" title="Copy selection to another folder">Copy…</button>
+            <button id="db-move-selected-btn" class="db-action-btn secondary" style="display:none;" title="Move selection to another folder">Move…</button>
             <button id="db-select-all-btn" class="db-action-btn secondary">Select All</button>
+            <button id="db-download-selected-btn" class="db-action-btn secondary" style="display:none;">Download</button>
             <button id="delete-all-db-btn" class="db-action-btn">Delete All</button>
             <span class="selection-info" id="db-selection-info">0 selected</span>
           </div>
         </div>
         <ul id="db-file-list"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOLDER PICKER MODAL (used by Copy / Move dialogs) -->
+  <div id="folder-picker-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="folder-picker-title">Choose destination folder</h3>
+        <button id="folder-picker-close" class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- Rich selection preview card -->
+        <div id="folder-picker-selection-card" class="fp-selection-card"></div>
+
+        <!-- Search -->
+        <div class="search-with-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <circle cx="11" cy="11" r="7"/>
+            <path d="M21 21l-4-4"/>
+          </svg>
+          <input type="text" id="folder-picker-search" placeholder="Search folders...">
+        </div>
+
+        <!-- Destination path breadcrumb (click any segment to navigate) -->
+        <div id="folder-picker-path-bar" class="fp-path-bar"></div>
+
+        <!-- Folder list (click to open, ctrl/⌘-click to select without opening) -->
+        <ul id="folder-picker-list"></ul>
+
+        <!-- Footer -->
+        <div class="fp-footer">
+          <button id="folder-picker-new-btn" class="db-action-btn secondary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>New Folder</button>
+          <div class="fp-spacer"></div>
+          <button id="folder-picker-cancel" class="db-action-btn secondary">Cancel</button>
+          <button id="folder-picker-confirm" class="db-action-btn">Confirm</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1951,6 +2765,54 @@ body.dark-mode { background-color: #1e1e1e; }
               <input type="checkbox" id="auto-pair-brackets" checked /><label for="auto-pair-brackets">Auto Pair Brackets</label>
             </div></div>
 
+            <!-- IDE feature settings -->
+            <div class="settings-section">
+              <label for="tab-view-mode">Tab View</label>
+              <select id="tab-view-mode">
+                <option value="classic">Classic (desktop toolbar)</option>
+                <option value="dropdown">Mobile-style dropdown</option>
+              </select>
+            </div>
+            <div class="settings-section"><div class="settings-toggle">
+              <input type="checkbox" id="open-new-file-in-tab" />
+              <label for="open-new-file-in-tab">Open new files in a tab</label>
+            </div></div>
+            <div class="settings-section">
+              <label for="editor-folder-select">Editor Folder (scopes editor &amp; search to a folder)</label>
+              <div class="folder-select-wrap" id="editor-folder-wrap">
+                <button type="button" id="editor-folder-toggle" class="folder-select-toggle">
+                  <span id="editor-folder-current">root</span>
+                  <span class="fst-caret">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                  </span>
+                </button>
+                <div id="editor-folder-dropdown" class="folder-select-dropdown">
+                  <div class="fs-search-wrap">
+                    <input type="text" class="fs-search" id="editor-folder-search" placeholder="Search folders..." autocomplete="off">
+                  </div>
+                  <div id="editor-folder-options"></div>
+                </div>
+              </div>
+            </div>
+            <div class="settings-section">
+              <label for="write-permission-mode">Local Write Permission</label>
+              <select id="write-permission-mode">
+                <option value="ask">Ask each time</option>
+                <option value="always">Always allow (no prompt)</option>
+              </select>
+            </div>
+            <div class="settings-section">
+              <label for="autosave-policy">Auto-save Policy for New Files</label>
+              <select id="autosave-policy">
+                <option value="off">Off (opt in per file)</option>
+                <option value="temp">Keep temporary only</option>
+                <option value="db">Always auto-save to IndexedDB</option>
+              </select>
+            </div>
+            <div class="settings-section"><div class="settings-toggle">
+              <input type="checkbox" id="virtual-file-linking" checked /><label for="virtual-file-linking">Virtual file linking in preview (auto-inject linked CSS/JS)</label>
+            </div></div>
+
             <button id="reset-settings-btn">Reset to Defaults</button>
           </div>
         </div>
@@ -2057,7 +2919,8 @@ function showAutosaveIndicator(message, type = 'success') {
 ============================================================= */
 function initIndexedDB() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('JSInsiderDB', 3);
+    // Bumped version to 4 to introduce a 'folders' store for folder metadata.
+    const request = indexedDB.open('JSInsiderDB', 4);
     request.onerror = () => reject(request.error);
     request.onsuccess = () => {
       db = request.result;
@@ -2075,7 +2938,145 @@ function initIndexedDB() {
       if (!db.objectStoreNames.contains('settings')) {
         db.createObjectStore('settings', { keyPath: 'key' });
       }
+      if (!db.objectStoreNames.contains('folders')) {
+        db.createObjectStore('folders', { keyPath: 'path' });
+      }
     };
+  });
+}
+
+/* =============================================================
+   FOLDER PATH HELPERS
+   Filenames may look like "css/theme.css" or "a/b/c/file.js".
+   The "editor folder" setting scopes the sidebar & top-search to a subtree.
+============================================================= */
+function normalizeFolderPath(p) {
+  if (!p) return '';
+  p = String(p).replace(/\\/g, '/').replace(/^\/+/, '').replace(/\/+$/, '');
+  // strip any ./ segments and reject ..
+  p = p.split('/').filter(seg => seg && seg !== '.' && seg !== '..').join('/');
+  return p;
+}
+function joinPath(dir, name) {
+  dir = normalizeFolderPath(dir);
+  name = String(name || '').replace(/^\/+|\/+$/g, '');
+  if (!dir) return name;
+  if (!name) return dir;
+  return dir + '/' + name;
+}
+function parentPath(p) {
+  p = normalizeFolderPath(p);
+  const i = p.lastIndexOf('/');
+  return i === -1 ? '' : p.slice(0, i);
+}
+function fileDir(filename) {
+  const i = String(filename || '').lastIndexOf('/');
+  return i === -1 ? '' : filename.slice(0, i);
+}
+function fileBase(filename) {
+  const i = String(filename || '').lastIndexOf('/');
+  return i === -1 ? String(filename || '') : filename.slice(i + 1);
+}
+/** Is filename directly inside folder (no deeper subfolders)? */
+function isDirectChild(filename, folder) {
+  return fileDir(filename) === normalizeFolderPath(folder);
+}
+/** Is filename anywhere under folder (recursively)? */
+function isUnder(filename, folder) {
+  folder = normalizeFolderPath(folder);
+  if (!folder) return true;
+  return filename === folder || filename.startsWith(folder + '/');
+}
+
+// The current "editor folder" scope. Persisted via saveSetting/localStorage.
+let editorFolder = '';
+function getEditorFolder() { return editorFolder || ''; }
+function setEditorFolder(p) {
+  editorFolder = normalizeFolderPath(p);
+  try { localStorage.setItem('setting_editorFolder', JSON.stringify(editorFolder)); } catch(e){}
+  try { saveSetting('editorFolder', editorFolder); } catch(e){}
+  try { updateFileExplorer(); } catch(e){}
+  try {
+    const cur = document.getElementById('editor-folder-current');
+    if (cur) cur.textContent = editorFolder || 'root';
+  } catch(e){}
+}
+try {
+  const s = localStorage.getItem('setting_editorFolder');
+  if (s !== null) editorFolder = normalizeFolderPath(JSON.parse(s));
+} catch(e){}
+
+/* Folder store helpers */
+function _foldersTx(mode) {
+  return db.transaction(['folders'], mode).objectStore('folders');
+}
+function createFolderInDB(path) {
+  path = normalizeFolderPath(path);
+  if (!db || !path) return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    // Create ancestors too
+    const parts = path.split('/');
+    const paths = [];
+    for (let i = 1; i <= parts.length; i++) paths.push(parts.slice(0, i).join('/'));
+    const tx = db.transaction(['folders'], 'readwrite');
+    const os = tx.objectStore('folders');
+    paths.forEach(p => { os.put({ path: p, createdAt: new Date().toISOString() }); });
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+function deleteFolderFromDB(path) {
+  path = normalizeFolderPath(path);
+  if (!db || !path) return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    // Also delete any files under it and any nested folder records.
+    const tx = db.transaction(['files', 'folders'], 'readwrite');
+    const fsOs = tx.objectStore('files');
+    const fdOs = tx.objectStore('folders');
+    const req = fsOs.openCursor();
+    req.onsuccess = (e) => {
+      const cur = e.target.result;
+      if (cur) {
+        if (isUnder(cur.value.filename, path)) cur.delete();
+        cur.continue();
+      }
+    };
+    const req2 = fdOs.openCursor();
+    req2.onsuccess = (e) => {
+      const cur = e.target.result;
+      if (cur) {
+        if (cur.value.path === path || cur.value.path.startsWith(path + '/')) cur.delete();
+        cur.continue();
+      }
+    };
+    tx.oncomplete = () => {
+      // Reap in-memory files under this folder
+      try {
+        Object.keys(files).forEach(fn => {
+          if (isUnder(fn, path)) {
+            delete files[fn];
+            savedFiles.delete(fn);
+            autoSaveFiles.delete(fn);
+            if (currentFile === fn) { currentFile = null; editor.setValue(''); }
+          }
+        });
+        updateFileExplorer();
+        updateSaveButtons();
+      } catch(e){}
+      resolve();
+    };
+    tx.onerror = () => reject(tx.error);
+  });
+}
+function getAllFoldersFromDB() {
+  if (!db) return Promise.resolve([]);
+  return new Promise((resolve) => {
+    try {
+      const tx = db.transaction(['folders'], 'readonly');
+      const req = tx.objectStore('folders').getAll();
+      req.onsuccess = () => resolve((req.result || []).map(r => r.path).filter(Boolean));
+      req.onerror = () => resolve([]);
+    } catch(e) { resolve([]); }
   });
 }
 
@@ -2386,20 +3387,23 @@ function saveCurrentFile() {
 function updateFileExplorer() {
   const list = document.getElementById("file-list");
   list.innerHTML = "";
-  Object.keys(files).sort().forEach(file => {
+  const folder = getEditorFolder();
+  const scoped = Object.keys(files).filter(f => isUnder(f, folder)).sort();
+  scoped.forEach(file => {
     const li = document.createElement("li");
     li.className = "file-item";
     const nameSpan = document.createElement('span');
     nameSpan.className = 'file-name-text';
-    nameSpan.textContent = file;
+    // Show path RELATIVE to the current editor folder so the sidebar is clean.
+    nameSpan.textContent = folder && file.startsWith(folder + '/')
+      ? file.slice(folder.length + 1)
+      : file;
+    nameSpan.title = file;
     li.appendChild(nameSpan);
     if (savedFiles.has(file)) li.classList.add("saved");
     if (file === currentFile) li.classList.add("selected");
     li.dataset.filename = file;
-    li.onclick = () => {
-      openFile(file);
-      /* On mobile in push-mode: keep sidebar open so user can keep navigating */
-    };
+    li.onclick = () => { openFile(file); };
     list.appendChild(li);
   });
   updateSaveButtons();
@@ -2447,7 +3451,12 @@ function setEditorMode(filename) {
 document.getElementById("new-file-btn").onclick = () => {
   const name = prompt("Enter new file name:");
   if (name && name.trim()) {
-    const t = name.trim();
+    // New files land inside the current editor folder (unless the user typed a
+    // path with a slash \u2014 then respect it).
+    let raw = name.trim().replace(/^\/+/, '');
+    const t = raw.includes('/')
+      ? normalizeFolderPath(raw.split('/').slice(0, -1).join('/')) + '/' + raw.split('/').pop()
+      : (getEditorFolder() ? joinPath(getEditorFolder(), raw) : raw);
     if (files.hasOwnProperty(t)) { showToast("File already exists", "error"); return; }
     saveCurrentFile();
     files[t] = "";
@@ -2522,12 +3531,16 @@ document.getElementById("file-input").addEventListener("change", function(e) {
   const reader = new FileReader();
   reader.onload = (ev) => {
     const content = ev.target.result;
-    const name = file.name;
+    // Land uploaded files inside the current editor folder for consistency.
+    const base = file.name;
+    const name = getEditorFolder() ? joinPath(getEditorFolder(), base) : base;
     if (files.hasOwnProperty(name) && !confirm(`File ${name} already exists. Overwrite?`)) return;
     saveCurrentFile();
     files[name] = content;
     updateFileExplorer();
-    openFile(name);
+    // FIX (tab bug): opening a freshly-uploaded file should always pin a tab for it,
+    // regardless of the "Open new files in a tab" setting — the user just brought it in.
+    openFile(name, { openInTab: true });
     showToast("Opened " + name);
   };
   reader.readAsText(file);
@@ -2561,9 +3574,16 @@ document.getElementById("hide-sidebar-btn").onclick = () => {
   setTimeout(() => editor.resize(), 280);
 };
 
-/* Resize handler — recompute editor size when crossing breakpoint */
+/* Resize handler — recompute editor size when crossing breakpoint (debounced).
+   FIX: previously fired a setTimeout PER resize event (dozens during a drag),
+   which caused visible jank. Now we coalesce with a single trailing call. */
+let __resizeT = null;
 window.addEventListener('resize', () => {
-  setTimeout(() => editor.resize(), 100);
+  if (__resizeT) return; // trailing-edge debounce
+  __resizeT = setTimeout(() => {
+    __resizeT = null;
+    try { if (editor && editor.resize) editor.resize(); } catch(e){}
+  }, 120);
 });
 
 editor.on('change', () => {
@@ -2580,22 +3600,36 @@ initIndexedDB().catch(e => console.error('IDB init failed:', e));
 
 document.getElementById('enable-indexeddb').addEventListener('change', function(e) {
   if (!currentFile) return;
-  if (e.target.checked) {
-    autoSaveFiles.add(currentFile);
-    if (!savedFiles.has(currentFile)) {
-      saveCurrentFile();
-      saveFileToIndexedDB(currentFile, files[currentFile])
-        .then(() => showToast("Auto-save enabled and file saved"));
-    } else {
-      autoSaveFile(currentFile, files[currentFile]);
-      showToast("Auto-save enabled");
-    }
+  // FIX: reflect UI state IMMEDIATELY, then do IDB work off the event loop so the
+  // checkbox doesn't feel laggy (it used to await a sync save chain before repainting).
+  const checked = e.target.checked;
+  const fname = currentFile;
+  if (checked) {
+    autoSaveFiles.add(fname);
   } else {
-    autoSaveFiles.delete(currentFile);
-    showAutosaveIndicator('Auto-save disabled (file stays in DB)');
-    showToast("Auto-save disabled");
+    autoSaveFiles.delete(fname);
   }
   updateSaveButtons();
+  // Defer the (potentially blocking) IDB work so the checkbox paints instantly.
+  setTimeout(() => {
+    if (checked) {
+      // Flush current buffer to `files[fname]` without arming another autosave timeout.
+      if (files.hasOwnProperty(fname) && typeof editor !== 'undefined' && currentFile === fname) {
+        files[fname] = editor.getValue();
+      }
+      if (!savedFiles.has(fname)) {
+        saveFileToIndexedDB(fname, files[fname])
+          .then(() => { lastSaveContent[fname] = files[fname]; showToast("Auto-save enabled and file saved"); })
+          .catch(() => showToast("Save failed", "error"));
+      } else {
+        autoSaveFile(fname, files[fname]);
+        showToast("Auto-save enabled");
+      }
+    } else {
+      showAutosaveIndicator('Auto-save disabled (file stays in DB)');
+      showToast("Auto-save disabled");
+    }
+  }, 0);
 });
 
 document.getElementById('save-to-db-btn').addEventListener('click', () => {
@@ -2620,13 +3654,36 @@ document.getElementById('remove-from-db-btn').addEventListener('click', () => {
 /* =============================================================
    DB FILES MODAL
 ============================================================= */
+// Selection is now a set of ENTRIES: {kind:'file'|'folder', path}
 let dbSelectedFiles = new Set();
 let dbLastClickedIndex = -1;
+let dbCurrentFolder = '';
+const dbNavHistory = { stack: [''], index: 0 };
 
 document.getElementById('db-files-btn').addEventListener('click', () => {
-  if (!db) initIndexedDB().then(loadDBFilesModal).catch(() => showToast("DB error", "error"));
-  else loadDBFilesModal();
+  if (!db) initIndexedDB().then(() => openDBModal('')).catch(() => showToast("DB error", "error"));
+  else openDBModal(dbCurrentFolder || '');
 });
+
+function openDBModal(folder) {
+  dbCurrentFolder = normalizeFolderPath(folder || '');
+  // Reset history so the modal always starts fresh from the current folder
+  dbNavHistory.stack = [dbCurrentFolder];
+  dbNavHistory.index = 0;
+  loadDBFilesModal();
+  document.getElementById('db-files-modal').style.display = 'flex';
+}
+
+function dbNavigateTo(folder, pushHistory = true) {
+  dbCurrentFolder = normalizeFolderPath(folder || '');
+  if (pushHistory) {
+    // Truncate any forward entries
+    dbNavHistory.stack = dbNavHistory.stack.slice(0, dbNavHistory.index + 1);
+    dbNavHistory.stack.push(dbCurrentFolder);
+    dbNavHistory.index = dbNavHistory.stack.length - 1;
+  }
+  loadDBFilesModal();
+}
 
 (function() {
   const modalBody = document.querySelector('#db-files-modal .modal-body');
@@ -2635,8 +3692,10 @@ document.getElementById('db-files-btn').addEventListener('click', () => {
     if (dbSelectedFiles.size === 0) return;
     if (e.target.closest('#db-file-list li')) return;
     if (e.target.closest('.db-action-btn')) return;
+    if (e.target.closest('.db-nav-btn')) return;
     if (e.target.closest('.search-with-icon')) return;
     if (e.target.closest('.db-toolbar')) return;
+    if (e.target.closest('.db-nav')) return;
     dbSelectedFiles.clear();
     dbLastClickedIndex = -1;
     updateDBSelectionInfo();
@@ -2645,7 +3704,7 @@ document.getElementById('db-files-btn').addEventListener('click', () => {
   if (list) {
     list.addEventListener('mousedown', (e) => {
       if (dbSelectedFiles.size === 0) return;
-      if (e.target.closest('li[data-filename]')) return;
+      if (e.target.closest('li[data-key]')) return;
       dbSelectedFiles.clear();
       dbLastClickedIndex = -1;
       updateDBSelectionInfo();
@@ -2653,19 +3712,27 @@ document.getElementById('db-files-btn').addEventListener('click', () => {
   }
 })();
 
+function selKey(kind, path) { return kind + ':' + path; }
+
 function updateDBSelectionInfo() {
   const info = document.getElementById('db-selection-info');
   const deleteBtn = document.getElementById('delete-all-db-btn');
-  info.textContent = `${dbSelectedFiles.size} selected`;
+  const dlBtn = document.getElementById('db-download-selected-btn');
+  const n = dbSelectedFiles.size;
+  info.textContent = `${n} selected`;
   if (deleteBtn) {
-    deleteBtn.textContent = dbSelectedFiles.size > 0
-      ? `Delete Selected (${dbSelectedFiles.size})`
-      : 'Delete All';
+    deleteBtn.textContent = n > 0 ? `Delete Selected (${n})` : 'Delete All';
   }
-  document.querySelectorAll('#db-file-list li').forEach(li => {
-    const name = li.dataset.filename;
+  if (dlBtn) dlBtn.style.display = n > 0 ? '' : 'none';
+  // Show/hide the copy/move buttons based on whether a selection exists.
+  const cpBtn = document.getElementById('db-copy-selected-btn');
+  const mvBtn = document.getElementById('db-move-selected-btn');
+  if (cpBtn) cpBtn.style.display = n > 0 ? '' : 'none';
+  if (mvBtn) mvBtn.style.display = n > 0 ? '' : 'none';
+  document.querySelectorAll('#db-file-list li[data-key]').forEach(li => {
+    const key = li.dataset.key;
     const cb = li.querySelector('.db-checkbox');
-    if (dbSelectedFiles.has(name)) {
+    if (dbSelectedFiles.has(key)) {
       li.classList.add('db-selected');
       if (cb) cb.checked = true;
     } else {
@@ -2675,146 +3742,1018 @@ function updateDBSelectionInfo() {
   });
 }
 
+function renderDBBreadcrumb() {
+  const el = document.getElementById('db-breadcrumb');
+  if (!el) return;
+  el.innerHTML = '';
+  const rootCrumb = document.createElement('span');
+  rootCrumb.className = 'crumb' + (dbCurrentFolder === '' ? ' active' : '');
+  rootCrumb.textContent = 'root';
+  if (dbCurrentFolder !== '') rootCrumb.addEventListener('click', () => dbNavigateTo(''));
+  el.appendChild(rootCrumb);
+  const parts = dbCurrentFolder ? dbCurrentFolder.split('/') : [];
+  let acc = '';
+  parts.forEach((p, i) => {
+    const sep = document.createElement('span');
+    sep.className = 'sep';
+    sep.textContent = ' / ';
+    el.appendChild(sep);
+    acc = acc ? acc + '/' + p : p;
+    const c = document.createElement('span');
+    c.className = 'crumb' + (i === parts.length - 1 ? ' active' : '');
+    c.textContent = p;
+    if (i !== parts.length - 1) {
+      const target = acc;
+      c.addEventListener('click', () => dbNavigateTo(target));
+    }
+    el.appendChild(c);
+  });
+
+  // Enable/disable nav btns
+  const back = document.getElementById('db-nav-back');
+  const fwd  = document.getElementById('db-nav-forward');
+  const up   = document.getElementById('db-nav-up');
+  if (back) back.disabled = dbNavHistory.index <= 0;
+  if (fwd)  fwd.disabled  = dbNavHistory.index >= dbNavHistory.stack.length - 1;
+  if (up)   up.disabled   = dbCurrentFolder === '';
+}
+
+// ICONS
+const DB_ICON_FILE = `<svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+const DB_ICON_FOLDER = `<svg class="folder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`;
+const DB_ICON_DOWNLOAD = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
+const DB_ICON_DELETE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>`;
+const DB_ICON_FOLDER_PIN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 2C7.03 2 3 6.03 3 11c0 7 9 11 9 11s9-4 9-11c0-4.97-4.03-9-9-9z"/></svg>`;
+const DB_ICON_RENAME = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`;
+
 function loadDBFilesModal() {
   const list = document.getElementById('db-file-list');
   list.innerHTML = '';
   dbSelectedFiles.clear();
   dbLastClickedIndex = -1;
+  renderDBBreadcrumb();
 
-  const tx = db.transaction(['files'], 'readonly');
-  const req = tx.objectStore('files').getAll();
+  const searchTerm = (document.getElementById('db-search-input').value || '').toLowerCase();
 
-  req.onsuccess = () => {
-    const dbFiles = req.result.sort((a, b) => a.filename.localeCompare(b.filename));
+  Promise.all([
+    new Promise(res => {
+      const tx = db.transaction(['files'], 'readonly');
+      const r = tx.objectStore('files').getAll();
+      r.onsuccess = () => res(r.result || []);
+      r.onerror = () => res([]);
+    }),
+    getAllFoldersFromDB()
+  ]).then(([allFiles, allFolders]) => {
+    const folder = dbCurrentFolder;
 
-    if (dbFiles.length === 0) {
-      list.innerHTML = '<li style="justify-content:center; color:#95a5a6; padding:30px;">No files in IndexedDB</li>';
-    } else {
-      dbFiles.forEach((f, idx) => {
-        const li = document.createElement('li');
-        li.dataset.filename = f.filename;
-        li.dataset.index = idx;
-        const dateStr = new Date(f.lastModified).toLocaleString();
+    // Direct-child folders live at depth folder-depth+1
+    const folderSet = new Set(allFolders);
+    // Also derive implicit folders from file paths so we still show a folder
+    // even if no explicit folder record exists (e.g. legacy data).
+    allFiles.forEach(f => {
+      const d = fileDir(f.filename);
+      if (d) {
+        const parts = d.split('/');
+        let acc = '';
+        for (let i = 0; i < parts.length; i++) {
+          acc = i === 0 ? parts[0] : acc + '/' + parts[i];
+          folderSet.add(acc);
+        }
+      }
+    });
 
-        li.innerHTML = `
-          <input type="checkbox" class="db-checkbox">
-          <div class="db-file-info">
-            <span class="filename"></span>
-            <small>Last modified: ${dateStr}</small>
-          </div>
-          <div class="db-file-actions">
-            <button class="db-icon-btn download" title="Download">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="7 10 12 15 17 10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
-              </svg>
-            </button>
-            <button class="db-icon-btn delete" title="Delete">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="3 6 5 6 21 6"/>
-                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                <path d="M10 11v6"/><path d="M14 11v6"/>
-                <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>
-              </svg>
-            </button>
-          </div>
-        `;
-        li.querySelector('.filename').textContent = f.filename;
+    const childFolders = [];
+    folderSet.forEach(p => {
+      if (folder === '' && !p.includes('/')) childFolders.push(p);
+      else if (folder !== '' && p.startsWith(folder + '/')) {
+        const rest = p.slice(folder.length + 1);
+        if (!rest.includes('/')) childFolders.push(p);
+      }
+    });
+    childFolders.sort((a,b) => a.localeCompare(b));
 
-        const cb = li.querySelector('.db-checkbox');
+    // Direct-child files
+    const childFiles = allFiles.filter(f => isDirectChild(f.filename, folder));
+    childFiles.sort((a,b) => a.filename.localeCompare(b.filename));
 
-        cb.addEventListener('click', (e) => {
-          e.stopPropagation();
-          if (cb.checked) dbSelectedFiles.add(f.filename);
-          else dbSelectedFiles.delete(f.filename);
-          dbLastClickedIndex = idx;
+    // Apply search filter (searches names in the current folder view)
+    const matchName = (name) => !searchTerm || name.toLowerCase().includes(searchTerm);
+    const visFolders = childFolders.filter(p => matchName(fileBase(p)));
+    const visFiles = childFiles.filter(f => matchName(fileBase(f.filename)));
+
+    if (visFolders.length === 0 && visFiles.length === 0) {
+      list.innerHTML = `<li style="justify-content:center; color:#95a5a6; padding:30px;">${
+        searchTerm ? 'No matches' : (folder ? 'Empty folder' : 'No files in IndexedDB')
+      }</li>`;
+      updateDBSelectionInfo();
+      return;
+    }
+
+    let idx = 0;
+    // Render folders first
+    visFolders.forEach(folderPath => {
+      const li = document.createElement('li');
+      li.classList.add('folder-item');
+      const key = selKey('folder', folderPath);
+      li.dataset.key = key;
+      li.dataset.index = idx++;
+      const isEditor = getEditorFolder() === folderPath;
+      li.innerHTML = `
+        <input type="checkbox" class="db-checkbox">
+        ${DB_ICON_FOLDER}
+        <div class="db-file-info">
+          <span class="filename"></span>
+          <small>Folder${isEditor ? ' \u2022 editor folder' : ''}</small>
+        </div>
+        <div class="db-file-actions">
+          <button class="db-icon-btn set-editor" title="Set as editor folder">${DB_ICON_FOLDER_PIN}</button>
+          <button class="db-icon-btn rename" title="Rename folder">${DB_ICON_RENAME}</button>
+          <button class="db-icon-btn download" title="Download folder as .zip">${DB_ICON_DOWNLOAD}</button>
+          <button class="db-icon-btn delete" title="Delete folder">${DB_ICON_DELETE}</button>
+        </div>
+      `;
+      li.querySelector('.filename').textContent = fileBase(folderPath);
+      if (isEditor) {
+        const badge = document.createElement('span');
+        badge.className = 'db-editor-badge';
+        badge.textContent = 'EDITOR';
+        li.querySelector('.filename').after(badge);
+      }
+      const cb = li.querySelector('.db-checkbox');
+      cb.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (cb.checked) dbSelectedFiles.add(key);
+        else dbSelectedFiles.delete(key);
+        updateDBSelectionInfo();
+      });
+      li.addEventListener('click', (e) => {
+        if (e.target.closest('.db-icon-btn')) return;
+        if (e.target.classList.contains('db-checkbox')) return;
+        if (e.ctrlKey || e.metaKey) {
+          if (dbSelectedFiles.has(key)) dbSelectedFiles.delete(key);
+          else dbSelectedFiles.add(key);
           updateDBSelectionInfo();
-        });
+          return;
+        }
+        // Navigate INTO folder
+        dbNavigateTo(folderPath);
+      });
+      li.querySelector('.db-icon-btn.set-editor').addEventListener('click', (e) => {
+        e.stopPropagation();
+        setEditorFolder(folderPath);
+        showToast('Editor folder set to "' + folderPath + '"');
+        loadDBFilesModal();
+      });
+      const renameBtn = li.querySelector('.db-icon-btn.rename');
+      if (renameBtn) renameBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        renameFolderInDB(folderPath);
+      });
+      li.querySelector('.db-icon-btn.download').addEventListener('click', (e) => {
+        e.stopPropagation();
+        downloadFolderAsZip(folderPath).catch(() => showToast('Zip failed', 'error'));
+      });
+      li.querySelector('.db-icon-btn.delete').addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (confirm(`Delete folder "${folderPath}" and everything inside it?\nThis cannot be undone.`)) {
+          deleteFolderFromDB(folderPath).then(() => {
+            showToast('Deleted ' + folderPath);
+            loadDBFilesModal();
+          });
+        }
+      });
+      list.appendChild(li);
+    });
 
-        li.addEventListener('click', (e) => {
-          if (e.target.closest('.db-icon-btn')) return;
-          if (e.target.classList.contains('db-checkbox')) return;
-
-          if (e.ctrlKey || e.metaKey) {
-            if (dbSelectedFiles.has(f.filename)) dbSelectedFiles.delete(f.filename);
-            else dbSelectedFiles.add(f.filename);
-            dbLastClickedIndex = idx;
-            updateDBSelectionInfo();
-          } else if (e.shiftKey && dbLastClickedIndex !== -1) {
-            const start = Math.min(dbLastClickedIndex, idx);
-            const end = Math.max(dbLastClickedIndex, idx);
-            const all = document.querySelectorAll('#db-file-list li');
-            for (let i = start; i <= end; i++) {
-              if (all[i]) dbSelectedFiles.add(all[i].dataset.filename);
-            }
-            updateDBSelectionInfo();
-          } else {
-            loadAndOpenDBFile(f.filename);
-            document.getElementById('db-files-modal').style.display = 'none';
-          }
-        });
-
-        li.addEventListener('dblclick', (e) => {
-          if (e.target.closest('.db-icon-btn')) return;
+    // Render files
+    visFiles.forEach(f => {
+      const li = document.createElement('li');
+      li.classList.add('file-item');
+      const key = selKey('file', f.filename);
+      li.dataset.key = key;
+      li.dataset.filename = f.filename;
+      li.dataset.index = idx++;
+      const dateStr = new Date(f.lastModified).toLocaleString();
+      li.innerHTML = `
+        <input type="checkbox" class="db-checkbox">
+        ${DB_ICON_FILE}
+        <div class="db-file-info">
+          <span class="filename"></span>
+          <small>Last modified: ${dateStr}</small>
+        </div>
+        <div class="db-file-actions">
+          <button class="db-icon-btn rename" title="Rename / move file">${DB_ICON_RENAME}</button>
+          <button class="db-icon-btn download" title="Download">${DB_ICON_DOWNLOAD}</button>
+          <button class="db-icon-btn delete" title="Delete">${DB_ICON_DELETE}</button>
+        </div>
+      `;
+      li.querySelector('.filename').textContent = fileBase(f.filename);
+      const cb = li.querySelector('.db-checkbox');
+      cb.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (cb.checked) dbSelectedFiles.add(key);
+        else dbSelectedFiles.delete(key);
+        updateDBSelectionInfo();
+      });
+      li.addEventListener('click', (e) => {
+        if (e.target.closest('.db-icon-btn')) return;
+        if (e.target.classList.contains('db-checkbox')) return;
+        if (e.ctrlKey || e.metaKey) {
+          if (dbSelectedFiles.has(key)) dbSelectedFiles.delete(key);
+          else dbSelectedFiles.add(key);
+          updateDBSelectionInfo();
+        } else {
           loadAndOpenDBFile(f.filename);
           document.getElementById('db-files-modal').style.display = 'none';
-        });
-
-        li.querySelector('.db-icon-btn.download').addEventListener('click', (e) => {
-          e.stopPropagation();
-          downloadDBFile(f.filename, f.content);
-          showToast("Downloaded " + f.filename);
-        });
-        li.querySelector('.db-icon-btn.delete').addEventListener('click', (e) => {
-          e.stopPropagation();
-          if (confirm(`Delete "${f.filename}" permanently?`)) {
-            removeFileFromIndexedDB(f.filename).then(() => {
-              loadDBFilesModal();
-              showToast("Deleted " + f.filename);
-            });
-          }
-        });
-
-        list.appendChild(li);
+        }
       });
-    }
-    updateDBSelectionInfo();
-  };
+      li.addEventListener('dblclick', (e) => {
+        if (e.target.closest('.db-icon-btn')) return;
+        loadAndOpenDBFile(f.filename);
+        document.getElementById('db-files-modal').style.display = 'none';
+      });
+      const renameFileBtn = li.querySelector('.db-icon-btn.rename');
+      if (renameFileBtn) renameFileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        renameDBFile(f.filename);
+      });
+      li.querySelector('.db-icon-btn.download').addEventListener('click', (e) => {
+        e.stopPropagation();
+        downloadDBFile(fileBase(f.filename), f.content);
+        showToast('Downloaded ' + fileBase(f.filename));
+      });
+      li.querySelector('.db-icon-btn.delete').addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (confirm(`Delete "${f.filename}" permanently?`)) {
+          removeFileFromIndexedDB(f.filename).then(() => {
+            loadDBFilesModal();
+            showToast('Deleted ' + f.filename);
+          });
+        }
+      });
+      list.appendChild(li);
+    });
 
-  document.getElementById('db-files-modal').style.display = 'flex';
+    updateDBSelectionInfo();
+  });
 }
 
+/** Download every file under folderPath as a .zip. */
+function downloadFolderAsZip(folderPath) {
+  if (typeof JSZip === 'undefined') {
+    showToast('JSZip not loaded', 'error');
+    return Promise.reject('no jszip');
+  }
+  folderPath = normalizeFolderPath(folderPath);
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(['files'], 'readonly');
+    const req = tx.objectStore('files').getAll();
+    req.onsuccess = () => {
+      const zip = new JSZip();
+      const under = (req.result || []).filter(f => isUnder(f.filename, folderPath));
+      if (under.length === 0) {
+        showToast('Folder is empty \u2014 nothing to zip', 'warning');
+        return resolve();
+      }
+      under.forEach(f => {
+        // Files inside the zip preserve their relative path *inside* folderPath
+        const rel = folderPath
+          ? f.filename.slice(folderPath.length + 1)
+          : f.filename;
+        zip.file(rel, f.content || '');
+      });
+      zip.generateAsync({ type: 'blob' }).then(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const zipName = (folderPath ? folderPath.replace(/\//g, '_') : 'root') + '.zip';
+        a.href = url; a.download = zipName;
+        document.body.appendChild(a); a.click();
+        URL.revokeObjectURL(url); a.remove();
+        showToast('Downloaded ' + zipName);
+        resolve();
+      }).catch(reject);
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
+
+/** Download every selected entry (files + folder subtrees) as a single .zip. */
+function downloadSelectedAsZip() {
+  if (typeof JSZip === 'undefined') { showToast('JSZip not loaded', 'error'); return; }
+  if (dbSelectedFiles.size === 0) return;
+  const tx = db.transaction(['files'], 'readonly');
+  const req = tx.objectStore('files').getAll();
+  req.onsuccess = () => {
+    const all = req.result || [];
+    const zip = new JSZip();
+    const seen = new Set();
+    dbSelectedFiles.forEach(k => {
+      const [kind, ...rest] = k.split(':');
+      const path = rest.join(':');
+      if (kind === 'file') {
+        const rec = all.find(x => x.filename === path);
+        if (rec && !seen.has(rec.filename)) {
+          seen.add(rec.filename);
+          zip.file(rec.filename, rec.content || '');
+        }
+      } else if (kind === 'folder') {
+        all.forEach(rec => {
+          if (isUnder(rec.filename, path) && !seen.has(rec.filename)) {
+            seen.add(rec.filename);
+            zip.file(rec.filename, rec.content || '');
+          }
+        });
+      }
+    });
+    if (seen.size === 0) { showToast('Nothing to download', 'warning'); return; }
+    zip.generateAsync({ type: 'blob' }).then(blob => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'selection.zip';
+      document.body.appendChild(a); a.click();
+      URL.revokeObjectURL(url); a.remove();
+      showToast('Downloaded selection.zip (' + seen.size + ' files)');
+    }).catch(() => showToast('Zip failed', 'error'));
+  };
+}
+
+/* =============================================================
+   NEW: Rename folder, rename/move file, copy/move selection,
+        upload into current folder, folder-picker dialog with search
+============================================================= */
+
+/** Rename a folder in-place: renames the folder record AND rewrites every
+ *  descendant file & sub-folder path. Refuses to overwrite an existing folder. */
+function renameFolderInDB(oldPath) {
+  oldPath = normalizeFolderPath(oldPath);
+  if (!oldPath) return;
+  const cur = fileBase(oldPath);
+  const raw = prompt('Rename folder "' + oldPath + '" to:', cur);
+  if (raw === null) return;
+  const newBase = String(raw).trim();
+  if (!newBase || newBase === cur) return;
+  if (newBase.indexOf('/') !== -1 || newBase === '.' || newBase === '..') {
+    showToast('Folder name cannot contain "/", "." or ".."', 'error');
+    return;
+  }
+  const parent = parentPath(oldPath);
+  const newPath = parent ? parent + '/' + newBase : newBase;
+  if (!db) { showToast('DB not ready', 'error'); return; }
+  // Guard: don't clobber an existing folder or file at newPath
+  Promise.all([
+    getAllFoldersFromDB(),
+    new Promise(res => {
+      const tx = db.transaction(['files'], 'readonly');
+      const r = tx.objectStore('files').getAll();
+      r.onsuccess = () => res(r.result || []); r.onerror = () => res([]);
+    })
+  ]).then(([allFolders, allFiles]) => {
+    const folderSet = new Set(allFolders);
+    if (folderSet.has(newPath)) { showToast('A folder called "' + newPath + '" already exists', 'error'); return; }
+    if (allFiles.some(f => f.filename === newPath || f.filename.startsWith(newPath + '/'))) {
+      showToast('A file already occupies "' + newPath + '"', 'error'); return;
+    }
+    const tx = db.transaction(['files', 'folders'], 'readwrite');
+    const fsOs = tx.objectStore('files');
+    const fdOs = tx.objectStore('folders');
+    // Rewrite folder records
+    allFolders.forEach(p => {
+      if (p === oldPath || p.startsWith(oldPath + '/')) {
+        const np = newPath + p.slice(oldPath.length);
+        fdOs.delete(p);
+        fdOs.put({ path: np, createdAt: new Date().toISOString() });
+      }
+    });
+    // Rewrite file records
+    allFiles.forEach(rec => {
+      if (isUnder(rec.filename, oldPath)) {
+        const nn = newPath + rec.filename.slice(oldPath.length);
+        fsOs.delete(rec.filename);
+        fsOs.put({
+          filename: nn,
+          content: rec.content,
+          autoSave: !!rec.autoSave,
+          lastModified: new Date().toISOString()
+        });
+      }
+    });
+    tx.oncomplete = () => {
+      // Update in-memory mirrors
+      Object.keys(files).forEach(fn => {
+        if (isUnder(fn, oldPath)) {
+          const nn = newPath + fn.slice(oldPath.length);
+          files[nn] = files[fn];
+          delete files[fn];
+          if (savedFiles.has(fn)) { savedFiles.delete(fn); savedFiles.add(nn); }
+          if (autoSaveFiles.has(fn)) { autoSaveFiles.delete(fn); autoSaveFiles.add(nn); }
+          if (lastSaveContent.hasOwnProperty(fn)) { lastSaveContent[nn] = lastSaveContent[fn]; delete lastSaveContent[fn]; }
+          if (currentFile === fn) currentFile = nn;
+        }
+      });
+      // Update editor-folder scope if it pointed inside
+      const ef = getEditorFolder();
+      if (ef === oldPath || ef.startsWith(oldPath + '/')) {
+        setEditorFolder(newPath + ef.slice(oldPath.length));
+      }
+      // Update current DB-view folder if it was inside the renamed subtree
+      if (dbCurrentFolder === oldPath || dbCurrentFolder.startsWith(oldPath + '/')) {
+        dbCurrentFolder = newPath + dbCurrentFolder.slice(oldPath.length);
+      }
+      updateFileExplorer();
+      loadDBFilesModal();
+      showToast('Renamed folder to "' + newPath + '"');
+    };
+    tx.onerror = () => showToast('Rename failed', 'error');
+  });
+}
+
+/** Rename a single DB file. Accepts a new path (may include a folder prefix)
+ *  so a user can also *move* the file by typing a new path. */
+function renameDBFile(oldName) {
+  if (!oldName) return;
+  const raw = prompt('Rename / move file. New path (folder/name):', oldName);
+  if (raw === null) return;
+  const newName = normalizeFolderPath(String(raw).trim()); // reuse: strips leading/trailing "/"
+  if (!newName || newName === oldName) return;
+  if (files.hasOwnProperty(newName)) { showToast('A file called "' + newName + '" already exists', 'error'); return; }
+  if (!db) { showToast('DB not ready', 'error'); return; }
+  loadFileFromIndexedDB(oldName).then(rec => {
+    // Ensure the destination folder exists as a folder record so it survives in views.
+    const destFolder = fileDir(newName);
+    const chain = destFolder ? createFolderInDB(destFolder) : Promise.resolve();
+    return chain.then(() => new Promise((resolve, reject) => {
+      const tx = db.transaction(['files'], 'readwrite');
+      const os = tx.objectStore('files');
+      os.put({
+        filename: newName, content: rec.content,
+        autoSave: !!rec.autoSave, lastModified: new Date().toISOString()
+      });
+      os.delete(oldName);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    }));
+  }).then(() => {
+    // In-memory mirror
+    if (files.hasOwnProperty(oldName)) { files[newName] = files[oldName]; delete files[oldName]; }
+    if (savedFiles.has(oldName)) { savedFiles.delete(oldName); savedFiles.add(newName); }
+    if (autoSaveFiles.has(oldName)) { autoSaveFiles.delete(oldName); autoSaveFiles.add(newName); }
+    if (lastSaveContent.hasOwnProperty(oldName)) { lastSaveContent[newName] = lastSaveContent[oldName]; delete lastSaveContent[oldName]; }
+    if (currentFile === oldName) currentFile = newName;
+    updateFileExplorer();
+    loadDBFilesModal();
+    showToast('Renamed to "' + newName + '"');
+  }).catch(() => showToast('Rename failed', 'error'));
+}
+
+/** Format a byte size to a short human string. */
+function humanSize(n) {
+  if (n == null || isNaN(n)) return '';
+  if (n < 1024) return n + ' B';
+  if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB';
+  if (n < 1024 * 1024 * 1024) return (n / 1024 / 1024).toFixed(2) + ' MB';
+  return (n / 1024 / 1024 / 1024).toFixed(2) + ' GB';
+}
+function fileExtOf(name) {
+  const b = fileBase(name);
+  const i = b.lastIndexOf('.');
+  return (i > 0 && i < b.length - 1) ? b.slice(i + 1).toLowerCase() : '';
+}
+
+/** Reusable folder-picker dialog. Returns a Promise that resolves to a folder
+ *  path (string) or rejects if the user cancels.
+ *
+ *  UX model:
+ *   - Click a folder row → OPEN (navigate into) it. The current view path is
+ *     also the current destination (shown in the path bar).
+ *   - Ctrl/⌘-click a folder row → pick it as destination WITHOUT navigating.
+ *   - "Confirm" writes to the current view path.
+ *   - The path breadcrumb is fully clickable — hop to any ancestor in one click.
+ *   - The list shows only DIRECT CHILDREN of the current view (a proper file-browser),
+ *     unless a search term is active, in which case results are flattened.
+ */
+function openFolderPicker(opts) {
+  opts = opts || {};
+  return new Promise((resolve, reject) => {
+    const modal = document.getElementById('folder-picker-modal');
+    const listEl = document.getElementById('folder-picker-list');
+    const searchEl = document.getElementById('folder-picker-search');
+    const titleEl = document.getElementById('folder-picker-title');
+    const cardEl = document.getElementById('folder-picker-selection-card');
+    const pathBarEl = document.getElementById('folder-picker-path-bar');
+    const okBtn = document.getElementById('folder-picker-confirm');
+    const cancelBtn = document.getElementById('folder-picker-cancel');
+    const closeBtn = document.getElementById('folder-picker-close');
+    const newBtn = document.getElementById('folder-picker-new-btn');
+
+    titleEl.textContent = opts.title || 'Choose destination folder';
+    okBtn.textContent = opts.confirmLabel || 'Confirm';
+
+    // Current path shown in the browser (also the destination)
+    let currentPath = opts.initial || '';
+    const disabled = new Set(opts.disabledPaths || []);
+    // Cache of {folders: Set<string>, files: Array}
+    let cache = null;
+
+    // ----- Render the rich selection preview card -----
+    (function renderCard() {
+      const info = opts.selectionInfo; // {count, items:[{kind,path,size?}], totalSize?}
+      if (!info || !info.items || info.items.length === 0) {
+        cardEl.style.display = 'none';
+        return;
+      }
+      cardEl.style.display = 'flex';
+      cardEl.classList.remove('multi', 'folder');
+      if (info.count > 1) {
+        cardEl.classList.add('multi');
+        cardEl.innerHTML = `
+          <div class="fp-sc-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 7h-8l-2-2H4a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+              <path d="M8 13h8M8 17h5"/>
+            </svg>
+          </div>
+          <div class="fp-sc-body">
+            <div class="fp-sc-name">${info.count} items</div>
+            <div class="fp-sc-meta">
+              <span class="fp-sc-chip">${info.count} selected</span>
+              ${info.totalSize ? `<span>Total ${humanSize(info.totalSize)}</span>` : ''}
+            </div>
+          </div>`;
+      } else {
+        const it = info.items[0];
+        const isFolder = it.kind === 'folder';
+        if (isFolder) cardEl.classList.add('folder');
+        const icon = isFolder
+          ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>'
+          : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
+        const name = fileBase(it.path) || it.path;
+        const parent = fileDir(it.path);
+        const ext = !isFolder ? fileExtOf(it.path) : '';
+        const meta = [];
+        meta.push(`<span class="fp-sc-chip">${isFolder ? 'Folder' : (ext || 'File')}</span>`);
+        if (!isFolder && it.size != null) meta.push(`<span>${humanSize(it.size)}</span>`);
+        if (parent) meta.push(`<span title="${parent}" style="overflow:hidden;text-overflow:ellipsis;">in ${parent}</span>`);
+        cardEl.innerHTML = `
+          <div class="fp-sc-icon">${icon}</div>
+          <div class="fp-sc-body">
+            <div class="fp-sc-name" title="${name}">${name}</div>
+            <div class="fp-sc-meta">${meta.join('')}</div>
+          </div>`;
+      }
+    })();
+
+    // ----- Path breadcrumb (destination path) -----
+    function renderPathBar() {
+      pathBarEl.innerHTML = '';
+      const rootCrumb = document.createElement('span');
+      rootCrumb.className = 'fp-crumb' + (currentPath === '' ? ' active' : '');
+      rootCrumb.textContent = 'root';
+      if (currentPath !== '') rootCrumb.addEventListener('click', () => navigateTo(''));
+      pathBarEl.appendChild(rootCrumb);
+      if (currentPath) {
+        const parts = currentPath.split('/');
+        let acc = '';
+        parts.forEach((p, i) => {
+          const sep = document.createElement('span'); sep.className = 'fp-sep'; sep.textContent = '/';
+          pathBarEl.appendChild(sep);
+          acc = i === 0 ? p : acc + '/' + p;
+          const localAcc = acc;
+          const crumb = document.createElement('span');
+          crumb.className = 'fp-crumb' + (i === parts.length - 1 ? ' active' : '');
+          crumb.textContent = p;
+          if (i !== parts.length - 1) crumb.addEventListener('click', () => navigateTo(localAcc));
+          pathBarEl.appendChild(crumb);
+        });
+      }
+      // Reflect confirmability
+      okBtn.disabled = disabled.has(currentPath);
+    }
+
+    function navigateTo(p) {
+      currentPath = p || '';
+      renderPathBar();
+      renderList();
+    }
+
+    // ----- Load folders + files once per open -----
+    function loadCache() {
+      return Promise.all([
+        getAllFoldersFromDB(),
+        new Promise(res => {
+          const tx = db.transaction(['files'], 'readonly');
+          const r = tx.objectStore('files').getAll();
+          r.onsuccess = () => res(r.result || []); r.onerror = () => res([]);
+        })
+      ]).then(([folders, allFiles]) => {
+        const set = new Set(folders);
+        // Derive implicit folders from file paths too
+        allFiles.forEach(f => {
+          const d = fileDir(f.filename);
+          if (d) {
+            const parts = d.split('/'); let acc = '';
+            for (let i = 0; i < parts.length; i++) {
+              acc = i === 0 ? parts[0] : acc + '/' + parts[i];
+              set.add(acc);
+            }
+          }
+        });
+        cache = { folders: set, files: allFiles };
+      });
+    }
+
+    // ----- Direct children of the current path -----
+    function directChildren(parent) {
+      const kids = new Set();
+      const prefix = parent === '' ? '' : parent + '/';
+      cache.folders.forEach(f => {
+        if (parent === '') {
+          if (!f.includes('/')) kids.add(f);
+        } else if (f.startsWith(prefix)) {
+          const rest = f.slice(prefix.length);
+          if (rest && !rest.includes('/')) kids.add(f);
+        }
+      });
+      return Array.from(kids).sort((a, b) => a.localeCompare(b));
+    }
+
+    // ----- Render folder list -----
+    function renderList() {
+      if (!cache) { loadCache().then(renderList); return; }
+      const term = (searchEl.value || '').toLowerCase().trim();
+      listEl.innerHTML = '';
+
+      let rows;
+      let flatMode = !!term;
+      if (flatMode) {
+        // Flat search across all folders
+        rows = [''].concat(Array.from(cache.folders).sort((a, b) => a.localeCompare(b)))
+          .filter(p => (p === '' ? 'root' : p).toLowerCase().includes(term));
+      } else {
+        rows = directChildren(currentPath);
+      }
+
+      if (rows.length === 0) {
+        const empty = document.createElement('li');
+        empty.className = 'empty';
+        empty.textContent = flatMode ? 'No folders match your search' : 'This folder has no sub-folders — click Confirm to put items here';
+        listEl.appendChild(empty);
+        return;
+      }
+
+      // Count children for the little chip
+      const childCount = (p) => {
+        let n = 0;
+        const prefix = p === '' ? '' : p + '/';
+        cache.folders.forEach(f => {
+          if (p === '' ? !f.includes('/') : (f.startsWith(prefix) && !f.slice(prefix.length).includes('/') && f !== p)) n++;
+        });
+        return n;
+      };
+
+      rows.forEach(p => {
+        const li = document.createElement('li');
+        const isDisabled = disabled.has(p);
+        if (p === currentPath && !flatMode) li.classList.add('current-dest');
+        if (isDisabled) li.classList.add('disabled');
+        const label = p === '' ? 'root' : (flatMode ? p : fileBase(p));
+        const kids = childCount(p);
+        li.innerHTML = `
+          <svg class="fp-folder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          <span class="fp-path"></span>
+          ${kids > 0 ? `<span class="fp-count">${kids}</span>` : ''}
+          ${isDisabled ? '<span class="fp-badge">not allowed</span>' : `
+            <span class="fp-open" title="Open folder">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>`}
+        `;
+        li.querySelector('.fp-path').textContent = label;
+        if (!isDisabled) {
+          li.addEventListener('click', (e) => {
+            // Ctrl/⌘-click: pick as destination WITHOUT navigating into it
+            if (e.ctrlKey || e.metaKey) { navigateTo(p); return; }
+            // Regular click: open (navigate into) the folder
+            navigateTo(p);
+            // Clear active search when the user navigates via the tree
+            if (searchEl.value) { searchEl.value = ''; renderList(); }
+          });
+        }
+        listEl.appendChild(li);
+      });
+    }
+
+    // ----- Wire up controls -----
+    const onSearchInput = () => renderList();
+    searchEl.addEventListener('input', onSearchInput);
+
+    function cleanup() {
+      modal.style.display = 'none';
+      searchEl.value = '';
+      searchEl.removeEventListener('input', onSearchInput);
+      okBtn.onclick = null;
+      cancelBtn.onclick = null;
+      closeBtn.onclick = null;
+      newBtn.onclick = null;
+      cache = null;
+    }
+
+    okBtn.onclick = () => {
+      if (disabled.has(currentPath)) return;
+      cleanup();
+      resolve(currentPath);
+    };
+    const doCancel = () => { cleanup(); reject(new Error('cancelled')); };
+    cancelBtn.onclick = doCancel;
+    closeBtn.onclick = doCancel;
+    newBtn.onclick = () => {
+      const raw = prompt('New folder name (created inside "' + (currentPath || 'root') + '"):');
+      if (!raw || !raw.trim()) return;
+      // Sanitize: strip slashes from the input; place under currentPath
+      const clean = raw.trim().replace(/^\/+|\/+$/g, '').replace(/[\\]/g, '/');
+      if (!clean) return;
+      const rel = normalizeFolderPath(currentPath ? currentPath + '/' + clean : clean);
+      if (!rel) return;
+      createFolderInDB(rel).then(() => {
+        cache = null;
+        // Navigate into the new folder so it becomes the destination
+        navigateTo(rel);
+        showToast('Folder created: ' + rel);
+      });
+    };
+
+    // Open modal
+    modal.style.display = 'flex';
+    renderPathBar();
+    loadCache().then(() => {
+      renderList();
+      searchEl.focus();
+    });
+  });
+}
+
+/** Copy or move the current selection to a destination folder. */
+function copyOrMoveSelection(mode /* 'copy' | 'move' */) {
+  if (dbSelectedFiles.size === 0) { showToast('Nothing selected', 'warning'); return; }
+  if (!db) { showToast('DB not ready', 'error'); return; }
+
+  const entries = Array.from(dbSelectedFiles).map(k => {
+    const [kind, ...rest] = k.split(':');
+    return { kind, path: rest.join(':') };
+  });
+
+  // For MOVE, disallow moving a folder into itself or its own descendants.
+  const disabled = new Set();
+  if (mode === 'move') {
+    entries.forEach(e => {
+      if (e.kind === 'folder') disabled.add(e.path);
+    });
+  }
+
+  // Compute rich selection info (file sizes come from the current file records
+  // already loaded in memory). This drives the selection preview card.
+  const buildSelectionInfo = () => new Promise(res => {
+    const tx = db.transaction(['files'], 'readonly');
+    const r = tx.objectStore('files').getAll();
+    r.onsuccess = () => {
+      const all = r.result || [];
+      const items = [];
+      let totalSize = 0;
+      entries.forEach(e => {
+        if (e.kind === 'file') {
+          const rec = all.find(x => x.filename === e.path);
+          const size = rec ? new Blob([rec.content || '']).size : 0;
+          totalSize += size;
+          items.push({ kind: 'file', path: e.path, size });
+        } else {
+          // Folder — sum contents
+          let folderSize = 0;
+          all.forEach(rec => {
+            if (isUnder(rec.filename, e.path)) folderSize += new Blob([rec.content || '']).size;
+          });
+          totalSize += folderSize;
+          items.push({ kind: 'folder', path: e.path, size: folderSize });
+        }
+      });
+      res({ count: entries.length, items, totalSize });
+    };
+    r.onerror = () => res({ count: entries.length, items: entries.map(e => ({ kind: e.kind, path: e.path })), totalSize: 0 });
+  });
+
+  buildSelectionInfo().then(selectionInfo => openFolderPicker({
+    title: (mode === 'copy' ? 'Copy to…' : 'Move to…'),
+    confirmLabel: (mode === 'copy' ? 'Copy here' : 'Move here'),
+    disabledPaths: Array.from(disabled),
+    initial: dbCurrentFolder || '',
+    selectionInfo: selectionInfo
+  })).then(dest => {
+    dest = normalizeFolderPath(dest || '');
+    // Extra guard: refuse to move a folder into its own subtree
+    if (mode === 'move') {
+      const bad = entries.some(e => e.kind === 'folder' && (dest === e.path || dest.startsWith(e.path + '/')));
+      if (bad) { showToast('Cannot move a folder into itself', 'error'); return; }
+    }
+
+    // Gather all files under selection
+    const tx = db.transaction(['files'], 'readonly');
+    const req = tx.objectStore('files').getAll();
+    req.onsuccess = () => {
+      const all = req.result || [];
+      const ops = []; // list of {oldName, newName, content, autoSave}
+      const foldersToEnsure = new Set();
+      if (dest) foldersToEnsure.add(dest);
+      entries.forEach(e => {
+        if (e.kind === 'file') {
+          const rec = all.find(x => x.filename === e.path);
+          if (!rec) return;
+          const base = fileBase(rec.filename);
+          const newName = dest ? dest + '/' + base : base;
+          ops.push({ oldName: rec.filename, newName, content: rec.content, autoSave: !!rec.autoSave });
+        } else if (e.kind === 'folder') {
+          const folderBase = fileBase(e.path);
+          const newRoot = dest ? dest + '/' + folderBase : folderBase;
+          if (mode === 'move' && (newRoot === e.path)) return; // no-op
+          foldersToEnsure.add(newRoot);
+          all.forEach(rec => {
+            if (isUnder(rec.filename, e.path)) {
+              const rel = rec.filename.slice(e.path.length + 1);
+              const newName = rel ? newRoot + '/' + rel : newRoot;
+              ops.push({ oldName: rec.filename, newName, content: rec.content, autoSave: !!rec.autoSave });
+              const nd = fileDir(newName); if (nd) foldersToEnsure.add(nd);
+            }
+          });
+        }
+      });
+
+      if (ops.length === 0 && foldersToEnsure.size === 0) { showToast('Nothing to ' + mode, 'warning'); return; }
+
+      // Detect collisions
+      const collisions = ops.filter(o => o.oldName !== o.newName && all.some(x => x.filename === o.newName));
+      if (collisions.length > 0) {
+        if (!confirm(collisions.length + ' file(s) already exist at the destination and will be overwritten. Continue?')) return;
+      }
+
+      // Perform: first ensure folders, then a single readwrite tx for files.
+      const foldersChain = Array.from(foldersToEnsure).reduce(
+        (p, f) => p.then(() => createFolderInDB(f)), Promise.resolve()
+      );
+      foldersChain.then(() => {
+        const tx2 = db.transaction(['files'], 'readwrite');
+        const os = tx2.objectStore('files');
+        ops.forEach(op => {
+          os.put({
+            filename: op.newName, content: op.content,
+            autoSave: op.autoSave, lastModified: new Date().toISOString()
+          });
+          if (mode === 'move' && op.oldName !== op.newName) os.delete(op.oldName);
+        });
+        tx2.oncomplete = () => {
+          // In-memory mirror
+          ops.forEach(op => {
+            const content = op.content;
+            if (mode === 'move') {
+              if (files.hasOwnProperty(op.oldName)) delete files[op.oldName];
+              savedFiles.delete(op.oldName);
+              autoSaveFiles.delete(op.oldName);
+              delete lastSaveContent[op.oldName];
+              if (currentFile === op.oldName) currentFile = op.newName;
+            }
+            files[op.newName] = content;
+            savedFiles.add(op.newName);
+            if (op.autoSave) autoSaveFiles.add(op.newName);
+            lastSaveContent[op.newName] = content;
+          });
+          dbSelectedFiles.clear();
+          updateFileExplorer();
+          loadDBFilesModal();
+          showToast((mode === 'copy' ? 'Copied ' : 'Moved ') + ops.length + ' file(s) to "' + (dest || 'root') + '"');
+        };
+        tx2.onerror = () => showToast(mode + ' failed', 'error');
+      });
+    };
+    req.onerror = () => showToast('DB read failed', 'error');
+  }).catch(() => {});
+}
+
+/** Upload one or more OS files directly into the currently viewed DB folder. */
+function uploadFilesToCurrentDBFolder(fileList) {
+  if (!fileList || !fileList.length) return;
+  const dest = dbCurrentFolder || '';
+  const arr = Array.from(fileList);
+  const chain = dest ? createFolderInDB(dest) : Promise.resolve();
+  chain.then(() => Promise.all(arr.map(f => new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const name = dest ? dest + '/' + f.name : f.name;
+      if (files.hasOwnProperty(name)) {
+        if (!confirm('"' + name + '" already exists. Overwrite?')) return resolve();
+      }
+      const content = String(ev.target.result || '');
+      files[name] = content;
+      saveFileToIndexedDB(name, content).then(() => {
+        savedFiles.add(name);
+        lastSaveContent[name] = content;
+        resolve();
+      }).catch(() => resolve());
+    };
+    reader.onerror = () => resolve();
+    reader.readAsText(f);
+  })))).then(() => {
+    updateFileExplorer();
+    loadDBFilesModal();
+    showToast('Uploaded ' + arr.length + ' file(s) into "' + (dest || 'root') + '"');
+  });
+}
+
+/* Toolbar wiring for the new buttons */
+(function() {
+  const upBtn  = document.getElementById('db-upload-here-btn');
+  const upInp  = document.getElementById('db-upload-input');
+  const cpBtn  = document.getElementById('db-copy-selected-btn');
+  const mvBtn  = document.getElementById('db-move-selected-btn');
+  if (upBtn && upInp) {
+    upBtn.addEventListener('click', () => upInp.click());
+    upInp.addEventListener('change', (e) => {
+      uploadFilesToCurrentDBFolder(e.target.files);
+      e.target.value = '';
+    });
+  }
+  if (cpBtn) cpBtn.addEventListener('click', () => copyOrMoveSelection('copy'));
+  if (mvBtn) mvBtn.addEventListener('click', () => copyOrMoveSelection('move'));
+})();
+
 document.getElementById('db-select-all-btn').addEventListener('click', () => {
-  const allLi = document.querySelectorAll('#db-file-list li[data-filename]');
+  const allLi = document.querySelectorAll('#db-file-list li[data-key]');
   if (dbSelectedFiles.size === allLi.length && allLi.length > 0) {
     dbSelectedFiles.clear();
   } else {
-    allLi.forEach(li => dbSelectedFiles.add(li.dataset.filename));
+    allLi.forEach(li => dbSelectedFiles.add(li.dataset.key));
   }
   updateDBSelectionInfo();
 });
 
 document.getElementById('delete-all-db-btn').addEventListener('click', () => {
   if (dbSelectedFiles.size > 0) {
-    if (!confirm(`Delete ${dbSelectedFiles.size} selected file(s)?`)) return;
+    if (!confirm(`Delete ${dbSelectedFiles.size} selected item(s)?\nFolders will delete everything inside them.`)) return;
     const n = dbSelectedFiles.size;
-    const promises = Array.from(dbSelectedFiles).map(name => removeFileFromIndexedDB(name));
+    const promises = [];
+    dbSelectedFiles.forEach(k => {
+      const [kind, ...rest] = k.split(':');
+      const path = rest.join(':');
+      if (kind === 'file') promises.push(removeFileFromIndexedDB(path));
+      else if (kind === 'folder') promises.push(deleteFolderFromDB(path));
+    });
     Promise.all(promises).then(() => {
-      showToast(`Deleted ${n} file(s)`);
+      showToast(`Deleted ${n} item(s)`);
       loadDBFilesModal();
-    }).catch(() => showToast("Some files failed to delete", "error"));
+    }).catch(() => showToast("Some items failed to delete", "error"));
   } else {
-    if (!confirm("Delete ALL files from DB?\nThis cannot be undone.")) return;
-    const tx = db.transaction(['files'], 'readwrite');
-    tx.objectStore('files').clear().onsuccess = () => {
+    if (!confirm("Delete ALL files & folders from DB?\nThis cannot be undone.")) return;
+    const tx = db.transaction(['files', 'folders'], 'readwrite');
+    tx.objectStore('files').clear();
+    tx.objectStore('folders').clear();
+    tx.oncomplete = () => {
       savedFiles.clear();
       autoSaveFiles.clear();
       updateFileExplorer();
       loadDBFilesModal();
-      showToast("All DB files deleted");
+      showToast("All DB entries deleted");
     };
   }
+});
+
+document.getElementById('db-download-selected-btn').addEventListener('click', downloadSelectedAsZip);
+
+document.getElementById('db-new-folder-btn').addEventListener('click', () => {
+  const raw = prompt('Enter new folder name (or a sub-path like "src/lib"):');
+  if (!raw || !raw.trim()) return;
+  const rel = normalizeFolderPath(raw.trim());
+  if (!rel) return;
+  const full = dbCurrentFolder ? dbCurrentFolder + '/' + rel : rel;
+  createFolderInDB(full)
+    .then(() => { showToast('Folder created: ' + full); loadDBFilesModal(); })
+    .catch(() => showToast('Failed to create folder', 'error'));
+});
+
+document.getElementById('db-nav-back').addEventListener('click', () => {
+  if (dbNavHistory.index <= 0) return;
+  dbNavHistory.index--;
+  dbCurrentFolder = dbNavHistory.stack[dbNavHistory.index];
+  loadDBFilesModal();
+});
+document.getElementById('db-nav-forward').addEventListener('click', () => {
+  if (dbNavHistory.index >= dbNavHistory.stack.length - 1) return;
+  dbNavHistory.index++;
+  dbCurrentFolder = dbNavHistory.stack[dbNavHistory.index];
+  loadDBFilesModal();
+});
+document.getElementById('db-nav-up').addEventListener('click', () => {
+  if (!dbCurrentFolder) return;
+  dbNavigateTo(parentPath(dbCurrentFolder));
+});
+
+document.getElementById('db-set-editor-folder-btn').addEventListener('click', () => {
+  setEditorFolder(dbCurrentFolder);
+  showToast('Editor folder set to "' + (dbCurrentFolder || 'root') + '"');
+  loadDBFilesModal();
 });
 
 function loadAndOpenDBFile(filename) {
@@ -2824,7 +4763,9 @@ function loadAndOpenDBFile(filename) {
     if (f.autoSave) autoSaveFiles.add(filename);
     lastSaveContent[filename] = f.content;
     updateFileExplorer();
-    openFile(filename);
+    // FIX (tab bug): loading a file from the DB modal should pin a tab so the user
+    // can see it appear in the tab strip without needing to enable the global setting.
+    openFile(filename, { openInTab: true });
     showToast("Opened " + filename);
   }).catch(() => showToast("Failed to load file", "error"));
 }
@@ -2838,11 +4779,9 @@ function downloadDBFile(filename, content) {
   URL.revokeObjectURL(url); a.remove();
 }
 
-document.getElementById('db-search-input').addEventListener('input', (e) => {
-  const term = e.target.value.toLowerCase();
-  document.querySelectorAll('#db-file-list li[data-filename]').forEach(item => {
-    item.style.display = item.dataset.filename.toLowerCase().includes(term) ? 'flex' : 'none';
-  });
+document.getElementById('db-search-input').addEventListener('input', () => {
+  // Re-render to include folders + files filtered by name
+  loadDBFilesModal();
 });
 
 /* =============================================================
@@ -2866,7 +4805,10 @@ topSearchInput.addEventListener('input', (e) => {
   const term = e.target.value.toLowerCase();
   searchResults.innerHTML = '';
   if (!term) { searchResults.style.display = 'none'; return; }
+  const folder = (typeof getEditorFolder === 'function') ? getEditorFolder() : '';
   Object.keys(files).forEach(f => {
+    // Restrict search to files under the current editor folder.
+    if (!isUnder(f, folder)) return;
     if (f.toLowerCase().includes(term)) {
       const li = document.createElement('li');
       li.textContent = f;
@@ -3054,11 +4996,34 @@ document.getElementById("reload-preview-btn").onclick = () => {
   const f = document.getElementById('code-preview');
   try { f.contentWindow.location.reload(); } catch (e) { f.srcdoc = files[currentFile]; }
 };
-function closePreviewModal() {
-  const iframe = document.getElementById('code-preview');
+document.getElementById("open-in-newtab-btn").onclick = () => {
   try {
-    iframe.contentDocument.querySelectorAll('audio, video').forEach(el => { if (el.pause) el.pause(); if (el.src) el.src = ''; });
-  } catch (e) {}
+    const iframe = document.getElementById('code-preview');
+    const content = (iframe && iframe.srcdoc) ? iframe.srcdoc : (files[currentFile] || '');
+    const blob = new Blob([content], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const w = window.open(url, '_blank');
+    if (!w) showToast('Popup blocked. Allow popups to open in a new tab.', 'error');
+    else showToast('Opened preview in new tab');
+  } catch(e) { showToast('Failed to open in new tab', 'error'); }
+};
+function closePreviewModal() {
+  // If we're in 'bg' mode, hand off to a headless iframe so the code keeps
+  // running in the background with a Stop button, instead of tearing it down.
+  let handedOff = false;
+  try {
+    if (typeof window.__handoffPreviewToBackground === 'function') {
+      handedOff = window.__handoffPreviewToBackground();
+    }
+  } catch(e){}
+
+  const iframe = document.getElementById('code-preview');
+  if (!handedOff) {
+    try {
+      iframe.contentDocument.querySelectorAll('audio, video').forEach(el => { if (el.pause) el.pause(); if (el.src) el.src = ''; });
+    } catch (e) {}
+  }
+  // Detach modal iframe either way (background copy lives in headlessFrame).
   iframe.srcdoc = '';
   iframe.src = 'about:blank';
   const parent = iframe.parentNode;
@@ -3073,6 +5038,12 @@ window.onclick = function(e) {
   if (e.target === document.getElementById("preview-modal")) closePreviewModal();
   if (e.target === document.getElementById("db-files-modal")) document.getElementById("db-files-modal").style.display = "none";
   if (e.target === document.getElementById("settings-modal")) document.getElementById("settings-modal").style.display = "none";
+  // Also dismiss the folder-picker on outside-click (it uses .modal so backdrop clicks land here)
+  const fpm = document.getElementById("folder-picker-modal");
+  if (fpm && e.target === fpm) {
+    const cancel = document.getElementById("folder-picker-cancel");
+    if (cancel) cancel.click();
+  }
 };
 
 /* =============================================================
@@ -3619,6 +5590,13 @@ document.addEventListener('click', (e) => {
 ============================================================= */
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
+    // If the folder picker is open, close it via its Cancel path first so its
+    // promise properly rejects — don't leak a pending promise or dangling handlers.
+    const fpm = document.getElementById("folder-picker-modal");
+    if (fpm && fpm.style.display === 'flex') {
+      const cancel = document.getElementById("folder-picker-cancel");
+      if (cancel) { cancel.click(); return; }
+    }
     if (document.getElementById("preview-modal").style.display === "block") closePreviewModal();
     document.getElementById("db-files-modal").style.display = "none";
     document.getElementById("settings-modal").style.display = "none";
@@ -4431,7 +6409,740 @@ window.closeColorPicker = function() {
 setTimeout(initColorPickerListeners, 200);
 setTimeout(() => document.querySelectorAll('.draggable-window').forEach(makeDraggable), 300);
 
+/* ==========================================================================
+   ============  NEW FEATURES: TABS · PREVIEW MODES · VIRTUAL LINKING ·
+                  PERMISSIONS · HYBRID IDB EVICTION · SEARCH TOGGLE
+   ========================================================================== */
+(function initIDEEnhancements(){
+  // ---- Persistent state ----------------------------------------------------
+  const openTabs = [];              // ordered list of filenames
+  const tabState = new Map();       // filename -> { cursor:{row,column}, scrollTop, dirty }
+  const sessionPerms = { write: null, upload: null }; // 'ask'|'temp'|'db'|'reject'
+  let currentPreviewMode = null;    // null | 'preview' | 'bg' | 'headless'
+  let bgPreviewWin = null;          // window handle for background/headless
+  let headlessFrame = null;         // hidden iframe for headless
+
+  // Expose for other code that may want them
+  window.__IDE = { openTabs, tabState, sessionPerms };
+
+  // ---- Setting getters ------------------------------------------------------
+  function getSet(key, fallback) {
+    try {
+      const v = localStorage.getItem('setting_' + key);
+      if (v !== null) return JSON.parse(v);
+    } catch (e) {}
+    const el = document.getElementById(key);
+    if (el) {
+      if (el.type === 'checkbox') return el.checked;
+      return el.value;
+    }
+    return fallback;
+  }
+  function persistSet(key, val) {
+    try { localStorage.setItem('setting_' + key, JSON.stringify(val)); } catch(e) {}
+    if (typeof saveSetting === 'function') { try { saveSetting(key, val); } catch(e){} }
+  }
+
+  // ---- Permission Modal -----------------------------------------------------
+  function askPermission({ title, message, kind }) {
+    return new Promise(resolve => {
+      const mode = getSet('write-permission-mode', 'ask');
+      if (mode === 'always' && kind === 'write') { resolve('db'); return; }
+      if (sessionPerms[kind] && sessionPerms[kind] !== 'ask') { resolve(sessionPerms[kind]); return; }
+
+      const modal = document.getElementById('permission-modal');
+      document.getElementById('perm-title').textContent = title || 'Permission required';
+      document.getElementById('perm-message').textContent = message || '';
+      document.getElementById('perm-remember').checked = false;
+      modal.classList.add('open');
+
+      function close(choice) {
+        modal.classList.remove('open');
+        if (document.getElementById('perm-remember').checked) sessionPerms[kind] = choice;
+        cleanup();
+        resolve(choice);
+      }
+      function onDb()     { close('db'); }
+      function onTemp()   { close('temp'); }
+      function onReject() { close('reject'); }
+      function cleanup() {
+        document.getElementById('perm-db').removeEventListener('click', onDb);
+        document.getElementById('perm-temp').removeEventListener('click', onTemp);
+        document.getElementById('perm-reject').removeEventListener('click', onReject);
+      }
+      document.getElementById('perm-db').addEventListener('click', onDb);
+      document.getElementById('perm-temp').addEventListener('click', onTemp);
+      document.getElementById('perm-reject').addEventListener('click', onReject);
+    });
+  }
+  window.askPermission = askPermission;
+
+  // ---- Tabs Manager ---------------------------------------------------------
+  const tabsBar = document.getElementById('tabs-bar');
+  const tabsDropdown = document.getElementById('tabs-dropdown');
+  const tabsToggleBtn = document.getElementById('tabs-toggle-btn');
+  const tabsCountBadge = document.getElementById('tabs-count-badge');
+  const topBarEl = document.getElementById('top-bar');
+
+  function currentTabViewMode() {
+    // On mobile always use dropdown
+    if (window.matchMedia('(max-width: 768px)').matches) return 'dropdown';
+    return getSet('tab-view-mode', 'classic');
+  }
+
+  function saveTabState() {
+    if (!currentFile) return;
+    try {
+      const st = tabState.get(currentFile) || {};
+      st.cursor = editor.getCursorPosition();
+      st.scrollTop = editor.session.getScrollTop();
+      tabState.set(currentFile, st);
+    } catch(e) {}
+  }
+  function restoreTabState(filename) {
+    const st = tabState.get(filename);
+    if (!st) return;
+    try {
+      if (st.cursor) editor.moveCursorToPosition(st.cursor);
+      if (typeof st.scrollTop === 'number') editor.session.setScrollTop(st.scrollTop);
+      editor.clearSelection();
+    } catch(e) {}
+  }
+
+  function addTab(filename, activate) {
+    if (!openTabs.includes(filename)) openTabs.push(filename);
+    if (activate !== false) activateTab(filename);
+    renderTabs();
+  }
+  function closeTab(filename) {
+    const idx = openTabs.indexOf(filename);
+    if (idx === -1) return;
+    openTabs.splice(idx, 1);
+    tabState.delete(filename);
+    // Hybrid IDB eviction: if file is auto-saved / in DB, drop in-memory copy
+    try {
+      if (typeof savedFiles !== 'undefined' && savedFiles.has && savedFiles.has(filename) &&
+          typeof files !== 'undefined' && files.hasOwnProperty(filename)) {
+        // Persist latest to memory-detached: keep files[filename] since existing code
+        // relies on it; but mark it "cold" so preview code path can lazy-reload if needed.
+        // We only truly evict when file is NOT currentFile.
+        if (currentFile !== filename) {
+          // leave content in files map for now to avoid breaking existing code paths,
+          // but mark as evictable
+          if (window.__IDE) {
+            window.__IDE.coldFiles = window.__IDE.coldFiles || new Set();
+            window.__IDE.coldFiles.add(filename);
+          }
+        }
+      }
+    } catch(e) {}
+    if (currentFile === filename) {
+      const next = openTabs[Math.min(idx, openTabs.length - 1)];
+      if (next) { try { openFile(next); } catch(e){} }
+      else {
+        currentFile = null;
+        try { editor.setValue(''); updateSaveButtons(); } catch(e){}
+      }
+    }
+    renderTabs();
+  }
+  function activateTab(filename) {
+    if (!openTabs.includes(filename)) openTabs.push(filename);
+    renderTabs();
+  }
+
+  function renderTabs() {
+    // Update inline count number in the tabs-toggle button
+    const count = openTabs.length;
+    if (tabsCountBadge) tabsCountBadge.textContent = count;
+
+    const mode = currentTabViewMode();
+    if (mode === 'classic') {
+      topBarEl.classList.add('tabs-visible');
+    } else {
+      topBarEl.classList.remove('tabs-visible');
+    }
+
+    // Desktop tab strip
+    tabsBar.innerHTML = '';
+    openTabs.forEach(name => {
+      const el = document.createElement('div');
+      el.className = 'tab-item' + (name === currentFile ? ' active' : '');
+      el.title = name;
+      el.innerHTML = `<span class="tab-title">${escapeHtml(name)}</span><button class="tab-close" title="Close">×</button>`;
+      el.addEventListener('click', (e) => {
+        if (e.target.closest('.tab-close')) return;
+        try { openFile(name, { openInTab: true }); } catch(err){}
+      });
+      el.querySelector('.tab-close').addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeTab(name);
+      });
+      tabsBar.appendChild(el);
+    });
+
+    // Mobile / dropdown list
+    tabsDropdown.innerHTML = '';
+    if (openTabs.length === 0) {
+      const d = document.createElement('div');
+      d.className = 'tabs-dd-empty';
+      d.textContent = 'No open tabs';
+      tabsDropdown.appendChild(d);
+    } else {
+      openTabs.forEach(name => {
+        const it = document.createElement('div');
+        it.className = 'tabs-dd-item' + (name === currentFile ? ' active' : '');
+        it.innerHTML = `<span class="tab-title">${escapeHtml(name)}</span><button class="tab-close" title="Close">×</button>`;
+        it.addEventListener('click', (e) => {
+          if (e.target.closest('.tab-close')) return;
+          try { openFile(name, { openInTab: true }); } catch(err){}
+          tabsDropdown.classList.remove('open');
+        });
+        it.querySelector('.tab-close').addEventListener('click', (e) => {
+          e.stopPropagation();
+          closeTab(name);
+        });
+        tabsDropdown.appendChild(it);
+      });
+    }
+  }
+  function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  function positionTabsDropdown() {
+    const btn = tabsToggleBtn;
+    if (!btn) return;
+    const r = btn.getBoundingClientRect();
+    const vw = window.innerWidth;
+    // Prefer right-aligning under the button
+    const desiredW = Math.min(320, vw - 16);
+    let left = Math.min(vw - desiredW - 8, Math.max(8, r.right - desiredW));
+    tabsDropdown.style.top  = (r.bottom + 4) + 'px';
+    tabsDropdown.style.left = left + 'px';
+    tabsDropdown.style.minWidth = Math.min(260, vw - 16) + 'px';
+  }
+  tabsToggleBtn.addEventListener('click', () => {
+    positionTabsDropdown();
+    tabsDropdown.classList.toggle('open');
+  });
+  window.addEventListener('scroll', () => tabsDropdown.classList.remove('open'), true);
+  document.addEventListener('click', (e) => {
+    if (!tabsDropdown.contains(e.target) && !tabsToggleBtn.contains(e.target)) {
+      tabsDropdown.classList.remove('open');
+    }
+  });
+  window.addEventListener('resize', () => renderTabs());
+
+  // ---- Hook openFile / saveCurrentFile / delete for tabs -------------------
+  const _origOpenFile = window.openFile;
+  window.openFile = function(filename, opts) {
+    opts = opts || {};
+    // Save state of outgoing file
+    saveTabState();
+    _origOpenFile.call(this, filename);
+    // Only pin as a tab when the caller explicitly asks OR the setting says so.
+    // Default: single-slot view, no auto-tab creation.
+    const openInTab = opts.openInTab === true
+      || getSet('open-new-file-in-tab', false) === true;
+    if (openInTab) {
+      if (!openTabs.includes(filename)) openTabs.push(filename);
+    }
+    renderTabs();
+    // Restore cursor / scroll
+    setTimeout(() => restoreTabState(filename), 0);
+  };
+  const _origSave = window.saveCurrentFile;
+  if (typeof _origSave === 'function') {
+    window.saveCurrentFile = function() {
+      saveTabState();
+      return _origSave.apply(this, arguments);
+    };
+  }
+
+  // If a file is deleted externally, drop its tab
+  const _origRemove = window.removeFileFromIndexedDB;
+  // (We don't wrap it; deletion path in existing code sets currentFile=null itself;
+  //  we just periodically prune tabs whose files no longer exist.)
+  setInterval(() => {
+    let changed = false;
+    for (let i = openTabs.length - 1; i >= 0; i--) {
+      const n = openTabs[i];
+      if (typeof files !== 'undefined' && !files.hasOwnProperty(n)) {
+        openTabs.splice(i, 1);
+        tabState.delete(n);
+        changed = true;
+      }
+    }
+    if (changed) renderTabs();
+  }, 1500);
+
+  // Initial tab render (in case files were preloaded)
+  setTimeout(() => {
+    if (typeof currentFile !== 'undefined' && currentFile && !openTabs.includes(currentFile)) {
+      openTabs.push(currentFile);
+    }
+    renderTabs();
+  }, 400);
+
+  // ---- Virtual File Linking (rewrite <link>/<script src> to blob URLs) ----
+  function buildVirtualPreviewHTML(entryFile) {
+    const raw = files[entryFile] || '';
+    if (!getSet('virtual-file-linking', true)) return raw;
+    if (!/\.(html?|xhtml|shtml)$/i.test(entryFile)) return raw;
+
+    // We inline referenced files that exist in the virtual project.
+    // - <link rel="stylesheet" href="X"> -> <style>...</style>
+    // - <script src="X"><\/script>        -> <script>...<\/script>
+    // - <img src="X">, url("X") etc. -> replaced with data: URL when text/binary matches
+    const resolve = (href) => {
+      if (!href) return null;
+      if (/^(https?:|data:|blob:|\/\/)/i.test(href)) return null; // external
+      // strip leading ./ and normalize
+      const clean = href.replace(/^\.\//, '').split(/[?#]/)[0];
+      if (files.hasOwnProperty(clean)) return clean;
+      // basename match
+      const base = clean.split('/').pop();
+      if (files.hasOwnProperty(base)) return base;
+      return null;
+    };
+
+    let html = raw;
+
+    // <link rel="stylesheet" href="X"> (any attribute order)
+    html = html.replace(/<link\b([^>]*?)>/gi, (m, attrs) => {
+      const relMatch = attrs.match(/\brel\s*=\s*["']?([^"'\s>]+)/i);
+      if (!relMatch || !/stylesheet/i.test(relMatch[1])) return m;
+      const hrefMatch = attrs.match(/\bhref\s*=\s*["']([^"']+)["']/i);
+      if (!hrefMatch) return m;
+      const target = resolve(hrefMatch[1]);
+      if (!target) return m;
+      return `<style data-virtual-src="${escapeAttr(target)}">\n${files[target]}\n</style>`;
+    });
+
+    // <script src="X"><\/script>
+    html = html.replace(/<script\b([^>]*)\bsrc\s*=\s*["']([^"']+)["']([^>]*)>\s*<\/script>/gi,
+      (m, before, src, after) => {
+        const target = resolve(src);
+        if (!target) return m;
+        const otherAttrs = (before + ' ' + after).replace(/\bsrc\s*=\s*["'][^"']+["']/i, '').trim();
+        return `<script data-virtual-src="${escapeAttr(target)}" ${otherAttrs}>\n${files[target]}\n<\/script>`;
+      }
+    );
+
+    // <img src="X">   →   inline as data URL (text-only heuristic: skip if binary content unknown)
+    html = html.replace(/<img\b([^>]*?)\bsrc\s*=\s*["']([^"']+)["']([^>]*?)>/gi,
+      (m, before, src, after) => {
+        const target = resolve(src);
+        if (!target) return m;
+        // If the file looks like text (svg), inline directly; otherwise leave as-is
+        const c = files[target];
+        if (/^\s*<svg/i.test(c)) {
+          const dataUrl = 'data:image/svg+xml;utf8,' + encodeURIComponent(c);
+          return `<img${before} src="${dataUrl}"${after}>`;
+        }
+        return m;
+      }
+    );
+
+    return html;
+  }
+  function escapeAttr(s) { return String(s).replace(/"/g, '&quot;'); }
+  window.buildVirtualPreviewHTML = buildVirtualPreviewHTML;
+
+  // ---- Preview Modes: dropdown, headless, background, stop ----------------
+  const previewBtn    = document.getElementById('preview-code-btn');
+  const previewCaret  = document.getElementById('preview-caret-btn');
+  const previewDD     = document.getElementById('preview-dropdown');
+  const previewStopDD = document.getElementById('preview-dd-stop');
+
+  function positionPreviewDropdown() {
+    const rect = previewCaret.getBoundingClientRect();
+    const vw = window.innerWidth, vh = window.innerHeight;
+    // measure after briefly showing (invisible) so we know its size
+    previewDD.style.visibility = 'hidden';
+    previewDD.classList.add('open');
+    const dw = previewDD.offsetWidth || 260;
+    const dh = previewDD.offsetHeight || 240;
+    previewDD.classList.remove('open');
+    previewDD.style.visibility = '';
+    let left = Math.min(vw - dw - 8, Math.max(8, rect.right - dw));
+    let top  = rect.bottom + 6;
+    // If it would overflow the bottom, place it ABOVE the button
+    if (top + dh > vh - 8) top = Math.max(8, rect.top - dh - 6);
+    previewDD.style.top  = top + 'px';
+    previewDD.style.left = left + 'px';
+  }
+  window.addEventListener('scroll', () => previewDD.classList.remove('open'), true);
+  window.addEventListener('resize', () => previewDD.classList.remove('open'));
+  previewCaret.addEventListener('click', (e) => {
+    e.stopPropagation();
+    positionPreviewDropdown();
+    previewDD.classList.toggle('open');
+  });
+  document.addEventListener('click', (e) => {
+    if (!previewDD.contains(e.target) && e.target !== previewCaret) previewDD.classList.remove('open');
+  });
+
+  function setRunningUI(running) {
+    if (running) {
+      previewBtn.classList.add('running');
+      previewBtn.textContent = 'Stop';
+      previewStopDD.style.display = '';
+    } else {
+      previewBtn.classList.remove('running');
+      previewBtn.textContent = 'Preview Code';
+      previewStopDD.style.display = 'none';
+      currentPreviewMode = null;
+    }
+  }
+
+  function startPreview(mode) {
+    if (!currentFile) { showToast('No file selected', 'error'); return; }
+    try { saveCurrentFile(); } catch(e){}
+    const content = buildVirtualPreviewHTML(currentFile);
+    if (mode === 'preview' || mode === 'bg') {
+      // Both open the preview modal. 'bg' additionally hands off to a headless
+      // iframe when the user closes the modal, so the code keeps running in the
+      // background with a stop button.
+      const modal = document.getElementById('preview-modal');
+      const iframe = document.getElementById('code-preview');
+      document.getElementById('preview-filename').textContent = currentFile;
+      iframe.srcdoc = content;
+      modal.style.display = 'block';
+      currentPreviewMode = mode;
+      // Show "Open in new tab" convenience button inside the modal header (added below).
+      const bgHint = document.getElementById('preview-bg-hint');
+      if (bgHint) bgHint.style.display = (mode === 'bg') ? '' : 'none';
+      // "preview" mode: nothing runs after close. "bg" mode: shown as running so the
+      // main button turns into Stop while the modal is open too.
+      setRunningUI(mode === 'bg');
+    } else if (mode === 'newtab') {
+      // Open in a real new browser tab (needs user gesture, which we're inside of).
+      try {
+        if (bgPreviewWin && !bgPreviewWin.closed) bgPreviewWin.close();
+      } catch(e){}
+      const blob = new Blob([content], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      bgPreviewWin = window.open(url, '_blank');
+      if (!bgPreviewWin) {
+        showToast('Popup blocked. Allow popups to open in a new tab.', 'error');
+        return;
+      }
+      currentPreviewMode = 'newtab';
+      setRunningUI(true);
+    } else if (mode === 'headless') {
+      stopHeadless();
+      headlessFrame = document.createElement('iframe');
+      headlessFrame.style.cssText = 'position:fixed;width:1px;height:1px;left:-9999px;top:-9999px;border:0;';
+      headlessFrame.sandbox = 'allow-scripts allow-same-origin';
+      headlessFrame.srcdoc = content;
+      document.body.appendChild(headlessFrame);
+      currentPreviewMode = 'headless';
+      setRunningUI(true);
+    }
+  }
+
+  // When the user closes the modal while in 'bg' mode, hand off to headless.
+  window.__handoffPreviewToBackground = function() {
+    if (currentPreviewMode !== 'bg') return false;
+    try {
+      const iframe = document.getElementById('code-preview');
+      const content = iframe && iframe.srcdoc ? iframe.srcdoc : (files[currentFile] || '');
+      stopHeadless();
+      headlessFrame = document.createElement('iframe');
+      headlessFrame.style.cssText = 'position:fixed;width:1px;height:1px;left:-9999px;top:-9999px;border:0;';
+      headlessFrame.sandbox = 'allow-scripts allow-same-origin';
+      headlessFrame.srcdoc = content;
+      document.body.appendChild(headlessFrame);
+      currentPreviewMode = 'headless';
+      setRunningUI(true);
+      showToast('Preview running in background \u2014 press Stop to end');
+      return true;
+    } catch(e) { return false; }
+  };
+  function stopHeadless() {
+    if (headlessFrame && headlessFrame.parentNode) {
+      try { headlessFrame.parentNode.removeChild(headlessFrame); } catch(e){}
+    }
+    headlessFrame = null;
+  }
+  function stopPreview() {
+    stopHeadless();
+    try { if (bgPreviewWin && !bgPreviewWin.closed) bgPreviewWin.close(); } catch(e){}
+    bgPreviewWin = null;
+    setRunningUI(false);
+    showToast('Preview stopped');
+  }
+  window.stopPreview = stopPreview;
+
+  // Rebind main button: if running -> stop, else default to preview modal
+  // (but preserve existing default behavior for the "Preview" mode)
+  const origPreviewClick = previewBtn.onclick;
+  previewBtn.onclick = null;
+  previewBtn.addEventListener('click', (e) => {
+    if (previewBtn.classList.contains('running')) {
+      stopPreview();
+      return;
+    }
+    // If virtual linking rewrote content, re-set srcdoc through our path; otherwise defer
+    // to original handler (which still works).
+    if (getSet('virtual-file-linking', true)) {
+      startPreview('preview');
+    } else if (typeof origPreviewClick === 'function') {
+      origPreviewClick.call(previewBtn, e);
+    } else {
+      startPreview('preview');
+    }
+  });
+
+  previewDD.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-mode]');
+    if (!btn) return;
+    previewDD.classList.remove('open');
+    const mode = btn.dataset.mode;
+    if (mode === 'stop') { stopPreview(); return; }
+    startPreview(mode);
+  });
+
+  // ---- Search-btn toggle behavior (classic desktop) -----------------------
+  const searchBtn  = document.getElementById('search-project-header-btn');
+  const searchBack = document.getElementById('search-back-btn');
+  if (searchBtn && topBarEl) {
+    // Replace listener with toggle
+    const newBtn = searchBtn.cloneNode(true);
+    searchBtn.parentNode.replaceChild(newBtn, searchBtn);
+    newBtn.addEventListener('click', () => {
+      const active = topBarEl.classList.contains('search-active');
+      if (active) {
+        topBarEl.classList.remove('search-active');
+        try { topSearchInput.value = ''; searchResults.innerHTML = ''; searchResults.style.display = 'none'; } catch(e){}
+      } else {
+        topBarEl.classList.add('search-active');
+        try { topSearchInput.focus(); } catch(e){}
+      }
+    });
+  }
+
+  // ---- Permission-gated upload / save-to-DB -------------------------------
+  // Wrap saveFileToIndexedDB to consult permission for the FIRST write per file
+  // (only when not already saved and not auto-save).
+  if (typeof window.saveFileToIndexedDB === 'function') {
+    const _origSaveDB = window.saveFileToIndexedDB;
+    window.saveFileToIndexedDB = async function(filename, content, isAutoSave) {
+      if (isAutoSave) return _origSaveDB.apply(this, arguments);
+      const mode = getSet('write-permission-mode', 'ask');
+      if (mode === 'always') return _origSaveDB.apply(this, arguments);
+      // If already in savedFiles, no prompt needed
+      if (typeof savedFiles !== 'undefined' && savedFiles.has && savedFiles.has(filename)) {
+        return _origSaveDB.apply(this, arguments);
+      }
+      const choice = await askPermission({
+        title: 'Save file to local DB?',
+        message: `The IDE wants to save "${filename}" to IndexedDB in your browser.`,
+        kind: 'write'
+      });
+      if (choice === 'reject') { showToast('Save rejected', 'error'); return Promise.reject('rejected'); }
+      if (choice === 'temp') { showToast('Kept temporary (not saved to DB)'); return Promise.resolve(); }
+      return _origSaveDB.apply(this, arguments);
+    };
+  }
+
+  // Wrap file upload input to ask permission
+  const fileInput = document.getElementById('file-input');
+  if (fileInput) {
+    fileInput.addEventListener('change', async function(e) {
+      // Original onchange handler runs at same time; we can't easily prevent it.
+      // Instead just show a permission toast so user knows their choice matters
+      // for the follow-up save-to-DB.
+      const mode = getSet('write-permission-mode', 'ask');
+      if (mode === 'ask' && this.files && this.files.length) {
+        // no-op; the saveFileToIndexedDB wrapper will ask on save
+      }
+    }, true);
+  }
+
+  // ---- Autosave policy: auto-enable auto-save for new files if 'db' ------
+  const autosavePolicyOnCreate = () => {
+    try {
+      // Default autosave policy is now 'off' — auto-save-to-DB is opt-in.
+      const pol = getSet('autosave-policy', 'off');
+      if (pol !== 'db') return;
+      if (!currentFile) return;
+      if (typeof autoSaveFiles !== 'undefined' && autoSaveFiles.add) {
+        autoSaveFiles.add(currentFile);
+        try { updateSaveButtons(); } catch(e){}
+      }
+    } catch(e) {}
+  };
+  const newFileBtn = document.getElementById('new-file-btn');
+  if (newFileBtn) newFileBtn.addEventListener('click', () => setTimeout(autosavePolicyOnCreate, 100));
+
+  // ---- Tab view mode setting change ---------------------------------------
+  const tvSel = document.getElementById('tab-view-mode');
+  if (tvSel) {
+    tvSel.value = getSet('tab-view-mode', 'classic');
+    tvSel.addEventListener('change', () => {
+      persistSet('tab-view-mode', tvSel.value);
+      renderTabs();
+    });
+  }
+  // ---- "Open new files in tab" toggle -------------------------------------
+  const openNewInTabCb = document.getElementById('open-new-file-in-tab');
+  if (openNewInTabCb) {
+    openNewInTabCb.checked = getSet('open-new-file-in-tab', false) === true;
+    openNewInTabCb.addEventListener('change', () => {
+      persistSet('open-new-file-in-tab', openNewInTabCb.checked);
+    });
+  }
+  // ---- Editor folder selector in settings ---------------------------------
+  const efToggle = document.getElementById('editor-folder-toggle');
+  const efDD     = document.getElementById('editor-folder-dropdown');
+  const efSearch = document.getElementById('editor-folder-search');
+  const efOptsEl = document.getElementById('editor-folder-options');
+  const efCurEl  = document.getElementById('editor-folder-current');
+  function refreshEditorFolderLabel() {
+    if (efCurEl) efCurEl.textContent = (typeof getEditorFolder === 'function' ? getEditorFolder() : '') || 'root';
+  }
+  refreshEditorFolderLabel();
+
+  function renderEditorFolderOptions(filterText) {
+    if (!efOptsEl) return;
+    efOptsEl.innerHTML = '';
+    // Gather all known folders (from DB + implied by in-memory file paths)
+    Promise.resolve(typeof getAllFoldersFromDB === 'function' ? getAllFoldersFromDB() : []).then(dbFolders => {
+      const folderSet = new Set(dbFolders || []);
+      try {
+        Object.keys(files).forEach(fn => {
+          const d = fileDir(fn);
+          if (!d) return;
+          const parts = d.split('/');
+          let acc = '';
+          for (let i = 0; i < parts.length; i++) {
+            acc = i === 0 ? parts[0] : acc + '/' + parts[i];
+            folderSet.add(acc);
+          }
+        });
+      } catch(e){}
+      const all = ['', ...Array.from(folderSet).sort((a,b) => a.localeCompare(b))];
+      const term = (filterText || '').toLowerCase();
+      const filtered = all.filter(p => {
+        const label = p === '' ? 'root' : p;
+        return !term || label.toLowerCase().includes(term);
+      });
+      if (filtered.length === 0) {
+        const e = document.createElement('div');
+        e.className = 'fs-empty';
+        e.textContent = 'No matching folders';
+        efOptsEl.appendChild(e);
+        return;
+      }
+      const cur = (typeof getEditorFolder === 'function' ? getEditorFolder() : '');
+      filtered.forEach(p => {
+        const opt = document.createElement('div');
+        opt.className = 'fs-opt' + (p === cur ? ' selected' : '');
+        opt.innerHTML = (p === '' ? '<strong>root</strong>' : p.replace(/</g, '&lt;'));
+        opt.addEventListener('click', () => {
+          setEditorFolder(p);
+          refreshEditorFolderLabel();
+          efDD.classList.remove('open');
+        });
+        efOptsEl.appendChild(opt);
+      });
+    });
+  }
+  if (efToggle && efDD) {
+    efToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const willOpen = !efDD.classList.contains('open');
+      efDD.classList.toggle('open');
+      if (willOpen) {
+        renderEditorFolderOptions('');
+        if (efSearch) { efSearch.value = ''; setTimeout(() => efSearch.focus(), 0); }
+      }
+    });
+    document.addEventListener('click', (e) => {
+      if (!efDD.contains(e.target) && e.target !== efToggle) efDD.classList.remove('open');
+    });
+    if (efSearch) {
+      efSearch.addEventListener('input', () => renderEditorFolderOptions(efSearch.value));
+    }
+  }
+  const wpSel = document.getElementById('write-permission-mode');
+  if (wpSel) {
+    wpSel.value = getSet('write-permission-mode', 'ask');
+    wpSel.addEventListener('change', () => persistSet('write-permission-mode', wpSel.value));
+  }
+  const apSel = document.getElementById('autosave-policy');
+  if (apSel) {
+    // Default autosave policy is now 'off' — auto-save-to-DB is opt-in.
+    apSel.value = getSet('autosave-policy', 'off');
+    apSel.addEventListener('change', () => persistSet('autosave-policy', apSel.value));
+  }
+  const vlToggle = document.getElementById('virtual-file-linking');
+  if (vlToggle) {
+    vlToggle.checked = !!getSet('virtual-file-linking', true);
+    vlToggle.addEventListener('change', () => persistSet('virtual-file-linking', vlToggle.checked));
+  }
+
+  // ---- Hybrid IDB Eviction: unload closed tabs from memory ---------------
+  // Every 30s, evict cold (closed) files that are safely in IDB.
+  setInterval(() => {
+    try {
+      if (!window.__IDE || !window.__IDE.coldFiles) return;
+      window.__IDE.coldFiles.forEach(name => {
+        if (openTabs.includes(name)) return;
+        if (currentFile === name) return;
+        if (typeof savedFiles !== 'undefined' && savedFiles.has && savedFiles.has(name)) {
+          if (typeof files !== 'undefined' && files.hasOwnProperty(name)) {
+            // Keep the key but drop the (potentially large) string content;
+            // preview / open path will lazy-load from IDB via loadFileFromIndexedDB.
+            files[name] = '';
+          }
+        }
+      });
+      window.__IDE.coldFiles.clear();
+    } catch(e) {}
+  }, 30000);
+
+  // Ensure openFile lazy-loads from IDB when in-memory copy is empty but file is in DB.
+  // IMPORTANT: this wrapper MUST preserve the `opts` argument (e.g. { openInTab: true })
+  // that the earlier tab-aware wrapper reads. Previous version silently dropped opts,
+  // which broke "open a file in a tab" (the tab bug).
+  const _origOpen2 = window.openFile;
+  window.openFile = function(filename, opts) {
+    try {
+      if (typeof files !== 'undefined' && files.hasOwnProperty(filename) && files[filename] === '' &&
+          typeof savedFiles !== 'undefined' && savedFiles.has && savedFiles.has(filename) &&
+          typeof loadFileFromIndexedDB === 'function') {
+        loadFileFromIndexedDB(filename).then(f => {
+          const content = f && typeof f === 'object' ? f.content : f;
+          if (typeof content === 'string') files[filename] = content;
+          _origOpen2.call(this, filename, opts);
+        }).catch(() => _origOpen2.call(this, filename, opts));
+        return;
+      }
+    } catch(e) {}
+    return _origOpen2.apply(this, arguments);
+  };
+})();
+
 </script>
+
+<!-- Permission Modal (file writes, uploads, saves) -->
+<div id="permission-modal" role="dialog" aria-modal="true">
+  <div class="perm-card">
+    <h3 id="perm-title">Permission required</h3>
+    <p id="perm-message">This action wants access.</p>
+    <label class="perm-remember">
+      <input type="checkbox" id="perm-remember"> Remember my choice for this session
+    </label>
+    <div class="perm-actions">
+      <button id="perm-reject" class="danger">Reject</button>
+      <button id="perm-temp" class="secondary">Temporary</button>
+      <button id="perm-db" class="primary">Save to DB</button>
+    </div>
+  </div>
+</div>
+<!-- (removed 4x duplicated Cloudflare beacon scripts for reliability) -->
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
