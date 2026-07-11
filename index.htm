@@ -321,7 +321,7 @@ body::-webkit-scrollbar { display: none; }
 
 /* ===== SIDEBAR BUTTONS ===== */
 #new-file-btn, #rename-file-btn, #delete-file-btn, #download-file-btn,
-#preview-code-btn, #change-language-btn, #sidebar-find-replace-btn, #open-file-btn, #db-files-btn {
+#preview-code-btn, #change-language-btn, #sidebar-find-replace-btn, #sidebar-tools-btn, #open-file-btn, #db-files-btn {
   width: 100%;
   padding: 9px;
   margin-top: 8px;
@@ -334,12 +334,12 @@ body::-webkit-scrollbar { display: none; }
   box-sizing: border-box;
 }
 #new-file-btn, #rename-file-btn, #download-file-btn,
-#preview-code-btn, #change-language-btn, #sidebar-find-replace-btn, #open-file-btn, #db-files-btn {
+#preview-code-btn, #change-language-btn, #sidebar-find-replace-btn, #sidebar-tools-btn, #open-file-btn, #db-files-btn {
   background-color: #3498db;
 }
 .delete-btn { background-color: #e74c3c; }
 #new-file-btn:hover, #rename-file-btn:hover, #download-file-btn:hover,
-#preview-code-btn:hover, #change-language-btn:hover, #sidebar-find-replace-btn:hover, #open-file-btn:hover, #db-files-btn:hover {
+#preview-code-btn:hover, #change-language-btn:hover, #sidebar-find-replace-btn:hover, #sidebar-tools-btn:hover, #open-file-btn:hover, #db-files-btn:hover {
   background-color: #2980b9;
 }
 .delete-btn:hover { background-color: #c0392b; }
@@ -1773,7 +1773,41 @@ body.dark-mode { background-color: #1e1e1e; }
   flex-direction: column;
   gap: 14px;
 }
-#folder-picker-modal .search-with-icon input { color: white; }
+/* Force proper anchoring of the search icon inside the search bar (some outer
+   flex parents were overriding position:relative on .search-with-icon). */
+#folder-picker-modal .search-with-icon {
+  position: relative;
+  display: block;
+  width: 100%;
+  flex: 0 0 auto;
+  min-width: 0;
+}
+#folder-picker-modal .search-with-icon svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: #95a5a6;
+  pointer-events: none;
+}
+#folder-picker-modal .search-with-icon input {
+  color: white;
+  width: 100%;
+  padding: 10px 12px 10px 38px;
+  background-color: #1c2a37;
+  border: 1px solid #3d556e;
+  border-radius: 8px;
+  font-size: 13.5px;
+  box-sizing: border-box;
+  transition: border-color 0.18s ease, background-color 0.18s ease;
+}
+#folder-picker-modal .search-with-icon input:focus {
+  border-color: #3498db;
+  background-color: #22323f;
+}
+#folder-picker-modal .search-with-icon input::placeholder { color: #7f8c95; }
 
 /* Selection preview card (single or multi) */
 .fp-selection-card {
@@ -1947,6 +1981,384 @@ body.dark-mode { background-color: #1e1e1e; }
 }
 #folder-picker-confirm:hover { background: #2f8ecf; }
 #folder-picker-confirm:disabled { background: #4a6278; cursor: not-allowed; opacity: 0.6; }
+
+/* Icon-only "new folder" button in the picker footer */
+.fp-new-icon-btn {
+  width: 36px;
+  height: 36px;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  flex: 0 0 auto;
+}
+.fp-new-icon-btn svg { margin: 0 !important; }
+
+/* ===================================================================
+   TOOLS DROPDOWN (replaces the old sidebar Find/Replace button)
+   =================================================================== */
+#tools-dropdown {
+  display: none;
+  position: fixed;
+  z-index: 1000060;
+  background: #2c3e50;
+  color: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.55);
+  min-width: 240px;
+  max-width: 320px;
+  padding: 6px;
+  border: 1px solid #3a4b5c;
+}
+#tools-dropdown.open { display: block; }
+#tools-dropdown button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  background: transparent;
+  color: white;
+  border: none;
+  padding: 9px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  text-align: left;
+  font-family: trebuchet ms;
+}
+#tools-dropdown button:hover { background: rgba(255,255,255,0.10); }
+#tools-dropdown button svg { width: 16px; height: 16px; flex-shrink: 0; color: #7fbfff; }
+#tools-dropdown .td-title { display: block; font-weight: 600; }
+#tools-dropdown .td-desc  { display: block; font-size: 11px; color: #b0bec5; margin-top: 2px; }
+#tools-dropdown .td-label { flex: 1; min-width: 0; }
+#tools-dropdown .td-divider {
+  height: 1px;
+  background: #3a4b5c;
+  margin: 4px 2px;
+}
+
+/* ===================================================================
+   JS CONSOLE — floating draggable window
+   =================================================================== */
+#js-console-window {
+  display: none;
+  position: fixed;
+  top: 90px;
+  left: 120px;
+  width: 560px;
+  height: 380px;
+  min-width: 340px;
+  min-height: 200px;
+  background: #1e2a37;
+  color: #ecf0f1;
+  border: 1px solid #3a4b5c;
+  border-radius: 10px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.65);
+  z-index: 1000070;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: 'Consolas', 'Menlo', 'Monaco', monospace;
+}
+#js-console-window.open { display: flex; }
+#js-console-window .jsc-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #1c2a37;
+  padding: 8px 10px;
+  border-bottom: 1px solid #3a4b5c;
+  cursor: move;
+  user-select: none;
+  font-family: trebuchet ms;
+}
+#js-console-window .jsc-title {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ecf0f1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#js-console-window .jsc-title svg { width: 15px; height: 15px; color: #7fbfff; }
+#js-console-window .jsc-header-btn {
+  background: transparent;
+  border: none;
+  color: #b0bec5;
+  cursor: pointer;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+#js-console-window .jsc-header-btn:hover { background: rgba(255,255,255,0.10); color: white; }
+#js-console-window .jsc-header-btn svg { width: 14px; height: 14px; }
+
+/* Language tabs (JS / Bash) */
+#js-console-window .jsc-lang-tabs {
+  display: inline-flex;
+  background: #0f1720;
+  border: 1px solid #3a4b5c;
+  border-radius: 6px;
+  padding: 2px;
+  gap: 2px;
+  margin-right: 4px;
+}
+#js-console-window .jsc-lang-tab {
+  background: transparent;
+  color: #b0bec5;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: trebuchet ms;
+  cursor: pointer;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+#js-console-window .jsc-lang-tab:hover { color: white; background: rgba(255,255,255,0.08); }
+#js-console-window .jsc-lang-tab.active {
+  background: #3498db;
+  color: white;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.25);
+}
+
+/* JS scope selector — only visible while lang=js */
+#js-console-window #jsc-scope-select {
+  background: #0f1720;
+  color: #ecf0f1;
+  border: 1px solid #3a4b5c;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 11.5px;
+  font-family: trebuchet ms;
+  outline: none;
+  cursor: pointer;
+  margin-right: 4px;
+  max-width: 140px;
+}
+#js-console-window #jsc-scope-select:focus { border-color: #3498db; }
+#js-console-window.lang-bash #jsc-scope-select { display: none; }
+
+/* Bash prompt line prefix */
+#js-console-window.lang-bash .jsc-line.input::before { content: '$ '; color: #27ae60; }
+#js-console-window.lang-bash .jsc-line.input  { color: #ecf0f1; }
+#js-console-window.lang-bash .jsc-line.output { color: #d0d8df; }
+#js-console-window.lang-bash .jsc-line.dir { color: #7fbfff; font-weight: 600; }
+#js-console-window.lang-bash .jsc-line.exec { color: #a8e6cf; }
+#js-console-window.lang-bash .jsc-body,
+#js-console-window.lang-bash .jsc-input { font-family: 'Consolas', 'Menlo', 'Monaco', monospace; }
+#js-console-window.lang-bash .jsc-title svg { color: #27ae60; }
+
+/* Preview-scope banner */
+#js-console-window.scope-preview .jsc-body { background: #17232f; }
+#js-console-window.scope-preview .jsc-title svg { color: #f39c12; }
+
+/* When the console is showing "current-file" scope, add subtle strip on the left */
+#js-console-window.scope-file  .jsc-body { border-left: 3px solid #9b59b6; }
+#js-console-window.scope-preview .jsc-body { border-left: 3px solid #f39c12; }
+#js-console-window .jsc-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 12px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  background: #1e2a37;
+}
+#js-console-window .jsc-line {
+  white-space: pre-wrap;
+  word-break: break-word;
+  padding: 2px 0;
+  border-bottom: 1px dashed rgba(255,255,255,0.05);
+}
+#js-console-window .jsc-line.input  { color: #7fbfff; }
+#js-console-window .jsc-line.input::before  { content: '› '; color: #4a6278; }
+#js-console-window .jsc-line.output { color: #ecf0f1; }
+#js-console-window .jsc-line.error  { color: #ff7a6b; }
+#js-console-window .jsc-line.info   { color: #f1c40f; }
+#js-console-window .jsc-line.log    { color: #a8e6cf; }
+#js-console-window .jsc-input-wrap {
+  border-top: 1px solid #3a4b5c;
+  background: #182430;
+  padding: 8px 10px;
+}
+#js-console-window .jsc-input {
+  width: 100%;
+  min-height: 34px;
+  max-height: 120px;
+  resize: none;
+  background: #0f1720;
+  color: #ecf0f1;
+  border: 1px solid #3a4b5c;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-family: 'Consolas', 'Menlo', 'Monaco', monospace;
+  font-size: 12.5px;
+  box-sizing: border-box;
+  outline: none;
+}
+#js-console-window .jsc-input:focus { border-color: #3498db; }
+#js-console-window .jsc-hint {
+  color: #6b7c8f;
+  font-size: 10.5px;
+  margin-top: 4px;
+  font-family: trebuchet ms;
+}
+#js-console-window .jsc-resize {
+  position: absolute;
+  right: 0; bottom: 0;
+  width: 14px; height: 14px;
+  cursor: nwse-resize;
+  background:
+    linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0.25) 60%, transparent 60%, transparent 70%, rgba(255,255,255,0.25) 70%, rgba(255,255,255,0.25) 80%, transparent 80%);
+}
+
+/* ===================================================================
+   NPM INSTALLER MODAL
+   =================================================================== */
+#npm-installer-modal .modal-content {
+  background: #243342;
+  color: white;
+  max-width: 720px;
+  height: auto;
+  max-height: 86vh;
+  border: 1px solid #3a4b5c;
+}
+#npm-installer-modal .modal-header {
+  background: #1c2a37;
+  padding: 14px 20px;
+  border-bottom: 1px solid #3a4b5c;
+}
+#npm-installer-modal .modal-body {
+  padding: 16px 20px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+}
+#npm-installer-modal .npm-target {
+  padding: 8px 12px;
+  background: rgba(0,0,0,0.22);
+  border: 1px solid #3a4b5c;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #b0bec5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#npm-installer-modal .npm-target svg { width: 14px; height: 14px; color: #f1c40f; }
+#npm-installer-modal .npm-target strong { color: #ecf0f1; font-weight: 600; }
+#npm-installer-modal .search-with-icon { display: block; width: 100%; position: relative; flex: 0 0 auto; }
+#npm-installer-modal .search-with-icon svg {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  width: 16px; height: 16px; color: #95a5a6; pointer-events: none;
+}
+#npm-installer-modal .search-with-icon input {
+  width: 100%;
+  padding: 10px 12px 10px 38px;
+  background-color: #1c2a37;
+  color: white;
+  border: 1px solid #3d556e;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+#npm-installer-modal .search-with-icon input:focus { border-color: #3498db; outline: none; }
+#npm-installer-modal .npm-section-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #7f8c95;
+  margin: 2px 0 -4px 4px;
+}
+#npm-package-list {
+  list-style: none;
+  padding: 4px;
+  margin: 0;
+  max-height: 380px;
+  overflow-y: auto;
+  border: 1px solid #3a4b5c;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.18);
+}
+#npm-package-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin: 2px 0;
+  transition: background 0.12s ease;
+  border: 1px solid transparent;
+}
+#npm-package-list li:hover { background: rgba(52,152,219,0.14); }
+#npm-package-list li .npm-icon {
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  background: rgba(203, 56, 55, 0.15);
+  color: #ff6b6b;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+}
+#npm-package-list li .npm-body { flex: 1; min-width: 0; }
+#npm-package-list li .npm-name {
+  font-weight: 600;
+  font-size: 13.5px;
+  color: #ecf0f1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#npm-package-list li .npm-desc {
+  font-size: 11.5px;
+  color: #a8b8c7;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#npm-package-list li .npm-meta {
+  font-size: 10.5px;
+  color: #7f8c95;
+  margin-top: 3px;
+  display: flex; gap: 10px; align-items: center;
+}
+#npm-package-list li .npm-install-btn {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12.5px;
+  font-family: trebuchet ms;
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+}
+#npm-package-list li .npm-install-btn:hover { background: #2f8ecf; }
+#npm-package-list li .npm-install-btn.installed {
+  background: #27ae60;
+  cursor: default;
+}
+#npm-package-list li .npm-install-btn:disabled { opacity: 0.6; cursor: wait; }
+#npm-package-list li.empty {
+  justify-content: center;
+  color: #95a5a6;
+  cursor: default;
+  font-style: italic;
+  padding: 20px;
+}
+#npm-package-list li.empty:hover { background: transparent; }
 
 /* ===== DB dialog: search/path toggle ===== */
 .db-search-toggle-btn {
@@ -2392,7 +2804,7 @@ body.dark-mode { background-color: #1e1e1e; }
               </span>
             </button>
           </div>
-          <button id="sidebar-find-replace-btn">Find / Replace</button>
+          <button id="sidebar-tools-btn" title="Developer tools">Tools <span style="opacity:0.75;font-size:11px;margin-left:4px;">▾</span></button>
           <button id="change-language-btn">Change Language</button>
       </div>
 
@@ -2489,6 +2901,9 @@ body.dark-mode { background-color: #1e1e1e; }
             <line x1="10" y1="14" x2="21" y2="3"/>
           </svg>
         </button>
+        <button id="preview-localhost-toggle" class="header-btn" title="Serve preview from a fake localhost:// origin (via service worker)" style="margin-right:6px; padding:4px 10px; font-size:11px; font-weight:600; letter-spacing:0.4px; border-radius:6px; background:transparent; border:1px solid rgba(255,255,255,0.35); color:white; font-family:trebuchet ms; cursor:pointer;">
+          <span style="opacity:0.75;">Serve:</span> <span id="preview-localhost-label">srcdoc</span>
+        </button>
         <button id="reload-preview-btn" class="header-btn" title="Reload Preview" style="margin-right:8px;">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="22" height="22">
             <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
@@ -2581,8 +2996,9 @@ body.dark-mode { background-color: #1e1e1e; }
 
         <!-- Footer -->
         <div class="fp-footer">
-          <button id="folder-picker-new-btn" class="db-action-btn secondary">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>New Folder</button>
+          <button id="folder-picker-new-btn" class="db-action-btn secondary fp-new-icon-btn" title="New Folder" aria-label="New Folder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;display:block;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+          </button>
           <div class="fp-spacer"></div>
           <button id="folder-picker-cancel" class="db-action-btn secondary">Cancel</button>
           <button id="folder-picker-confirm" class="db-action-btn">Confirm</button>
@@ -4253,6 +4669,10 @@ function openFolderPicker(opts) {
     const disabled = new Set(opts.disabledPaths || []);
     // Cache of {folders: Set<string>, files: Array}
     let cache = null;
+    // Track folders that were created *inside* this picker session — if the user
+    // cancels (or dismisses) without actually confirming the copy/move, we roll
+    // these back so we don't leave orphaned empty folders behind.
+    const provisionalFolders = new Set();
 
     // ----- Render the rich selection preview card -----
     (function renderCard() {
@@ -4456,12 +4876,42 @@ function openFolderPicker(opts) {
       cache = null;
     }
 
+    // Roll back any folders the user created inside this session but never
+    // actually used (i.e. they cancelled instead of confirming the operation).
+    function rollbackProvisional() {
+      if (provisionalFolders.size === 0) return Promise.resolve();
+      // Delete deepest paths first so parents don't wipe out children mid-loop.
+      const paths = Array.from(provisionalFolders).sort((a, b) => b.length - a.length);
+      return paths.reduce((p, folder) => p.then(() => new Promise(res => {
+        if (!db) return res();
+        try {
+          const tx = db.transaction(['folders'], 'readwrite');
+          tx.objectStore('folders').delete(folder);
+          tx.oncomplete = () => res();
+          tx.onerror = () => res();
+        } catch (e) { res(); }
+      })), Promise.resolve()).then(() => {
+        provisionalFolders.clear();
+        // Refresh the underlying db-files modal in the background so its
+        // tree matches the rollback (harmless no-op if it's not open).
+        try { if (typeof loadDBFilesModal === 'function') loadDBFilesModal(); } catch(e){}
+      });
+    }
+
     okBtn.onclick = () => {
       if (disabled.has(currentPath)) return;
+      // Confirm — the provisional folders are now "real" (they'll host the
+      // copied/moved payload) so clear the tracker and DO NOT roll back.
+      provisionalFolders.clear();
       cleanup();
       resolve(currentPath);
     };
-    const doCancel = () => { cleanup(); reject(new Error('cancelled')); };
+    const doCancel = () => {
+      rollbackProvisional().finally(() => {
+        cleanup();
+        reject(new Error('cancelled'));
+      });
+    };
     cancelBtn.onclick = doCancel;
     closeBtn.onclick = doCancel;
     newBtn.onclick = () => {
@@ -4472,7 +4922,17 @@ function openFolderPicker(opts) {
       if (!clean) return;
       const rel = normalizeFolderPath(currentPath ? currentPath + '/' + clean : clean);
       if (!rel) return;
+      // Snapshot pre-existing folders BEFORE the create so we only mark the
+      // truly new ancestors (rel + any missing intermediates) as provisional.
+      const preExisting = cache ? new Set(cache.folders) : new Set();
       createFolderInDB(rel).then(() => {
+        // Every path segment that did NOT exist before is provisional.
+        const parts = rel.split('/');
+        let acc = '';
+        for (let i = 0; i < parts.length; i++) {
+          acc = i === 0 ? parts[0] : acc + '/' + parts[i];
+          if (!preExisting.has(acc)) provisionalFolders.add(acc);
+        }
         cache = null;
         // Navigate into the new folder so it becomes the destination
         navigateTo(rel);
@@ -4784,6 +5244,46 @@ document.getElementById('db-search-input').addEventListener('input', () => {
   loadDBFilesModal();
 });
 
+/* ---- DB files: search button toggles the breadcrumb <-> search input,
+       and gets highlighted while active. ---- */
+(function wireDBSearchToggle() {
+  const toggleBtn  = document.getElementById('db-search-toggle-btn');
+  const navSearch  = document.getElementById('db-nav-search');
+  const breadcrumb = document.getElementById('db-breadcrumb');
+  const searchInp  = document.getElementById('db-search-input');
+  if (!toggleBtn || !navSearch || !breadcrumb || !searchInp) return;
+
+  function setSearchActive(on) {
+    if (on) {
+      navSearch.classList.add('active');
+      breadcrumb.classList.add('hidden');
+      toggleBtn.classList.add('active');
+      toggleBtn.setAttribute('aria-pressed', 'true');
+      setTimeout(() => searchInp.focus(), 30);
+    } else {
+      navSearch.classList.remove('active');
+      breadcrumb.classList.remove('hidden');
+      toggleBtn.classList.remove('active');
+      toggleBtn.setAttribute('aria-pressed', 'false');
+      if (searchInp.value) {
+        searchInp.value = '';
+        loadDBFilesModal();
+      }
+    }
+  }
+  // Start collapsed: breadcrumb showing, search hidden.
+  setSearchActive(false);
+
+  toggleBtn.addEventListener('click', () => {
+    const on = !navSearch.classList.contains('active');
+    setSearchActive(on);
+  });
+  // Esc while searching -> collapse back to breadcrumb view
+  searchInp.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { e.preventDefault(); setSearchActive(false); }
+  });
+})();
+
 /* =============================================================
    TOP BAR SEARCH
 ============================================================= */
@@ -4963,6 +5463,91 @@ document.getElementById('reset-settings-btn').addEventListener('click', resetSet
    PREVIEW MODAL
 ============================================================= */
 let previewInterval = null;
+/** Bridge shim injected into every HTML preview. Reports uncaught errors,
+ *  unhandled rejections, and console.error/warn calls back to the parent,
+ *  and answers `postMessage({__jscBridge:'eval', ...})` requests from the
+ *  developer-console preview scope. */
+function __jscBuildBridgeScript(fileName) {
+  return "<script>(function(){\n" +
+    "  var __src = " + JSON.stringify(fileName || '') + ";\n" +
+    "  function __post(payload){ try { parent.postMessage(Object.assign({__jscBridge:'preview'}, payload), '*'); } catch(e){} }\n" +
+    "  window.addEventListener('error', function(e){\n" +
+    "    __post({ kind:'error', message:e.message||String(e.error||e), source:e.filename||__src, line:e.lineno, col:e.colno, stack:e.error&&e.error.stack });\n" +
+    "  });\n" +
+    "  window.addEventListener('unhandledrejection', function(e){\n" +
+    "    var r = e.reason;\n" +
+    "    __post({ kind:'error', message:'Unhandled rejection: '+(r&&r.message?r.message:String(r)), stack:r&&r.stack, source:__src });\n" +
+    "  });\n" +
+    "  ['log','info','warn','error'].forEach(function(fn){\n" +
+    "    var orig = console[fn].bind(console);\n" +
+    "    console[fn] = function(){\n" +
+    "      try {\n" +
+    "        var args = Array.prototype.slice.call(arguments).map(function(a){\n" +
+    "          if (typeof a === 'string') return a;\n" +
+    "          try { return JSON.stringify(a); } catch(e){ return String(a); }\n" +
+    "        });\n" +
+    "        __post({ kind:'log', level:fn, message:args.join(' '), source:__src });\n" +
+    "      } catch(e){}\n" +
+    "      return orig.apply(console, arguments);\n" +
+    "    };\n" +
+    "  });\n" +
+    "  window.addEventListener('message', function(e){\n" +
+    "    var d = e && e.data; if (!d || d.__jscBridge !== 'eval') return;\n" +
+    "    var out, kind = 'ok';\n" +
+    "    try { out = (0, eval)(d.src); }\n" +
+    "    catch(err){ out = (err && err.stack) ? err.stack : String(err); kind = 'error'; }\n" +
+    "    try { parent.postMessage({__jscBridge:'eval-result', id:d.id, result:out, kind:kind}, '*'); } catch(_) {}\n" +
+    "  });\n" +
+    "  __post({ kind:'ready', source:__src });\n" +
+    "})();<\/script>";
+}
+/** Given the HTML source of a preview page, inject the bridge shim near <head>
+ *  start (or at the top if there's no head). Idempotent — never injects twice. */
+function __jscInjectPreviewBridge(html, fileName) {
+  if (!html || html.indexOf('__jscBridge') !== -1) return html;
+  const shim = __jscBuildBridgeScript(fileName);
+  if (/<head[^>]*>/i.test(html)) return html.replace(/<head([^>]*)>/i, '<head$1>' + shim);
+  if (/<html[^>]*>/i.test(html)) return html.replace(/<html([^>]*)>/i, '<html$1>' + shim);
+  return shim + html;
+}
+
+/* Preview → parent bridge handler: shows toast for uncaught errors and
+   auto-routes them to the developer console (Preview scope). */
+window.addEventListener('message', (e) => {
+  const d = e && e.data;
+  if (!d || d.__jscBridge !== 'preview') return;
+  if (d.kind === 'error') {
+    // Show a toast — clickable messages aren't supported, but keep the msg short.
+    const short = (d.message || 'Uncaught error in preview').toString().slice(0, 160);
+    try { showToast(short, 'error', 4200); } catch(_) {}
+    // Auto-route: if the buggy file is the current file, open the console in
+    // Preview scope so the user immediately sees it.
+    try {
+      const buggy = d.source || '';
+      const cur   = (typeof currentFile === 'string') ? currentFile : '';
+      const willAutoOpen = (buggy && cur && (buggy === cur || buggy.endsWith('/' + cur) || cur.endsWith('/' + buggy)));
+      if (willAutoOpen && typeof window.__openJSConsole === 'function') {
+        window.__openJSConsole({ scope: 'preview', lang: 'js' });
+      }
+      if (typeof window.__jscAppend === 'function') {
+        const loc = (d.line ? ' (line ' + d.line + (d.col ? ':' + d.col : '') + ')' : '');
+        window.__jscAppend('[preview error] ' + d.message + loc, 'error');
+        if (d.stack) window.__jscAppend(d.stack, 'error');
+      }
+    } catch(_) {}
+  } else if (d.kind === 'log' && typeof window.__jscAppend === 'function') {
+    // Only mirror preview logs into the console if the user is currently
+    // looking at the Preview scope — otherwise this would be noisy.
+    try {
+      const win = document.getElementById('js-console-window');
+      if (win && win.classList.contains('open') && win.classList.contains('scope-preview')) {
+        const kind = d.level === 'error' ? 'error' : (d.level === 'warn' ? 'info' : 'log');
+        window.__jscAppend('[preview:' + d.level + '] ' + d.message, kind);
+      }
+    } catch(_) {}
+  }
+});
+
 document.getElementById("preview-code-btn").onclick = () => {
   if (!currentFile) { showToast("No file selected", "error"); return; }
   saveCurrentFile();
@@ -4989,12 +5574,27 @@ document.getElementById("preview-code-btn").onclick = () => {
   } else {
     titleSpan.textContent = currentFile;
   }
-  iframe.srcdoc = content;
+  // Decide between srcdoc and the localhost:// service-worker URL.
+  const useLocalhost = (typeof window.__previewUseLocalhost === 'function') && window.__previewUseLocalhost();
+  if (useLocalhost && isHTML && typeof window.__previewOverLocalhost === 'function') {
+    window.__previewOverLocalhost(currentFile, content).then(url => {
+      if (url) { iframe.removeAttribute('srcdoc'); iframe.src = url; }
+      else     { iframe.srcdoc = isHTML ? __jscInjectPreviewBridge(content, currentFile) : content; }
+    });
+  } else {
+    iframe.srcdoc = isHTML ? __jscInjectPreviewBridge(content, currentFile) : content;
+  }
   modal.style.display = "block";
 };
 document.getElementById("reload-preview-btn").onclick = () => {
   const f = document.getElementById('code-preview');
-  try { f.contentWindow.location.reload(); } catch (e) { f.srcdoc = files[currentFile]; }
+  try { f.contentWindow.location.reload(); }
+  catch (e) {
+    const c = files[currentFile] || '';
+    const ext2 = (currentFile || '').toLowerCase().split('.').pop();
+    const isHTML2 = ['html','htm','shtml','shtm','xhtml'].includes(ext2);
+    f.srcdoc = isHTML2 ? __jscInjectPreviewBridge(c, currentFile) : c;
+  }
 };
 document.getElementById("open-in-newtab-btn").onclick = () => {
   try {
@@ -5045,6 +5645,156 @@ window.onclick = function(e) {
     if (cancel) cancel.click();
   }
 };
+
+/* =============================================================
+   LOCALHOST-STYLE PREVIEW (Service Worker)
+   ============================================================
+   Serves the preview iframe from a fake "http(s)://<origin>/__jsi/…"
+   path, so pages under preview see:
+   • an origin (window.location.origin) instead of "null"
+   • cookies + localStorage keyed to that origin
+   • a real URL bar location, absolute paths in the address, etc.
+   Requires a service worker; if the browser blocks it (e.g. inside
+   a sandboxed iframe context) we fall back to srcdoc silently.
+============================================================= */
+(function() {
+  let __localhostEnabled = false;
+  let __swReady = null;    // Promise<ServiceWorkerRegistration|null>
+  let __virtualFiles = {}; // path -> {content, ctype}
+
+  function __supportsSW() {
+    return ('serviceWorker' in navigator) && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+  }
+
+  function __ensureSW() {
+    if (__swReady) return __swReady;
+    if (!__supportsSW()) return (__swReady = Promise.resolve(null));
+
+    const swSrc = [
+      "self.addEventListener('install', e => self.skipWaiting());",
+      "self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));",
+      "const __store = new Map();",
+      "self.addEventListener('message', e => {",
+      "  const d = e.data || {};",
+      "  if (d.__jsi === 'set-file')   __store.set(d.path, { content:d.content, ctype:d.ctype });",
+      "  if (d.__jsi === 'set-batch')  { (d.files||[]).forEach(f => __store.set(f.path, { content:f.content, ctype:f.ctype })); }",
+      "  if (d.__jsi === 'clear')      __store.clear();",
+      "});",
+      "self.addEventListener('fetch', e => {",
+      "  const url = new URL(e.request.url);",
+      "  if (!url.pathname.startsWith('/__jsi/')) return;",
+      "  const key = decodeURIComponent(url.pathname.replace(/^\\/__jsi\\//, ''));",
+      "  const rec = __store.get(key);",
+      "  if (rec) {",
+      "    e.respondWith(new Response(rec.content, { status:200, headers: { 'Content-Type': rec.ctype || 'text/html; charset=utf-8', 'X-JSI-Served':'1' } }));",
+      "  } else {",
+      "    e.respondWith(new Response('Not Found: ' + key, { status:404, headers: { 'Content-Type':'text/plain' } }));",
+      "  }",
+      "});"
+    ].join('\n');
+
+    return (__swReady = new Promise(res => {
+      try {
+        const blob = new Blob([swSrc], { type: 'application/javascript' });
+        // Service workers can't be registered from blob: URLs on all browsers;
+        // fall back to a data URL and if that fails as well, disable.
+        const url = URL.createObjectURL(blob);
+        navigator.serviceWorker.register(url, { scope: '/__jsi/' })
+          .then(reg => {
+            // Wait until it's controlling us
+            const waitReady = navigator.serviceWorker.ready.then(() => reg);
+            res(waitReady);
+          })
+          .catch(() => res(null));
+      } catch(e) { res(null); }
+    }));
+  }
+
+  const CTYPE = {
+    'html':'text/html; charset=utf-8', 'htm':'text/html; charset=utf-8',
+    'js':'application/javascript', 'mjs':'application/javascript',
+    'css':'text/css', 'json':'application/json',
+    'svg':'image/svg+xml', 'txt':'text/plain', 'md':'text/plain',
+    'png':'image/png', 'jpg':'image/jpeg', 'jpeg':'image/jpeg', 'gif':'image/gif', 'webp':'image/webp'
+  };
+  function __ctype(name) {
+    const ext = (name || '').toLowerCase().split('.').pop();
+    return CTYPE[ext] || 'text/plain; charset=utf-8';
+  }
+
+  // Publish every editor-visible file under /__jsi/ so relative asset URLs
+  // (./style.css, images, etc.) referenced by the previewed HTML resolve.
+  function __syncFilesToSW(mainFile, mainContent) {
+    return __ensureSW().then(reg => {
+      if (!reg) return null;
+      const target = navigator.serviceWorker.controller || reg.active || reg.waiting || reg.installing;
+      if (!target) return null;
+      const batch = [];
+      const filesLive = (typeof files !== 'undefined') ? files : {};
+      Object.keys(filesLive).forEach(name => {
+        // Only publish stringy content
+        if (typeof filesLive[name] === 'string') {
+          batch.push({ path: name, content: filesLive[name], ctype: __ctype(name) });
+        }
+      });
+      // Ensure the "main" file we're about to load carries the bridge shim
+      const mainInjected = __jscInjectPreviewBridge(mainContent, mainFile);
+      const idx = batch.findIndex(x => x.path === mainFile);
+      if (idx >= 0) batch[idx] = { path: mainFile, content: mainInjected, ctype: __ctype(mainFile) };
+      else          batch.push({ path: mainFile, content: mainInjected, ctype: __ctype(mainFile) });
+
+      // Save state locally too, in case the SW respawns.
+      batch.forEach(b => __virtualFiles[b.path] = b);
+      target.postMessage({ __jsi: 'set-batch', files: batch });
+      return '/__jsi/' + mainFile;
+    });
+  }
+
+  // Public API used by the preview-code button
+  window.__previewUseLocalhost = () => __localhostEnabled;
+  window.__previewOverLocalhost = (fileName, content) => __syncFilesToSW(fileName, content);
+
+  // Toggle button in the preview modal header
+  const toggle = document.getElementById('preview-localhost-toggle');
+  const label  = document.getElementById('preview-localhost-label');
+
+  function refreshLabel() {
+    if (!label) return;
+    if (__localhostEnabled) {
+      label.textContent = 'localhost://';
+      toggle.style.borderColor = '#27ae60';
+      toggle.style.background = 'rgba(39,174,96,0.20)';
+    } else {
+      label.textContent = 'srcdoc';
+      toggle.style.borderColor = 'rgba(255,255,255,0.35)';
+      toggle.style.background = 'transparent';
+    }
+  }
+  refreshLabel();
+
+  if (toggle) toggle.addEventListener('click', () => {
+    if (!__supportsSW()) {
+      showToast('This browser context blocks service workers — falling back to srcdoc.', 'warning', 3800);
+      return;
+    }
+    __localhostEnabled = !__localhostEnabled;
+    refreshLabel();
+    showToast(__localhostEnabled
+      ? 'Preview will now be served from a fake localhost:// URL (via service worker).'
+      : 'Preview will use srcdoc (in-memory).', 'info', 2600);
+
+    // If the preview modal is open right now, re-load using the new mode.
+    const modal = document.getElementById('preview-modal');
+    if (modal && modal.style.display && modal.style.display !== 'none') {
+      const btn = document.getElementById('preview-code-btn');
+      if (btn) btn.onclick && btn.onclick();
+    }
+  });
+
+  // Best-effort: kick off SW registration in the background so the first
+  // toggle click doesn't stall while the SW installs.
+  if (__supportsSW()) __ensureSW();
+})();
 
 /* =============================================================
    FIND / REPLACE
@@ -5137,10 +5887,9 @@ document.getElementById('change-language-btn').addEventListener('click', () => {
   else { showSidebarPanel(sidebarLanguage); refreshLanguagePicker(); }
 });
 document.getElementById('close-sidebar-language').addEventListener('click', hideSidebarPanels);
-document.getElementById('sidebar-find-replace-btn').addEventListener('click', () => {
-  if (isPanelActive(sidebarFindReplace)) hideSidebarPanels();
-  else showSidebarPanel(sidebarFindReplace);
-});
+// (The old sidebar "Find / Replace" button has been replaced by the "Tools"
+//  dropdown — see the tools-dropdown block further below. Find/Replace is
+//  still reachable via the top-bar magnifier button and the tools dropdown.)
 
 /* =============================================================
    NEW LANGUAGE PICKER (searchable, with current file type + None)
@@ -7127,6 +7876,106 @@ setTimeout(() => document.querySelectorAll('.draggable-window').forEach(makeDrag
 
 </script>
 
+<!-- ==================================================================
+     TOOLS DROPDOWN (opened by the sidebar "Tools" button)
+     ================================================================== -->
+<div id="tools-dropdown" role="menu" aria-label="Developer tools">
+  <button type="button" id="tool-find-replace" role="menuitem">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+    <span class="td-label">
+      <span class="td-title">Find / Replace</span>
+      <span class="td-desc">Search inside the current file</span>
+    </span>
+  </button>
+  <div class="td-divider"></div>
+  <button type="button" id="tool-js-console" role="menuitem">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+    <span class="td-label">
+      <span class="td-title">JS Console</span>
+      <span class="td-desc">Floating REPL — press Enter to run</span>
+    </span>
+  </button>
+  <button type="button" id="tool-npm-installer" role="menuitem">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+    <span class="td-label">
+      <span class="td-title">NPM Package Installer</span>
+      <span class="td-desc">Install popular packages into this folder</span>
+    </span>
+  </button>
+</div>
+
+<!-- ==================================================================
+     JS CONSOLE — draggable floating window
+     ================================================================== -->
+<div id="js-console-window" role="dialog" aria-label="Developer Console">
+  <div class="jsc-header" id="jsc-header">
+    <div class="jsc-title">
+      <svg id="jsc-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+      <span id="jsc-title-text">JS Console</span>
+    </div>
+
+    <!-- Language switch (JS vs Bash) -->
+    <div class="jsc-lang-tabs" role="tablist" aria-label="Language">
+      <button type="button" class="jsc-lang-tab active" data-lang="js"   role="tab">JS</button>
+      <button type="button" class="jsc-lang-tab"        data-lang="bash" role="tab">Bash</button>
+    </div>
+
+    <!-- JS-only scope selector (Page / Current file / Preview) -->
+    <select id="jsc-scope-select" title="Evaluation scope">
+      <option value="page">Page context</option>
+      <option value="file">Current file</option>
+      <option value="preview">Preview (iframe)</option>
+    </select>
+
+    <button type="button" id="jsc-clear-btn" class="jsc-header-btn" title="Clear">
+      <!-- Proper trash icon: lid handle bar (top short line) + lid tray + can body + two ribs -->
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 4h6a1 1 0 0 1 1 1v2H8V5a1 1 0 0 1 1-1z"/>
+        <line x1="3" y1="7" x2="21" y2="7"/>
+        <path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/>
+        <line x1="10" y1="11" x2="10" y2="18"/>
+        <line x1="14" y1="11" x2="14" y2="18"/>
+      </svg>
+    </button>
+    <button type="button" id="jsc-close-btn" class="jsc-header-btn" title="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="jsc-body" id="jsc-body"></div>
+  <div class="jsc-input-wrap">
+    <textarea id="jsc-input" class="jsc-input" placeholder="Type an expression and press Enter (Shift+Enter for a new line)…" spellcheck="false" rows="1"></textarea>
+    <div class="jsc-hint" id="jsc-hint">Enter runs · Shift+Enter = new line · ↑/↓ = history · scope = <b>Page context</b> (has <code>files</code>, <code>editor</code>, <code>db</code>).</div>
+  </div>
+  <div class="jsc-resize" id="jsc-resize"></div>
+</div>
+
+<!-- ==================================================================
+     NPM INSTALLER MODAL
+     ================================================================== -->
+<div id="npm-installer-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title">Install an NPM package</h3>
+      <button id="npm-close-btn" class="close-btn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="npm-target" id="npm-target-line">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        <span>Install into <strong id="npm-target-folder">root</strong></span>
+      </div>
+      <div class="search-with-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <circle cx="11" cy="11" r="7"/>
+          <path d="M21 21l-4-4"/>
+        </svg>
+        <input type="text" id="npm-search-input" placeholder="Search packages on npm…" autocomplete="off">
+      </div>
+      <div class="npm-section-label" id="npm-section-label">Most popular</div>
+      <ul id="npm-package-list"></ul>
+    </div>
+  </div>
+</div>
+
 <!-- Permission Modal (file writes, uploads, saves) -->
 <div id="permission-modal" role="dialog" aria-modal="true">
   <div class="perm-card">
@@ -7142,7 +7991,1033 @@ setTimeout(() => document.querySelectorAll('.draggable-window').forEach(makeDrag
     </div>
   </div>
 </div>
+<script>
+/* ==================================================================
+   TOOLS DROPDOWN + JS CONSOLE + NPM INSTALLER wiring
+   ================================================================== */
+(function() {
+  /* ---------- Tools dropdown ---------- */
+  const toolsBtn = document.getElementById('sidebar-tools-btn');
+  const toolsDD  = document.getElementById('tools-dropdown');
+  function openToolsDD() {
+    if (!toolsBtn || !toolsDD) return;
+    const r = toolsBtn.getBoundingClientRect();
+    // Position beside the sidebar button, aligned to its top
+    toolsDD.style.left = (r.right + 8) + 'px';
+    toolsDD.style.top  = r.top + 'px';
+    toolsDD.classList.add('open');
+    // If the dropdown would spill off the right edge, flip it to open leftward
+    requestAnimationFrame(() => {
+      const dR = toolsDD.getBoundingClientRect();
+      if (dR.right > window.innerWidth - 8) {
+        toolsDD.style.left = Math.max(8, r.left - dR.width - 8) + 'px';
+      }
+      if (dR.bottom > window.innerHeight - 8) {
+        toolsDD.style.top = Math.max(8, window.innerHeight - dR.height - 8) + 'px';
+      }
+    });
+  }
+  function closeToolsDD() { if (toolsDD) toolsDD.classList.remove('open'); }
+
+  if (toolsBtn && toolsDD) {
+    toolsBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (toolsDD.classList.contains('open')) closeToolsDD();
+      else openToolsDD();
+    });
+    document.addEventListener('click', (e) => {
+      if (!toolsDD.classList.contains('open')) return;
+      if (toolsDD.contains(e.target) || e.target === toolsBtn) return;
+      closeToolsDD();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && toolsDD.classList.contains('open')) closeToolsDD();
+    });
+  }
+
+  // Wire the three tool entries
+  const findBtn = document.getElementById('tool-find-replace');
+  if (findBtn) findBtn.addEventListener('click', () => {
+    closeToolsDD();
+    try {
+      const sfr = document.getElementById('sidebar-find-replace');
+      if (typeof showSidebarPanel === 'function' && sfr) showSidebarPanel(sfr);
+      else if (typeof openFindReplace === 'function') openFindReplace();
+    } catch(e) {}
+  });
+
+  const jscBtn = document.getElementById('tool-js-console');
+  if (jscBtn) jscBtn.addEventListener('click', () => {
+    closeToolsDD();
+    openJSConsole();
+  });
+
+  const npmBtn = document.getElementById('tool-npm-installer');
+  if (npmBtn) npmBtn.addEventListener('click', () => {
+    closeToolsDD();
+    openNPMInstaller();
+  });
+
+  /* =================================================================
+     JS CONSOLE — floating draggable window
+     ================================================================= */
+  const jscWin   = document.getElementById('js-console-window');
+  const jscBody  = document.getElementById('jsc-body');
+  const jscInput = document.getElementById('jsc-input');
+  const jscHdr   = document.getElementById('jsc-header');
+  const jscClose = document.getElementById('jsc-close-btn');
+  const jscClear = document.getElementById('jsc-clear-btn');
+  const jscResize= document.getElementById('jsc-resize');
+
+  const jscHistory = [];
+  let jscHistIdx = -1;
+  let jscPatched = false;
+
+  /* ---------- State: language (js|bash) + JS scope (page|file|preview) ---- */
+  let jscLang  = 'js';
+  let jscScope = 'page';
+
+  const langTabs   = jscWin ? jscWin.querySelectorAll('.jsc-lang-tab') : [];
+  const scopeSel   = document.getElementById('jsc-scope-select');
+  const jscHint    = document.getElementById('jsc-hint');
+  const jscTitleT  = document.getElementById('jsc-title-text');
+  const jscInputEl = document.getElementById('jsc-input');
+
+  function jscAppend(text, kind) {
+    if (!jscBody) return;
+    const line = document.createElement('div');
+    line.className = 'jsc-line ' + (kind || 'output');
+    if (typeof text !== 'string') {
+      try { text = JSON.stringify(text, null, 2); }
+      catch(e) { text = String(text); }
+    }
+    line.textContent = text;
+    jscBody.appendChild(line);
+    jscBody.scrollTop = jscBody.scrollHeight;
+    return line;
+  }
+  // Expose for the preview error-router below
+  window.__jscAppend = jscAppend;
+
+  function updateHint() {
+    if (!jscHint) return;
+    if (jscLang === 'bash') {
+      jscHint.innerHTML = 'Enter runs · ↑/↓ = history · type <code>help</code> for the command list · cwd = <code>' + (bashCwd || '/') + '</code>';
+    } else {
+      const label = jscScope === 'file' ? 'Current file' : (jscScope === 'preview' ? 'Preview iframe' : 'Page context');
+      const extra = jscScope === 'preview'
+        ? 'runs inside the preview iframe (whatever your preview page exposes).'
+        : (jscScope === 'file'
+            ? 'evaluates the CURRENT file with the page as its host — great for testing a snippet you just wrote.'
+            : 'runs against the top page (has <code>files</code>, <code>editor</code>, <code>db</code>).');
+      jscHint.innerHTML = 'Enter runs · Shift+Enter = new line · ↑/↓ = history · scope = <b>' + label + '</b> — ' + extra;
+    }
+  }
+
+  function setLang(lang) {
+    jscLang = lang;
+    langTabs.forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+    if (jscWin) {
+      jscWin.classList.toggle('lang-bash', lang === 'bash');
+      jscWin.classList.toggle('lang-js',   lang === 'js');
+    }
+    if (jscTitleT) jscTitleT.textContent = (lang === 'bash') ? 'Bash Terminal' : 'JS Console';
+    if (jscInputEl) {
+      jscInputEl.placeholder = (lang === 'bash')
+        ? 'Type a shell command and press Enter…  (try: help)'
+        : 'Type an expression and press Enter (Shift+Enter for a new line)…';
+    }
+    updateHint();
+  }
+
+  function setScope(scope) {
+    jscScope = scope;
+    if (scopeSel && scopeSel.value !== scope) scopeSel.value = scope;
+    if (jscWin) {
+      jscWin.classList.remove('scope-page','scope-file','scope-preview');
+      jscWin.classList.add('scope-' + scope);
+    }
+    updateHint();
+  }
+
+  langTabs.forEach(btn => {
+    btn.addEventListener('click', () => setLang(btn.dataset.lang));
+  });
+  if (scopeSel) scopeSel.addEventListener('change', () => setScope(scopeSel.value));
+
+  // Mirror console.log/warn/error into the JSC pane, but only while it's open
+  // AND we're on the "page" JS scope (so we don't cross-pollute preview logs).
+  function patchConsoleOnce() {
+    if (jscPatched) return;
+    jscPatched = true;
+    ['log','info','warn','error'].forEach(fn => {
+      const orig = console[fn].bind(console);
+      console[fn] = function(...args) {
+        try {
+          if (jscWin && jscWin.classList.contains('open') && jscLang === 'js' && jscScope === 'page') {
+            const kind = fn === 'error' ? 'error' : (fn === 'warn' ? 'info' : 'log');
+            jscAppend(args.map(a => {
+              if (typeof a === 'string') return a;
+              try { return JSON.stringify(a); } catch(e) { return String(a); }
+            }).join(' '), kind);
+          }
+        } catch(e) {}
+        return orig(...args);
+      };
+    });
+  }
+
+  /* ------ Render an eval result the way a browser console would --------- */
+  function jscRenderResult(result) {
+    if (typeof result === 'undefined') jscAppend('undefined', 'output');
+    else if (result === null) jscAppend('null', 'output');
+    else if (typeof result === 'string') jscAppend('"' + result + '"', 'output');
+    else if (typeof result === 'function') jscAppend(result.toString().slice(0, 400), 'output');
+    else if (result && typeof result.then === 'function') {
+      jscAppend('Promise { <pending> }', 'info');
+      result.then(v => jscAppend('Promise resolved: ' + (typeof v === 'string' ? v : (function(){ try { return JSON.stringify(v); } catch(e) { return String(v); } })()), 'log'))
+            .catch(err => jscAppend('Promise rejected: ' + (err && err.stack ? err.stack : String(err)), 'error'));
+    } else {
+      try { jscAppend(JSON.stringify(result, null, 2), 'output'); }
+      catch(e) { jscAppend(String(result), 'output'); }
+    }
+  }
+
+  /* ------ Evaluate a JS expression in the currently-selected scope ------ */
+  function jscEvalJS(src) {
+    if (jscScope === 'page') {
+      try { jscRenderResult((0, eval)(src)); }
+      catch(err) { jscAppend((err && err.stack) ? err.stack : String(err), 'error'); }
+      return;
+    }
+    if (jscScope === 'file') {
+      // Wrap the current file's contents + the user's expression in a Function
+      // so the file's declarations are visible to the expression on the last line.
+      let fileSrc = '';
+      try {
+        if (typeof currentFile !== 'undefined' && currentFile && typeof files !== 'undefined' && files.hasOwnProperty(currentFile)) {
+          fileSrc = files[currentFile] || '';
+        } else if (typeof editor !== 'undefined' && editor && typeof editor.getValue === 'function') {
+          fileSrc = editor.getValue();
+        }
+      } catch(e) {}
+      // Strip <script> wrappers if it's an HTML file — extract inline JS.
+      const ext = (typeof currentFile === 'string' ? currentFile.toLowerCase().split('.').pop() : 'js');
+      if (['html','htm','shtml','shtm','xhtml'].includes(ext)) {
+        const scripts = [];
+        fileSrc.replace(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi, (_, body) => { scripts.push(body); return ''; });
+        fileSrc = scripts.join('\n;\n');
+      }
+      try {
+        // eslint-disable-next-line no-new-func
+        const runner = new Function(fileSrc + '\n;return (' + src + ');');
+        jscRenderResult(runner());
+      } catch(err) {
+        // If it was a statement not an expression, retry as a plain body.
+        try {
+          // eslint-disable-next-line no-new-func
+          new Function(fileSrc + '\n;' + src)();
+          jscAppend('(ok — statement)', 'info');
+        } catch(err2) {
+          jscAppend((err2 && err2.stack) ? err2.stack : String(err2), 'error');
+        }
+      }
+      return;
+    }
+    if (jscScope === 'preview') {
+      const iframe = document.getElementById('code-preview');
+      if (!iframe || !iframe.contentWindow) {
+        jscAppend('No preview iframe is open.', 'error');
+        return;
+      }
+      // Try direct eval first (same-origin sandbox flag makes it possible for srcdoc)
+      let ok = false;
+      try {
+        const w = iframe.contentWindow;
+        if (w && w.eval) {
+          jscRenderResult(w.eval(src));
+          ok = true;
+        }
+      } catch(_) {}
+      if (!ok) {
+        // Fall back to postMessage-based bridge (works for cross-origin previews
+        // and for the localhost:// service-worker preview).
+        const id = 'q_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+        pendingPreviewEvals.set(id, (result, kind) => {
+          if (kind === 'error') jscAppend(result, 'error');
+          else jscRenderResult(result);
+        });
+        try {
+          iframe.contentWindow.postMessage({ __jscBridge: 'eval', id: id, src: src }, '*');
+          setTimeout(() => {
+            if (pendingPreviewEvals.has(id)) {
+              pendingPreviewEvals.delete(id);
+              jscAppend('(preview eval timed out — the preview page must include the JS Insider bridge shim)', 'error');
+            }
+          }, 4000);
+        } catch(err) {
+          jscAppend('Preview eval failed: ' + err, 'error');
+        }
+      }
+      return;
+    }
+  }
+
+  /* ---- Pending eval callbacks (Preview scope bridge) ------------------- */
+  const pendingPreviewEvals = new Map();
+  window.addEventListener('message', (e) => {
+    const d = e && e.data;
+    if (!d || typeof d !== 'object') return;
+    if (d.__jscBridge === 'eval-result' && d.id && pendingPreviewEvals.has(d.id)) {
+      const cb = pendingPreviewEvals.get(d.id);
+      pendingPreviewEvals.delete(d.id);
+      cb(d.result, d.kind);
+    }
+  });
+
+  /* ----------------- BASH TERMINAL ------------------------------------- */
+  // The terminal keeps its own cwd (a virtual path under the file system that
+  // the file explorer manages). Everything is backed by the in-memory `files`
+  // dict + IndexedDB via the existing helpers (saveFileToIndexedDB, etc.).
+  let bashCwd = '';   // '' = root
+  let bashLastExit = 0;
+
+  function bashNormalize(p) {
+    // Absolute path if starts with '/', else joined against bashCwd
+    if (!p || p === '.') return bashCwd;
+    let base = p.startsWith('/') ? '' : bashCwd;
+    const parts = (base + '/' + p).split('/').filter(Boolean);
+    const out = [];
+    for (const seg of parts) {
+      if (seg === '.') continue;
+      if (seg === '..') { out.pop(); continue; }
+      out.push(seg);
+    }
+    return out.join('/');
+  }
+  function bashList(dir) {
+    dir = bashNormalize(dir);
+    const filesArr = Object.keys(typeof files !== 'undefined' ? files : {});
+    const kids = new Set();
+    const filesHere = [];
+    const prefix = dir === '' ? '' : dir + '/';
+    filesArr.forEach(name => {
+      if (dir === '' && !name.includes('/')) filesHere.push(name);
+      else if (name.startsWith(prefix)) {
+        const rest = name.slice(prefix.length);
+        if (!rest.includes('/')) filesHere.push(name);
+        else kids.add(rest.split('/')[0]);
+      }
+    });
+    // Also merge in known folder records
+    return new Promise(res => {
+      const finish = (folders) => {
+        folders.forEach(f => {
+          if (dir === '' && !f.includes('/')) kids.add(f);
+          else if (f.startsWith(prefix)) {
+            const rest = f.slice(prefix.length);
+            if (rest && !rest.includes('/')) kids.add(rest);
+          }
+        });
+        res({ dirs: Array.from(kids).sort(), files: filesHere.map(f => f.slice(prefix.length)).sort() });
+      };
+      if (typeof getAllFoldersFromDB === 'function') {
+        getAllFoldersFromDB().then(finish).catch(() => finish([]));
+      } else finish([]);
+    });
+  }
+  function bashResolveFile(p) { return bashNormalize(p); }
+  function bashFileExists(p) {
+    p = bashNormalize(p);
+    return typeof files !== 'undefined' && files.hasOwnProperty(p);
+  }
+  function bashDirExists(p) {
+    p = bashNormalize(p);
+    if (p === '') return true;
+    if (typeof files === 'undefined') return false;
+    if (Object.keys(files).some(f => f.startsWith(p + '/'))) return true;
+    // fall through — we can't sync-check the folder store, so accept optimistically
+    return null;
+  }
+
+  /* -- Parse a bash line into argv (handles quotes) -- */
+  function bashParse(line) {
+    const argv = []; let cur = ''; let q = null;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (q) {
+        if (c === q) q = null;
+        else if (c === '\\' && q === '"' && i + 1 < line.length) { cur += line[++i]; }
+        else cur += c;
+      } else if (c === '"' || c === "'") { q = c; }
+      else if (c === ' ' || c === '\t') { if (cur) { argv.push(cur); cur = ''; } }
+      else cur += c;
+    }
+    if (cur) argv.push(cur);
+    return argv;
+  }
+
+  const BASH_HELP = [
+    'File system:',
+    '  pwd                    print working directory',
+    '  cd <dir>               change directory (.., /, ~)',
+    '  ls [-a] [dir]          list contents (alias: dir)',
+    '  cat <file>             print file contents',
+    '  touch <file>           create empty file (or update)',
+    '  mkdir <dir>            create directory (recursive)',
+    '  rm [-r] <path>         remove file or directory',
+    '  mv <src> <dst>         move / rename',
+    '  cp <src> <dst>         copy file',
+    '  echo <text>            print text  (echo "hi" > file.txt to write)',
+    '  head <file> [-n N]     first N lines (default 10)',
+    '  tail <file> [-n N]     last N lines',
+    '  wc <file>              lines / words / chars',
+    '  find <pat>             find files by name substring',
+    '  grep <pat> <file>      search for pattern in file',
+    '  tree [dir]             show a directory tree',
+    '  stat <file>            show file size / modified',
+    'Node-style:',
+    '  node <file> | node -e "expr"    run JS (uses the page eval)',
+    '  npm install <pkg>      open the NPM installer for pkg',
+    '  npm ls                 list dependencies in ./package.json',
+    'Editor:',
+    '  open <file>            open file in the editor',
+    '  save                   save the current file',
+    '  which <cmd>            show what a command maps to',
+    '  clear                  clear the terminal',
+    '  history                show command history',
+    '  help                   this message',
+    '  exit                   close the terminal window',
+  ].join('\n');
+
+  function bashWriteFile(name, content) {
+    const full = bashNormalize(name);
+    if (!full) return Promise.reject(new Error('Refusing to write empty name'));
+    if (typeof files !== 'undefined') files[full] = content;
+    if (typeof lastSaveContent !== 'undefined') lastSaveContent[full] = content;
+    if (typeof savedFiles !== 'undefined' && savedFiles.add) savedFiles.add(full);
+    if (typeof saveFileToIndexedDB === 'function') {
+      return saveFileToIndexedDB(full, content).catch(() => {});
+    }
+    return Promise.resolve();
+  }
+  function bashRemoveFile(name) {
+    const full = bashNormalize(name);
+    if (typeof files !== 'undefined' && files.hasOwnProperty(full)) delete files[full];
+    if (typeof savedFiles !== 'undefined' && savedFiles.delete) savedFiles.delete(full);
+    if (typeof lastSaveContent !== 'undefined') delete lastSaveContent[full];
+    if (typeof db !== 'undefined' && db) {
+      return new Promise(res => {
+        try {
+          const tx = db.transaction(['files'], 'readwrite');
+          tx.objectStore('files').delete(full);
+          tx.oncomplete = () => res();
+          tx.onerror = () => res();
+        } catch(e) { res(); }
+      });
+    }
+    return Promise.resolve();
+  }
+  function bashMkdir(name) {
+    const full = bashNormalize(name);
+    if (typeof createFolderInDB === 'function') return createFolderInDB(full);
+    return Promise.resolve();
+  }
+  function bashRefreshExplorer() {
+    try { if (typeof updateFileExplorer === 'function') updateFileExplorer(); } catch(e){}
+    try { if (typeof loadDBFilesModal === 'function') loadDBFilesModal(); } catch(e){}
+  }
+
+  /* -- Execute one bash command -- */
+  async function bashExec(argv, rawLine) {
+    const cmd = argv[0];
+    // Simple ">" redirection: `echo hello > file.txt`
+    const redirIdx = argv.indexOf('>');
+    const appendIdx = argv.indexOf('>>');
+    let outFile = null, appendMode = false;
+    if (redirIdx > 0 && redirIdx < argv.length - 1) {
+      outFile = argv[redirIdx + 1];
+      argv = argv.slice(0, redirIdx);
+    } else if (appendIdx > 0 && appendIdx < argv.length - 1) {
+      outFile = argv[appendIdx + 1];
+      appendMode = true;
+      argv = argv.slice(0, appendIdx);
+    }
+    const emit = (text, kind) => {
+      if (outFile) {
+        const cur = (appendMode && files && files[bashNormalize(outFile)]) ? files[bashNormalize(outFile)] : '';
+        return bashWriteFile(outFile, cur + (cur && !cur.endsWith('\n') ? '\n' : '') + text)
+          .then(() => bashRefreshExplorer());
+      }
+      jscAppend(text, kind || 'output');
+    };
+
+    switch (cmd) {
+      case undefined: case '': return;
+      case 'help': case '?':
+        jscAppend(BASH_HELP, 'info'); return;
+      case 'clear':
+        if (jscBody) jscBody.innerHTML = '';
+        return;
+      case 'exit': closeJSConsole(); return;
+      case 'history':
+        jscHistory.forEach((h, i) => jscAppend((i + 1) + '  ' + h, 'output'));
+        return;
+      case 'pwd':
+        return emit('/' + (bashCwd || ''));
+      case 'cd': {
+        if (!argv[1] || argv[1] === '~' || argv[1] === '/') { bashCwd = ''; updateHint(); return; }
+        const target = bashNormalize(argv[1]);
+        const de = bashDirExists(target);
+        if (de === false) { jscAppend('cd: no such directory: ' + argv[1], 'error'); bashLastExit = 1; return; }
+        bashCwd = target;
+        updateHint();
+        return;
+      }
+      case 'ls': case 'dir': {
+        const showAll = argv.includes('-a') || argv.includes('-la');
+        const target = argv.find((a, i) => i > 0 && !a.startsWith('-')) || '.';
+        const { dirs, files: fs } = await bashList(target);
+        if (dirs.length === 0 && fs.length === 0) { emit('(empty)', 'output'); return; }
+        dirs.forEach(d => emit(d + '/', 'dir'));
+        fs.forEach(f => emit(f, 'output'));
+        return;
+      }
+      case 'tree': {
+        const target = bashNormalize(argv[1] || '.');
+        const prefix = target === '' ? '' : target + '/';
+        const rows = Object.keys(typeof files !== 'undefined' ? files : {})
+          .filter(f => target === '' || f === target || f.startsWith(prefix))
+          .sort();
+        if (rows.length === 0) { emit('(empty)', 'output'); return; }
+        emit((target || '/') + '/', 'dir');
+        rows.forEach(f => {
+          const rel = target === '' ? f : f.slice(prefix.length);
+          emit('  ' + rel, 'output');
+        });
+        return;
+      }
+      case 'cat': {
+        if (!argv[1]) { jscAppend('cat: missing operand', 'error'); return; }
+        const full = bashNormalize(argv[1]);
+        if (!bashFileExists(full)) { jscAppend('cat: ' + argv[1] + ': no such file', 'error'); return; }
+        return emit(files[full] || '', 'output');
+      }
+      case 'head': case 'tail': {
+        if (!argv[1]) { jscAppend(cmd + ': missing file', 'error'); return; }
+        const nIdx = argv.indexOf('-n');
+        const n = (nIdx > 0 && argv[nIdx + 1]) ? parseInt(argv[nIdx + 1], 10) : 10;
+        const full = bashNormalize(argv[1]);
+        if (!bashFileExists(full)) { jscAppend(cmd + ': ' + argv[1] + ': no such file', 'error'); return; }
+        const lines = (files[full] || '').split('\n');
+        const slice = cmd === 'head' ? lines.slice(0, n) : lines.slice(-n);
+        return emit(slice.join('\n'), 'output');
+      }
+      case 'wc': {
+        if (!argv[1]) { jscAppend('wc: missing file', 'error'); return; }
+        const full = bashNormalize(argv[1]);
+        if (!bashFileExists(full)) { jscAppend('wc: ' + argv[1] + ': no such file', 'error'); return; }
+        const c = files[full] || '';
+        return emit(c.split('\n').length + ' ' + c.split(/\s+/).filter(Boolean).length + ' ' + c.length + ' ' + argv[1], 'output');
+      }
+      case 'echo': {
+        const text = rawLine.replace(/^echo\s+/, '').replace(/\s*>>\s*\S+$/, '').replace(/\s*>\s*\S+$/, '');
+        // Strip surrounding quotes
+        const clean = text.replace(/^["']|["']$/g, '');
+        return emit(clean, 'output');
+      }
+      case 'touch': {
+        if (!argv[1]) { jscAppend('touch: missing file', 'error'); return; }
+        const full = bashNormalize(argv[1]);
+        if (!bashFileExists(full)) await bashWriteFile(full, '');
+        bashRefreshExplorer();
+        return;
+      }
+      case 'mkdir': {
+        if (!argv[1]) { jscAppend('mkdir: missing operand', 'error'); return; }
+        for (let i = 1; i < argv.length; i++) if (!argv[i].startsWith('-')) await bashMkdir(argv[i]);
+        bashRefreshExplorer();
+        return;
+      }
+      case 'rm': {
+        const recursive = argv.includes('-r') || argv.includes('-rf') || argv.includes('-R');
+        const targets = argv.slice(1).filter(a => !a.startsWith('-'));
+        if (targets.length === 0) { jscAppend('rm: missing operand', 'error'); return; }
+        for (const t of targets) {
+          const full = bashNormalize(t);
+          if (bashFileExists(full)) { await bashRemoveFile(full); }
+          else if (recursive) {
+            // Remove everything under that folder
+            const prefix = full + '/';
+            const kids = Object.keys(files || {}).filter(f => f === full || f.startsWith(prefix));
+            for (const k of kids) await bashRemoveFile(k);
+            if (typeof deleteFolderFromDB === 'function') await deleteFolderFromDB(full);
+          } else jscAppend('rm: cannot remove ' + t + ': is a directory (use -r)', 'error');
+        }
+        bashRefreshExplorer();
+        return;
+      }
+      case 'mv': case 'cp': {
+        if (!argv[1] || !argv[2]) { jscAppend(cmd + ': need <src> <dst>', 'error'); return; }
+        const src = bashNormalize(argv[1]);
+        const dst = bashNormalize(argv[2]);
+        if (!bashFileExists(src)) { jscAppend(cmd + ': ' + argv[1] + ': no such file', 'error'); return; }
+        await bashWriteFile(dst, files[src]);
+        if (cmd === 'mv') await bashRemoveFile(src);
+        bashRefreshExplorer();
+        return;
+      }
+      case 'find': {
+        if (!argv[1]) { jscAppend('find: missing pattern', 'error'); return; }
+        const pat = argv[1].toLowerCase();
+        const hits = Object.keys(files || {}).filter(f => f.toLowerCase().includes(pat));
+        if (hits.length === 0) return emit('(no matches)', 'output');
+        hits.forEach(f => emit(f, 'output'));
+        return;
+      }
+      case 'grep': {
+        if (!argv[1] || !argv[2]) { jscAppend('grep: usage: grep <pattern> <file>', 'error'); return; }
+        const pat = argv[1];
+        const full = bashNormalize(argv[2]);
+        if (!bashFileExists(full)) { jscAppend('grep: ' + argv[2] + ': no such file', 'error'); return; }
+        const re = new RegExp(pat);
+        const lines = (files[full] || '').split('\n');
+        let printed = 0;
+        lines.forEach((ln, i) => { if (re.test(ln)) { emit((i + 1) + ': ' + ln, 'output'); printed++; } });
+        if (printed === 0) emit('(no matches)', 'output');
+        return;
+      }
+      case 'stat': {
+        if (!argv[1]) { jscAppend('stat: missing file', 'error'); return; }
+        const full = bashNormalize(argv[1]);
+        if (!bashFileExists(full)) { jscAppend('stat: ' + argv[1] + ': no such file', 'error'); return; }
+        const size = (files[full] || '').length;
+        return emit('  File: ' + full + '\n  Size: ' + size + ' bytes\n  Type: ' + (full.split('.').pop() || 'file'), 'output');
+      }
+      case 'open': {
+        if (!argv[1]) { jscAppend('open: missing file', 'error'); return; }
+        const full = bashNormalize(argv[1]);
+        if (typeof openFile === 'function') openFile(full);
+        return;
+      }
+      case 'save': {
+        if (typeof saveCurrentFile === 'function') { saveCurrentFile(); emit('Saved ' + (typeof currentFile === 'string' ? currentFile : ''), 'info'); }
+        return;
+      }
+      case 'which': {
+        if (!argv[1]) { jscAppend('which: missing command', 'error'); return; }
+        const known = ['pwd','cd','ls','dir','cat','head','tail','wc','echo','touch','mkdir','rm','mv','cp','find','grep','tree','stat','open','save','node','npm','clear','history','help','exit','which'];
+        return emit(known.includes(argv[1]) ? '(built-in shell command)' : argv[1] + ': not found', 'output');
+      }
+      case 'node': {
+        // node -e "code"   or   node file.js
+        if (argv[1] === '-e' && argv[2]) {
+          const code = rawLine.replace(/^node\s+-e\s+/, '').replace(/^["']|["']$/g, '');
+          try { jscRenderResult((0, eval)(code)); }
+          catch(err) { jscAppend((err && err.stack) ? err.stack : String(err), 'error'); }
+          return;
+        }
+        if (argv[1]) {
+          const full = bashNormalize(argv[1]);
+          if (!bashFileExists(full)) { jscAppend('node: cannot find module: ' + argv[1], 'error'); return; }
+          try {
+            // eslint-disable-next-line no-new-func
+            new Function(files[full])();
+            emit('(exit 0)', 'info');
+          } catch(err) { jscAppend((err && err.stack) ? err.stack : String(err), 'error'); }
+          return;
+        }
+        jscAppend('node: interactive REPL not available — use the JS tab, or `node file.js`.', 'info');
+        return;
+      }
+      case 'npm': {
+        if (argv[1] === 'install' || argv[1] === 'i' || argv[1] === 'add') {
+          const pkg = argv[2];
+          if (typeof openNPMInstaller === 'function') openNPMInstaller();
+          if (pkg) {
+            setTimeout(() => {
+              const inp = document.getElementById('npm-search-input');
+              if (inp) { inp.value = pkg; inp.dispatchEvent(new Event('input')); }
+            }, 60);
+          }
+          return;
+        }
+        if (argv[1] === 'ls' || argv[1] === 'list') {
+          const pjPath = bashNormalize('package.json');
+          if (!bashFileExists(pjPath)) { emit('(no package.json in ' + (bashCwd || 'root') + ')', 'output'); return; }
+          try {
+            const pj = JSON.parse(files[pjPath] || '{}');
+            const deps = pj.dependencies || {};
+            const keys = Object.keys(deps);
+            if (keys.length === 0) emit('(no dependencies)', 'output');
+            else keys.forEach(k => emit('  ' + k + ' ' + deps[k], 'output'));
+          } catch(e) { emit('(malformed package.json)', 'error'); }
+          return;
+        }
+        jscAppend('npm: usage: npm install <pkg>  |  npm ls', 'info');
+        return;
+      }
+      default:
+        // If it looks like an assignment or expression in the JS tab, hint at it
+        jscAppend(cmd + ': command not found  (type `help`)', 'error');
+        bashLastExit = 127;
+    }
+  }
+
+  function jscRun(src) {
+    if (!src.trim()) return;
+    jscAppend(src, 'input');
+    jscHistory.push(src);
+    if (jscHistory.length > 200) jscHistory.shift();
+    jscHistIdx = jscHistory.length;
+    if (jscLang === 'bash') {
+      const argv = bashParse(src);
+      bashExec(argv, src.trim()).catch(err => {
+        jscAppend((err && err.stack) ? err.stack : String(err), 'error');
+      });
+    } else {
+      jscEvalJS(src);
+    }
+  }
+
+  function openJSConsole(opts) {
+    if (!jscWin) return;
+    opts = opts || {};
+    jscWin.classList.add('open');
+    patchConsoleOnce();
+    setLang(jscLang || 'js');
+    setScope(jscScope || 'page');
+    if (opts.scope) setScope(opts.scope);
+    if (opts.lang) setLang(opts.lang);
+    if (jscBody && jscBody.childElementCount === 0) {
+      jscAppend('Developer Console ready.  JS tab evaluates in the selected scope; Bash tab runs shell commands (`help`).', 'info');
+    }
+    setTimeout(() => { if (jscInput) jscInput.focus(); }, 30);
+  }
+  function closeJSConsole() { if (jscWin) jscWin.classList.remove('open'); }
+  window.__openJSConsole = openJSConsole;
+
+  if (jscClose) jscClose.addEventListener('click', closeJSConsole);
+  if (jscClear) jscClear.addEventListener('click', () => {
+    if (jscBody) jscBody.innerHTML = '';
+    jscAppend('Cleared.', 'info');
+  });
+
+  // Auto-grow textarea + Enter handling
+  if (jscInput) {
+    const autoGrow = () => {
+      jscInput.style.height = 'auto';
+      jscInput.style.height = Math.min(120, jscInput.scrollHeight) + 'px';
+    };
+    jscInput.addEventListener('input', autoGrow);
+
+    jscInput.addEventListener('keydown', (e) => {
+      // Enter runs; Shift+Enter inserts newline
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        const src = jscInput.value;
+        if (!src.trim()) return;
+        jscRun(src);
+        jscInput.value = '';
+        autoGrow();
+        return;
+      }
+      // Command history
+      if (e.key === 'ArrowUp' && (jscInput.selectionStart === 0 || jscInput.value === '')) {
+        if (jscHistory.length === 0) return;
+        e.preventDefault();
+        jscHistIdx = Math.max(0, jscHistIdx - 1);
+        jscInput.value = jscHistory[jscHistIdx] || '';
+        autoGrow();
+      } else if (e.key === 'ArrowDown' && jscHistory.length > 0) {
+        e.preventDefault();
+        jscHistIdx = Math.min(jscHistory.length, jscHistIdx + 1);
+        jscInput.value = jscHistory[jscHistIdx] || '';
+        autoGrow();
+      }
+    });
+  }
+
+  /* ---- Drag the JSC window by its header ---- */
+  (function() {
+    if (!jscHdr || !jscWin) return;
+    let dragging = false, ox = 0, oy = 0;
+    jscHdr.addEventListener('mousedown', (e) => {
+      // Ignore drags that start on the header buttons.
+      if (e.target.closest('button')) return;
+      dragging = true;
+      const r = jscWin.getBoundingClientRect();
+      ox = e.clientX - r.left;
+      oy = e.clientY - r.top;
+      document.body.style.userSelect = 'none';
+    });
+    document.addEventListener('mousemove', (e) => {
+      if (!dragging) return;
+      const w = jscWin.offsetWidth, h = jscWin.offsetHeight;
+      let nx = e.clientX - ox, ny = e.clientY - oy;
+      nx = Math.max(0, Math.min(window.innerWidth - w, nx));
+      ny = Math.max(0, Math.min(window.innerHeight - h, ny));
+      jscWin.style.left = nx + 'px';
+      jscWin.style.top  = ny + 'px';
+    });
+    document.addEventListener('mouseup', () => {
+      if (dragging) { dragging = false; document.body.style.userSelect = ''; }
+    });
+  })();
+
+  /* ---- Resize handle (bottom-right corner) ---- */
+  (function() {
+    if (!jscResize || !jscWin) return;
+    let resizing = false, sx = 0, sy = 0, sw = 0, sh = 0;
+    jscResize.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      resizing = true;
+      const r = jscWin.getBoundingClientRect();
+      sx = e.clientX; sy = e.clientY; sw = r.width; sh = r.height;
+      document.body.style.userSelect = 'none';
+    });
+    document.addEventListener('mousemove', (e) => {
+      if (!resizing) return;
+      const nw = Math.max(340, sw + (e.clientX - sx));
+      const nh = Math.max(200, sh + (e.clientY - sy));
+      jscWin.style.width  = nw + 'px';
+      jscWin.style.height = nh + 'px';
+    });
+    document.addEventListener('mouseup', () => {
+      if (resizing) { resizing = false; document.body.style.userSelect = ''; }
+    });
+  })();
+
+  /* =================================================================
+     NPM PACKAGE INSTALLER
+     ================================================================= */
+  const npmModal   = document.getElementById('npm-installer-modal');
+  const npmClose   = document.getElementById('npm-close-btn');
+  const npmSearch  = document.getElementById('npm-search-input');
+  const npmList    = document.getElementById('npm-package-list');
+  const npmTarget  = document.getElementById('npm-target-folder');
+  const npmLabel   = document.getElementById('npm-section-label');
+
+  // A hand-picked "most popular packages" list to seed the panel before the
+  // user searches. Kept small so the modal opens instantly without a network
+  // round-trip; the actual npmjs.com registry backs the search box.
+  const NPM_POPULAR = [
+    { name: 'react',       description: 'A JavaScript library for building user interfaces.', version: 'latest' },
+    { name: 'lodash',      description: 'A modern JavaScript utility library delivering modularity, performance & extras.', version: 'latest' },
+    { name: 'axios',       description: 'Promise based HTTP client for the browser and node.js.', version: 'latest' },
+    { name: 'express',     description: 'Fast, unopinionated, minimalist web framework for Node.js.', version: 'latest' },
+    { name: 'vue',         description: 'The progressive JavaScript framework.', version: 'latest' },
+    { name: 'chalk',       description: 'Terminal string styling done right.', version: 'latest' },
+    { name: 'moment',      description: 'Parse, validate, manipulate, and display dates.', version: 'latest' },
+    { name: 'uuid',        description: 'RFC-compliant UUIDs for JavaScript.', version: 'latest' },
+    { name: 'commander',   description: 'The complete solution for node.js command-line programs.', version: 'latest' },
+    { name: 'dotenv',      description: 'Loads environment variables from .env for nodejs projects.', version: 'latest' },
+    { name: 'typescript',  description: 'TypeScript is a language for application-scale JavaScript development.', version: 'latest' },
+    { name: 'jquery',      description: 'JavaScript library for DOM operations.', version: 'latest' },
+    { name: 'webpack',     description: 'A bundler for javascript and friends.', version: 'latest' },
+    { name: 'eslint',      description: 'An AST-based pattern checker for JavaScript.', version: 'latest' }
+  ];
+
+  function currentInstallFolder() {
+    try {
+      if (typeof getEditorFolder === 'function') return getEditorFolder() || '';
+    } catch(e) {}
+    return '';
+  }
+
+  function refreshNPMTargetLine() {
+    if (!npmTarget) return;
+    const f = currentInstallFolder();
+    npmTarget.textContent = f ? f : 'root';
+  }
+
+  function renderNPMPackages(pkgs, sectionTitle) {
+    if (!npmList) return;
+    npmList.innerHTML = '';
+    if (npmLabel && sectionTitle) npmLabel.textContent = sectionTitle;
+    if (!pkgs || pkgs.length === 0) {
+      const li = document.createElement('li');
+      li.className = 'empty';
+      li.textContent = 'No packages found';
+      npmList.appendChild(li);
+      return;
+    }
+    pkgs.forEach(pkg => {
+      const li = document.createElement('li');
+      const initials = (pkg.name || '?').replace(/^@[^/]+\//, '').slice(0, 2).toUpperCase();
+      const meta = [];
+      if (pkg.version) meta.push('v' + pkg.version);
+      if (pkg.publisher) meta.push('by ' + pkg.publisher);
+      li.innerHTML = `
+        <div class="npm-icon">${initials}</div>
+        <div class="npm-body">
+          <div class="npm-name"></div>
+          <div class="npm-desc"></div>
+          <div class="npm-meta">${meta.join(' · ')}</div>
+        </div>
+        <button type="button" class="npm-install-btn">Install</button>
+      `;
+      li.querySelector('.npm-name').textContent = pkg.name;
+      li.querySelector('.npm-desc').textContent = pkg.description || '';
+      const btn = li.querySelector('.npm-install-btn');
+      btn.addEventListener('click', () => installNPMPackage(pkg, btn));
+      npmList.appendChild(li);
+    });
+  }
+
+  /** Fetch npm search results. Uses the public registry search endpoint,
+   *  which supports CORS. Falls back to filtering the popular list. */
+  function searchNPM(term) {
+    term = (term || '').trim();
+    if (!term) {
+      renderNPMPackages(NPM_POPULAR, 'Most popular');
+      return;
+    }
+    renderNPMPackages([{ name: 'Searching…', description: '' }], 'Search: "' + term + '"');
+    fetch('https://registry.npmjs.org/-/v1/search?text=' + encodeURIComponent(term) + '&size=20')
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(data => {
+        const results = (data.objects || []).map(o => ({
+          name: o.package.name,
+          description: o.package.description || '',
+          version: o.package.version,
+          publisher: o.package.publisher ? o.package.publisher.username : ''
+        }));
+        renderNPMPackages(results, 'Search: "' + term + '"');
+      })
+      .catch(() => {
+        // Offline / blocked — fall back to local filter over the popular list
+        const t = term.toLowerCase();
+        const filtered = NPM_POPULAR.filter(p =>
+          p.name.toLowerCase().includes(t) ||
+          (p.description || '').toLowerCase().includes(t)
+        );
+        renderNPMPackages(filtered, 'Offline results for "' + term + '"');
+      });
+  }
+
+  /** Install a package into the current editor folder as a package.json entry
+   *  + a stub node_modules/<name>/package.json record. We record it into the
+   *  same IndexedDB the file explorer uses, so the user sees the installed
+   *  package in the editor's file tree. */
+  function installNPMPackage(pkg, btn) {
+    if (!pkg || !pkg.name) return;
+    const folder = currentInstallFolder();
+    const pkgJsonPath = folder ? folder + '/package.json' : 'package.json';
+    const modulePkgPath = (folder ? folder + '/' : '') + 'node_modules/' + pkg.name + '/package.json';
+
+    // Resolve version: use whatever the search API gave us, else 'latest'.
+    const version = pkg.version || 'latest';
+
+    btn.disabled = true;
+    btn.textContent = 'Installing…';
+
+    // 1) Ensure the destination folder record exists in DB (best-effort).
+    const ensureFolder = (folder && typeof createFolderInDB === 'function')
+      ? createFolderInDB(folder)
+      : Promise.resolve();
+
+    // 2) Also make sure the node_modules folder record exists.
+    const nmFolder = (folder ? folder + '/' : '') + 'node_modules/' + pkg.name;
+    const ensureNM = (typeof createFolderInDB === 'function') ? createFolderInDB(nmFolder) : Promise.resolve();
+
+    ensureFolder.then(() => ensureNM).then(() => {
+      // 3) Load-or-create package.json in the target folder.
+      const readPkgJson = new Promise(res => {
+        if (typeof files !== 'undefined' && files.hasOwnProperty(pkgJsonPath)) {
+          try { return res(JSON.parse(files[pkgJsonPath] || '{}')); }
+          catch(e) { return res({}); }
+        }
+        if (!db) return res({});
+        try {
+          const tx = db.transaction(['files'], 'readonly');
+          const r = tx.objectStore('files').get(pkgJsonPath);
+          r.onsuccess = () => {
+            const rec = r.result;
+            if (rec && rec.content) {
+              try { res(JSON.parse(rec.content)); } catch(e) { res({}); }
+            } else res({});
+          };
+          r.onerror = () => res({});
+        } catch(e) { res({}); }
+      });
+
+      readPkgJson.then(pj => {
+        pj.name = pj.name || (folder ? folder.split('/').pop() : 'project');
+        pj.version = pj.version || '1.0.0';
+        pj.dependencies = pj.dependencies || {};
+        pj.dependencies[pkg.name] = '^' + (version === 'latest' ? '0.0.0' : version);
+        const pjContent = JSON.stringify(pj, null, 2);
+
+        // 4) Write package.json + a stub module entry.
+        const stub = JSON.stringify({ name: pkg.name, version: version, description: pkg.description || '' }, null, 2);
+
+        const writeOne = (name, content) => new Promise(res2 => {
+          if (typeof files !== 'undefined') files[name] = content;
+          if (typeof savedFiles !== 'undefined' && savedFiles.add) savedFiles.add(name);
+          if (typeof lastSaveContent !== 'undefined') lastSaveContent[name] = content;
+          if (typeof saveFileToIndexedDB === 'function') {
+            saveFileToIndexedDB(name, content).then(() => res2()).catch(() => res2());
+          } else if (db) {
+            try {
+              const tx = db.transaction(['files'], 'readwrite');
+              tx.objectStore('files').put({ filename: name, content: content, lastModified: new Date().toISOString() });
+              tx.oncomplete = () => res2();
+              tx.onerror = () => res2();
+            } catch(e) { res2(); }
+          } else res2();
+        });
+
+        Promise.all([
+          writeOne(pkgJsonPath, pjContent),
+          writeOne(modulePkgPath, stub)
+        ]).then(() => {
+          btn.textContent = 'Installed';
+          btn.classList.add('installed');
+          btn.disabled = true;
+          try { if (typeof updateFileExplorer === 'function') updateFileExplorer(); } catch(e){}
+          try { if (typeof loadDBFilesModal === 'function') loadDBFilesModal(); } catch(e){}
+          if (typeof showToast === 'function') showToast('Installed "' + pkg.name + '" into ' + (folder || 'root'));
+        });
+      });
+    }).catch(() => {
+      btn.disabled = false;
+      btn.textContent = 'Install';
+      if (typeof showToast === 'function') showToast('Failed to install ' + pkg.name, 'error');
+    });
+  }
+
+  function openNPMInstaller() {
+    if (!npmModal) return;
+    refreshNPMTargetLine();
+    if (npmSearch) npmSearch.value = '';
+    renderNPMPackages(NPM_POPULAR, 'Most popular');
+    npmModal.style.display = 'flex';
+    setTimeout(() => { if (npmSearch) npmSearch.focus(); }, 40);
+  }
+  function closeNPMInstaller() { if (npmModal) npmModal.style.display = 'none'; }
+
+  if (npmClose) npmClose.addEventListener('click', closeNPMInstaller);
+  if (npmModal) npmModal.addEventListener('click', (e) => {
+    // click on backdrop closes the modal
+    if (e.target === npmModal) closeNPMInstaller();
+  });
+  // Debounced live search
+  if (npmSearch) {
+    let t = null;
+    npmSearch.addEventListener('input', () => {
+      clearTimeout(t);
+      t = setTimeout(() => searchNPM(npmSearch.value), 220);
+    });
+  }
+
+  // Expose for debugging / re-entry from the JS console
+  window.openJSConsole = openJSConsole;
+  window.openNPMInstaller = openNPMInstaller;
+})();
+</script>
 <!-- (removed 4x duplicated Cloudflare beacon scripts for reliability) -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
