@@ -2129,23 +2129,6 @@ body.dark-mode { background-color: #1e1e1e; }
   box-shadow: 0 1px 2px rgba(0,0,0,0.25);
 }
 
-/* JS scope selector — only visible while lang=js */
-#js-console-window #jsc-scope-select {
-  background: #0f1720;
-  color: #ecf0f1;
-  border: 1px solid #3a4b5c;
-  border-radius: 6px;
-  padding: 4px 8px;
-  font-size: 11.5px;
-  font-family: trebuchet ms;
-  outline: none;
-  cursor: pointer;
-  margin-right: 4px;
-  max-width: 140px;
-}
-#js-console-window #jsc-scope-select:focus { border-color: #3498db; }
-#js-console-window.lang-bash #jsc-scope-select { display: none; }
-
 /* Bash prompt line prefix */
 #js-console-window.lang-bash .jsc-line.input::before { content: '$ '; color: #27ae60; }
 #js-console-window.lang-bash .jsc-line.input  { color: #ecf0f1; }
@@ -2156,13 +2139,6 @@ body.dark-mode { background-color: #1e1e1e; }
 #js-console-window.lang-bash .jsc-input { font-family: 'Consolas', 'Menlo', 'Monaco', monospace; }
 #js-console-window.lang-bash .jsc-title svg { color: #27ae60; }
 
-/* Preview-scope banner */
-#js-console-window.scope-preview .jsc-body { background: #17232f; }
-#js-console-window.scope-preview .jsc-title svg { color: #f39c12; }
-
-/* When the console is showing "current-file" scope, add subtle strip on the left */
-#js-console-window.scope-file  .jsc-body { border-left: 3px solid #9b59b6; }
-#js-console-window.scope-preview .jsc-body { border-left: 3px solid #f39c12; }
 #js-console-window .jsc-body {
   flex: 1;
   overflow-y: auto;
@@ -2211,6 +2187,268 @@ body.dark-mode { background-color: #1e1e1e; }
   font-family: trebuchet ms;
 }
 #js-console-window .jsc-resize {
+  position: absolute;
+  right: 0; bottom: 0;
+  width: 14px; height: 14px;
+  cursor: nwse-resize;
+  background:
+    linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0.25) 60%, transparent 60%, transparent 70%, rgba(255,255,255,0.25) 70%, rgba(255,255,255,0.25) 80%, transparent 80%);
+}
+
+/* ===================================================================
+   CODE SNIPPETS — floating draggable window
+   =================================================================== */
+#snippets-window {
+  display: none;
+  position: fixed;
+  top: 80px;
+  left: 160px;
+  width: 720px;
+  height: 560px;
+  min-width: 460px;
+  min-height: 340px;
+  background: #1e2a37;
+  color: #ecf0f1;
+  border: 1px solid #3a4b5c;
+  border-radius: 10px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.65);
+  z-index: 1000075;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: trebuchet ms;
+}
+#snippets-window.open { display: flex; }
+#snippets-window .snip-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #1c2a37;
+  padding: 10px 12px;
+  border-bottom: 1px solid #3a4b5c;
+  cursor: move;
+  user-select: none;
+}
+#snippets-window .snip-title {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ecf0f1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#snippets-window .snip-title svg { width: 17px; height: 17px; color: #7fbfff; }
+#snippets-window .snip-header-btn {
+  background: transparent;
+  border: none;
+  color: #b0bec5;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+#snippets-window .snip-header-btn:hover { background: rgba(255,255,255,0.10); color: white; }
+#snippets-window .snip-header-btn svg { width: 15px; height: 15px; }
+
+#snippets-window .snip-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background: #182430;
+  border-bottom: 1px solid #3a4b5c;
+}
+#snippets-window .snip-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+#snippets-window .snip-search-wrap svg {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 15px;
+  height: 15px;
+  color: #7fbfff;
+  pointer-events: none;
+}
+#snippets-window #snip-search {
+  width: 100%;
+  padding: 8px 10px 8px 32px;
+  background: #0f1720;
+  color: #ecf0f1;
+  border: 1px solid #3a4b5c;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: trebuchet ms;
+  outline: none;
+  box-sizing: border-box;
+}
+#snippets-window #snip-search:focus { border-color: #3498db; }
+#snippets-window .snip-filters {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+#snippets-window .snip-lang-tabs {
+  display: inline-flex;
+  background: #0f1720;
+  border: 1px solid #3a4b5c;
+  border-radius: 6px;
+  padding: 2px;
+  gap: 2px;
+}
+#snippets-window .snip-lang-tab {
+  background: transparent;
+  color: #b0bec5;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: trebuchet ms;
+  cursor: pointer;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  transition: background 0.15s, color 0.15s;
+}
+#snippets-window .snip-lang-tab:hover { color: white; background: rgba(255,255,255,0.08); }
+#snippets-window .snip-lang-tab.active {
+  background: #3498db;
+  color: white;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.25);
+}
+#snippets-window .snip-lang-tab[data-lang="html"].active { background: #e67e22; }
+#snippets-window .snip-lang-tab[data-lang="css"].active  { background: #9b59b6; }
+#snippets-window .snip-lang-tab[data-lang="js"].active   { background: #f1c40f; color: #1e2a37; }
+#snippets-window #snip-sort {
+  background: #0f1720;
+  color: #ecf0f1;
+  border: 1px solid #3a4b5c;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-family: trebuchet ms;
+  cursor: pointer;
+  outline: none;
+  margin-left: auto;
+}
+#snippets-window #snip-sort:focus { border-color: #3498db; }
+
+#snippets-window .snip-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #1e2a37;
+}
+#snippets-window .snip-body::-webkit-scrollbar { width: 10px; }
+#snippets-window .snip-body::-webkit-scrollbar-thumb { background: #3a4b5c; border-radius: 6px; }
+
+#snippets-window .snip-card {
+  background: #253645;
+  border: 1px solid #3a4b5c;
+  border-radius: 8px;
+  padding: 10px 12px;
+  transition: border-color 0.15s, transform 0.1s;
+}
+#snippets-window .snip-card:hover { border-color: #4a6278; }
+#snippets-window .snip-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+#snippets-window .snip-lang-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 3px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  color: white;
+}
+#snippets-window .snip-lang-badge.html { background: #e67e22; }
+#snippets-window .snip-lang-badge.css  { background: #9b59b6; }
+#snippets-window .snip-lang-badge.js   { background: #f1c40f; color: #1e2a37; }
+#snippets-window .snip-cat-badge {
+  font-size: 10px;
+  padding: 3px 7px;
+  border-radius: 4px;
+  background: #34495e;
+  color: #b0bec5;
+}
+#snippets-window .snip-name {
+  flex: 1;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #ecf0f1;
+}
+#snippets-window .snip-actions {
+  display: flex;
+  gap: 6px;
+}
+#snippets-window .snip-btn {
+  background: #34495e;
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-family: trebuchet ms;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+#snippets-window .snip-btn:hover { background: #3498db; }
+#snippets-window .snip-btn.primary { background: #27ae60; }
+#snippets-window .snip-btn.primary:hover { background: #2ecc71; }
+#snippets-window .snip-desc {
+  font-size: 12px;
+  color: #b0bec5;
+  margin: 4px 0 8px;
+  line-height: 1.45;
+}
+#snippets-window .snip-code {
+  background: #0f1720;
+  color: #ecf0f1;
+  border: 1px solid #3a4b5c;
+  border-radius: 5px;
+  padding: 8px 10px;
+  font-family: 'Consolas', 'Menlo', 'Monaco', monospace;
+  font-size: 12px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 200px;
+  overflow-y: auto;
+  margin: 0;
+}
+#snippets-window .snip-empty {
+  text-align: center;
+  color: #6b7c8f;
+  padding: 40px 20px;
+  font-style: italic;
+}
+#snippets-window .snip-footer {
+  padding: 8px 12px;
+  background: #182430;
+  border-top: 1px solid #3a4b5c;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #6b7c8f;
+}
+#snippets-window .snip-hint b { color: #b0bec5; }
+#snippets-window .snip-resize {
   position: absolute;
   right: 0; bottom: 0;
   width: 14px; height: 14px;
@@ -2900,9 +3138,6 @@ body.dark-mode { background-color: #1e1e1e; }
             <polyline points="15 3 21 3 21 9"/>
             <line x1="10" y1="14" x2="21" y2="3"/>
           </svg>
-        </button>
-        <button id="preview-localhost-toggle" class="header-btn" title="Serve preview from a fake localhost:// origin (via service worker)" style="margin-right:6px; padding:4px 10px; font-size:11px; font-weight:600; letter-spacing:0.4px; border-radius:6px; background:transparent; border:1px solid rgba(255,255,255,0.35); color:white; font-family:trebuchet ms; cursor:pointer;">
-          <span style="opacity:0.75;">Serve:</span> <span id="preview-localhost-label">srcdoc</span>
         </button>
         <button id="reload-preview-btn" class="header-btn" title="Reload Preview" style="margin-right:8px;">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="22" height="22">
@@ -5511,40 +5746,15 @@ function __jscInjectPreviewBridge(html, fileName) {
   return shim + html;
 }
 
-/* Preview → parent bridge handler: shows toast for uncaught errors and
-   auto-routes them to the developer console (Preview scope). */
+/* Preview → parent bridge handler: shows a toast for uncaught errors in the
+   preview iframe. The JS Console is standalone and unrelated to the preview,
+   so we only surface a toast here — we don't auto-open the console. */
 window.addEventListener('message', (e) => {
   const d = e && e.data;
   if (!d || d.__jscBridge !== 'preview') return;
   if (d.kind === 'error') {
-    // Show a toast — clickable messages aren't supported, but keep the msg short.
     const short = (d.message || 'Uncaught error in preview').toString().slice(0, 160);
     try { showToast(short, 'error', 4200); } catch(_) {}
-    // Auto-route: if the buggy file is the current file, open the console in
-    // Preview scope so the user immediately sees it.
-    try {
-      const buggy = d.source || '';
-      const cur   = (typeof currentFile === 'string') ? currentFile : '';
-      const willAutoOpen = (buggy && cur && (buggy === cur || buggy.endsWith('/' + cur) || cur.endsWith('/' + buggy)));
-      if (willAutoOpen && typeof window.__openJSConsole === 'function') {
-        window.__openJSConsole({ scope: 'preview', lang: 'js' });
-      }
-      if (typeof window.__jscAppend === 'function') {
-        const loc = (d.line ? ' (line ' + d.line + (d.col ? ':' + d.col : '') + ')' : '');
-        window.__jscAppend('[preview error] ' + d.message + loc, 'error');
-        if (d.stack) window.__jscAppend(d.stack, 'error');
-      }
-    } catch(_) {}
-  } else if (d.kind === 'log' && typeof window.__jscAppend === 'function') {
-    // Only mirror preview logs into the console if the user is currently
-    // looking at the Preview scope — otherwise this would be noisy.
-    try {
-      const win = document.getElementById('js-console-window');
-      if (win && win.classList.contains('open') && win.classList.contains('scope-preview')) {
-        const kind = d.level === 'error' ? 'error' : (d.level === 'warn' ? 'info' : 'log');
-        window.__jscAppend('[preview:' + d.level + '] ' + d.message, kind);
-      }
-    } catch(_) {}
   }
 });
 
@@ -5574,16 +5784,7 @@ document.getElementById("preview-code-btn").onclick = () => {
   } else {
     titleSpan.textContent = currentFile;
   }
-  // Decide between srcdoc and the localhost:// service-worker URL.
-  const useLocalhost = (typeof window.__previewUseLocalhost === 'function') && window.__previewUseLocalhost();
-  if (useLocalhost && isHTML && typeof window.__previewOverLocalhost === 'function') {
-    window.__previewOverLocalhost(currentFile, content).then(url => {
-      if (url) { iframe.removeAttribute('srcdoc'); iframe.src = url; }
-      else     { iframe.srcdoc = isHTML ? __jscInjectPreviewBridge(content, currentFile) : content; }
-    });
-  } else {
-    iframe.srcdoc = isHTML ? __jscInjectPreviewBridge(content, currentFile) : content;
-  }
+  iframe.srcdoc = isHTML ? __jscInjectPreviewBridge(content, currentFile) : content;
   modal.style.display = "block";
 };
 document.getElementById("reload-preview-btn").onclick = () => {
@@ -5645,156 +5846,6 @@ window.onclick = function(e) {
     if (cancel) cancel.click();
   }
 };
-
-/* =============================================================
-   LOCALHOST-STYLE PREVIEW (Service Worker)
-   ============================================================
-   Serves the preview iframe from a fake "http(s)://<origin>/__jsi/…"
-   path, so pages under preview see:
-   • an origin (window.location.origin) instead of "null"
-   • cookies + localStorage keyed to that origin
-   • a real URL bar location, absolute paths in the address, etc.
-   Requires a service worker; if the browser blocks it (e.g. inside
-   a sandboxed iframe context) we fall back to srcdoc silently.
-============================================================= */
-(function() {
-  let __localhostEnabled = false;
-  let __swReady = null;    // Promise<ServiceWorkerRegistration|null>
-  let __virtualFiles = {}; // path -> {content, ctype}
-
-  function __supportsSW() {
-    return ('serviceWorker' in navigator) && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1');
-  }
-
-  function __ensureSW() {
-    if (__swReady) return __swReady;
-    if (!__supportsSW()) return (__swReady = Promise.resolve(null));
-
-    const swSrc = [
-      "self.addEventListener('install', e => self.skipWaiting());",
-      "self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));",
-      "const __store = new Map();",
-      "self.addEventListener('message', e => {",
-      "  const d = e.data || {};",
-      "  if (d.__jsi === 'set-file')   __store.set(d.path, { content:d.content, ctype:d.ctype });",
-      "  if (d.__jsi === 'set-batch')  { (d.files||[]).forEach(f => __store.set(f.path, { content:f.content, ctype:f.ctype })); }",
-      "  if (d.__jsi === 'clear')      __store.clear();",
-      "});",
-      "self.addEventListener('fetch', e => {",
-      "  const url = new URL(e.request.url);",
-      "  if (!url.pathname.startsWith('/__jsi/')) return;",
-      "  const key = decodeURIComponent(url.pathname.replace(/^\\/__jsi\\//, ''));",
-      "  const rec = __store.get(key);",
-      "  if (rec) {",
-      "    e.respondWith(new Response(rec.content, { status:200, headers: { 'Content-Type': rec.ctype || 'text/html; charset=utf-8', 'X-JSI-Served':'1' } }));",
-      "  } else {",
-      "    e.respondWith(new Response('Not Found: ' + key, { status:404, headers: { 'Content-Type':'text/plain' } }));",
-      "  }",
-      "});"
-    ].join('\n');
-
-    return (__swReady = new Promise(res => {
-      try {
-        const blob = new Blob([swSrc], { type: 'application/javascript' });
-        // Service workers can't be registered from blob: URLs on all browsers;
-        // fall back to a data URL and if that fails as well, disable.
-        const url = URL.createObjectURL(blob);
-        navigator.serviceWorker.register(url, { scope: '/__jsi/' })
-          .then(reg => {
-            // Wait until it's controlling us
-            const waitReady = navigator.serviceWorker.ready.then(() => reg);
-            res(waitReady);
-          })
-          .catch(() => res(null));
-      } catch(e) { res(null); }
-    }));
-  }
-
-  const CTYPE = {
-    'html':'text/html; charset=utf-8', 'htm':'text/html; charset=utf-8',
-    'js':'application/javascript', 'mjs':'application/javascript',
-    'css':'text/css', 'json':'application/json',
-    'svg':'image/svg+xml', 'txt':'text/plain', 'md':'text/plain',
-    'png':'image/png', 'jpg':'image/jpeg', 'jpeg':'image/jpeg', 'gif':'image/gif', 'webp':'image/webp'
-  };
-  function __ctype(name) {
-    const ext = (name || '').toLowerCase().split('.').pop();
-    return CTYPE[ext] || 'text/plain; charset=utf-8';
-  }
-
-  // Publish every editor-visible file under /__jsi/ so relative asset URLs
-  // (./style.css, images, etc.) referenced by the previewed HTML resolve.
-  function __syncFilesToSW(mainFile, mainContent) {
-    return __ensureSW().then(reg => {
-      if (!reg) return null;
-      const target = navigator.serviceWorker.controller || reg.active || reg.waiting || reg.installing;
-      if (!target) return null;
-      const batch = [];
-      const filesLive = (typeof files !== 'undefined') ? files : {};
-      Object.keys(filesLive).forEach(name => {
-        // Only publish stringy content
-        if (typeof filesLive[name] === 'string') {
-          batch.push({ path: name, content: filesLive[name], ctype: __ctype(name) });
-        }
-      });
-      // Ensure the "main" file we're about to load carries the bridge shim
-      const mainInjected = __jscInjectPreviewBridge(mainContent, mainFile);
-      const idx = batch.findIndex(x => x.path === mainFile);
-      if (idx >= 0) batch[idx] = { path: mainFile, content: mainInjected, ctype: __ctype(mainFile) };
-      else          batch.push({ path: mainFile, content: mainInjected, ctype: __ctype(mainFile) });
-
-      // Save state locally too, in case the SW respawns.
-      batch.forEach(b => __virtualFiles[b.path] = b);
-      target.postMessage({ __jsi: 'set-batch', files: batch });
-      return '/__jsi/' + mainFile;
-    });
-  }
-
-  // Public API used by the preview-code button
-  window.__previewUseLocalhost = () => __localhostEnabled;
-  window.__previewOverLocalhost = (fileName, content) => __syncFilesToSW(fileName, content);
-
-  // Toggle button in the preview modal header
-  const toggle = document.getElementById('preview-localhost-toggle');
-  const label  = document.getElementById('preview-localhost-label');
-
-  function refreshLabel() {
-    if (!label) return;
-    if (__localhostEnabled) {
-      label.textContent = 'localhost://';
-      toggle.style.borderColor = '#27ae60';
-      toggle.style.background = 'rgba(39,174,96,0.20)';
-    } else {
-      label.textContent = 'srcdoc';
-      toggle.style.borderColor = 'rgba(255,255,255,0.35)';
-      toggle.style.background = 'transparent';
-    }
-  }
-  refreshLabel();
-
-  if (toggle) toggle.addEventListener('click', () => {
-    if (!__supportsSW()) {
-      showToast('This browser context blocks service workers — falling back to srcdoc.', 'warning', 3800);
-      return;
-    }
-    __localhostEnabled = !__localhostEnabled;
-    refreshLabel();
-    showToast(__localhostEnabled
-      ? 'Preview will now be served from a fake localhost:// URL (via service worker).'
-      : 'Preview will use srcdoc (in-memory).', 'info', 2600);
-
-    // If the preview modal is open right now, re-load using the new mode.
-    const modal = document.getElementById('preview-modal');
-    if (modal && modal.style.display && modal.style.display !== 'none') {
-      const btn = document.getElementById('preview-code-btn');
-      if (btn) btn.onclick && btn.onclick();
-    }
-  });
-
-  // Best-effort: kick off SW registration in the background so the first
-  // toggle click doesn't stall while the SW installs.
-  if (__supportsSW()) __ensureSW();
-})();
 
 /* =============================================================
    FIND / REPLACE
@@ -7902,6 +7953,14 @@ setTimeout(() => document.querySelectorAll('.draggable-window').forEach(makeDrag
       <span class="td-desc">Install popular packages into this folder</span>
     </span>
   </button>
+  <div class="td-divider"></div>
+  <button type="button" id="tool-code-snippets" role="menuitem">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/><line x1="14" y1="4" x2="10" y2="20"/></svg>
+    <span class="td-label">
+      <span class="td-title">Code Snippets</span>
+      <span class="td-desc">Searchable library of HTML / CSS / JS snippets</span>
+    </span>
+  </button>
 </div>
 
 <!-- ==================================================================
@@ -7920,13 +7979,6 @@ setTimeout(() => document.querySelectorAll('.draggable-window').forEach(makeDrag
       <button type="button" class="jsc-lang-tab"        data-lang="bash" role="tab">Bash</button>
     </div>
 
-    <!-- JS-only scope selector (Page / Current file / Preview) -->
-    <select id="jsc-scope-select" title="Evaluation scope">
-      <option value="page">Page context</option>
-      <option value="file">Current file</option>
-      <option value="preview">Preview (iframe)</option>
-    </select>
-
     <button type="button" id="jsc-clear-btn" class="jsc-header-btn" title="Clear">
       <!-- Proper trash icon: lid handle bar (top short line) + lid tray + can body + two ribs -->
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -7944,9 +7996,52 @@ setTimeout(() => document.querySelectorAll('.draggable-window').forEach(makeDrag
   <div class="jsc-body" id="jsc-body"></div>
   <div class="jsc-input-wrap">
     <textarea id="jsc-input" class="jsc-input" placeholder="Type an expression and press Enter (Shift+Enter for a new line)…" spellcheck="false" rows="1"></textarea>
-    <div class="jsc-hint" id="jsc-hint">Enter runs · Shift+Enter = new line · ↑/↓ = history · scope = <b>Page context</b> (has <code>files</code>, <code>editor</code>, <code>db</code>).</div>
+    <div class="jsc-hint" id="jsc-hint">Enter runs · Shift+Enter = new line · ↑/↓ = history · standalone sandbox — variables persist between commands.</div>
   </div>
   <div class="jsc-resize" id="jsc-resize"></div>
+</div>
+
+<!-- ==================================================================
+     CODE SNIPPETS — floating draggable window
+     ================================================================== -->
+<div id="snippets-window" role="dialog" aria-label="Code Snippets">
+  <div class="snip-header" id="snip-header">
+    <div class="snip-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/><line x1="14" y1="4" x2="10" y2="20"/></svg>
+      <span>Code Snippets</span>
+    </div>
+    <button type="button" id="snip-close-btn" class="snip-header-btn" title="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="snip-toolbar">
+    <div class="snip-search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+      <input type="text" id="snip-search" placeholder="Search snippets by name, tag, or description…" spellcheck="false" autocomplete="off">
+    </div>
+    <div class="snip-filters">
+      <div class="snip-lang-tabs" role="tablist">
+        <button type="button" class="snip-lang-tab active" data-lang="all">All</button>
+        <button type="button" class="snip-lang-tab" data-lang="html">HTML</button>
+        <button type="button" class="snip-lang-tab" data-lang="css">CSS</button>
+        <button type="button" class="snip-lang-tab" data-lang="js">JS</button>
+      </div>
+      <select id="snip-sort" title="Sort order">
+        <option value="cat">Sort: By category</option>
+        <option value="az">Sort: A → Z</option>
+        <option value="za">Sort: Z → A</option>
+        <option value="lang">Sort: By language</option>
+      </select>
+    </div>
+  </div>
+  <div class="snip-body" id="snip-body">
+    <!-- snippet cards get injected here -->
+  </div>
+  <div class="snip-footer">
+    <span id="snip-count">0 snippets</span>
+    <span class="snip-hint">Click <b>Copy</b> to copy · <b>Insert</b> to paste at cursor</span>
+  </div>
+  <div class="snip-resize" id="snip-resize"></div>
 </div>
 
 <!-- ==================================================================
@@ -8058,6 +8153,12 @@ setTimeout(() => document.querySelectorAll('.draggable-window').forEach(makeDrag
     openNPMInstaller();
   });
 
+  const snipBtn = document.getElementById('tool-code-snippets');
+  if (snipBtn) snipBtn.addEventListener('click', () => {
+    closeToolsDD();
+    if (typeof openCodeSnippets === 'function') openCodeSnippets();
+  });
+
   /* =================================================================
      JS CONSOLE — floating draggable window
      ================================================================= */
@@ -8071,17 +8172,63 @@ setTimeout(() => document.querySelectorAll('.draggable-window').forEach(makeDrag
 
   const jscHistory = [];
   let jscHistIdx = -1;
-  let jscPatched = false;
 
-  /* ---------- State: language (js|bash) + JS scope (page|file|preview) ---- */
+  /* ---------- State: language (js|bash) ---------------------------------- */
   let jscLang  = 'js';
-  let jscScope = 'page';
 
   const langTabs   = jscWin ? jscWin.querySelectorAll('.jsc-lang-tab') : [];
-  const scopeSel   = document.getElementById('jsc-scope-select');
   const jscHint    = document.getElementById('jsc-hint');
   const jscTitleT  = document.getElementById('jsc-title-text');
   const jscInputEl = document.getElementById('jsc-input');
+
+  /* ---------- Standalone JS sandbox --------------------------------------
+   * The JS Console runs in its OWN isolated context — it does not touch
+   * `files`, `editor`, or the preview iframe. A hidden same-origin iframe
+   * hosts the sandbox so declarations (var/let/const/function) persist
+   * across commands, and the sandbox has its own `window`, `console`,
+   * `document`, timers, etc. We intercept its `console.log/info/warn/error`
+   * so those calls print into this pane instead of the browser devtools.
+   * -------------------------------------------------------------------- */
+  let jscSandbox = null;   // window of the hidden iframe
+  function jscEnsureSandbox() {
+    if (jscSandbox && !jscSandbox.closed && jscSandbox.document) return jscSandbox;
+    let host = document.getElementById('jsc-sandbox-host');
+    if (host && host.parentNode) host.parentNode.removeChild(host);
+    host = document.createElement('iframe');
+    host.id = 'jsc-sandbox-host';
+    host.setAttribute('aria-hidden', 'true');
+    host.style.cssText = 'position:absolute;width:0;height:0;border:0;left:-9999px;top:-9999px;';
+    // Blank same-origin document so we can eval JS inside it.
+    host.srcdoc = '<!doctype html><html><head><meta charset="utf-8"></head><body></body></html>';
+    document.body.appendChild(host);
+    jscSandbox = host.contentWindow;
+    // Wait a tick for the srcdoc to finish parsing on some browsers.
+    try {
+      const sw = jscSandbox;
+      // Patch console methods to route into our pane.
+      ['log','info','warn','error','debug'].forEach(fn => {
+        const orig = sw.console[fn].bind(sw.console);
+        sw.console[fn] = function(...args) {
+          try {
+            const kind = fn === 'error' ? 'error' : (fn === 'warn' ? 'info' : 'log');
+            jscAppend(args.map(a => jscFormatArg(a)).join(' '), kind);
+          } catch(_) {}
+          return orig.apply(sw.console, args);
+        };
+      });
+      // Handy globals inside the sandbox
+      sw.$clear = () => { if (jscBody) jscBody.innerHTML = ''; };
+    } catch(_) {}
+    return jscSandbox;
+  }
+
+  function jscFormatArg(a) {
+    if (typeof a === 'string') return a;
+    if (a === null) return 'null';
+    if (a === undefined) return 'undefined';
+    if (typeof a === 'function') return a.toString();
+    try { return JSON.stringify(a); } catch(_) { return String(a); }
+  }
 
   function jscAppend(text, kind) {
     if (!jscBody) return;
@@ -8104,13 +8251,7 @@ setTimeout(() => document.querySelectorAll('.draggable-window').forEach(makeDrag
     if (jscLang === 'bash') {
       jscHint.innerHTML = 'Enter runs · ↑/↓ = history · type <code>help</code> for the command list · cwd = <code>' + (bashCwd || '/') + '</code>';
     } else {
-      const label = jscScope === 'file' ? 'Current file' : (jscScope === 'preview' ? 'Preview iframe' : 'Page context');
-      const extra = jscScope === 'preview'
-        ? 'runs inside the preview iframe (whatever your preview page exposes).'
-        : (jscScope === 'file'
-            ? 'evaluates the CURRENT file with the page as its host — great for testing a snippet you just wrote.'
-            : 'runs against the top page (has <code>files</code>, <code>editor</code>, <code>db</code>).');
-      jscHint.innerHTML = 'Enter runs · Shift+Enter = new line · ↑/↓ = history · scope = <b>' + label + '</b> — ' + extra;
+      jscHint.innerHTML = 'Enter runs · Shift+Enter = new line · ↑/↓ = history · <b>standalone sandbox</b> — variables persist. Type <code>$clear()</code> to clear.';
     }
   }
 
@@ -8130,52 +8271,21 @@ setTimeout(() => document.querySelectorAll('.draggable-window').forEach(makeDrag
     updateHint();
   }
 
-  function setScope(scope) {
-    jscScope = scope;
-    if (scopeSel && scopeSel.value !== scope) scopeSel.value = scope;
-    if (jscWin) {
-      jscWin.classList.remove('scope-page','scope-file','scope-preview');
-      jscWin.classList.add('scope-' + scope);
-    }
-    updateHint();
-  }
-
   langTabs.forEach(btn => {
     btn.addEventListener('click', () => setLang(btn.dataset.lang));
   });
-  if (scopeSel) scopeSel.addEventListener('change', () => setScope(scopeSel.value));
-
-  // Mirror console.log/warn/error into the JSC pane, but only while it's open
-  // AND we're on the "page" JS scope (so we don't cross-pollute preview logs).
-  function patchConsoleOnce() {
-    if (jscPatched) return;
-    jscPatched = true;
-    ['log','info','warn','error'].forEach(fn => {
-      const orig = console[fn].bind(console);
-      console[fn] = function(...args) {
-        try {
-          if (jscWin && jscWin.classList.contains('open') && jscLang === 'js' && jscScope === 'page') {
-            const kind = fn === 'error' ? 'error' : (fn === 'warn' ? 'info' : 'log');
-            jscAppend(args.map(a => {
-              if (typeof a === 'string') return a;
-              try { return JSON.stringify(a); } catch(e) { return String(a); }
-            }).join(' '), kind);
-          }
-        } catch(e) {}
-        return orig(...args);
-      };
-    });
-  }
 
   /* ------ Render an eval result the way a browser console would --------- */
   function jscRenderResult(result) {
-    if (typeof result === 'undefined') jscAppend('undefined', 'output');
-    else if (result === null) jscAppend('null', 'output');
+    if (typeof result === 'undefined') return; // suppress trailing undefined
+    if (result === null) jscAppend('null', 'output');
     else if (typeof result === 'string') jscAppend('"' + result + '"', 'output');
+    else if (typeof result === 'number' || typeof result === 'boolean' || typeof result === 'bigint') jscAppend(String(result), 'output');
+    else if (typeof result === 'symbol') jscAppend(result.toString(), 'output');
     else if (typeof result === 'function') jscAppend(result.toString().slice(0, 400), 'output');
     else if (result && typeof result.then === 'function') {
       jscAppend('Promise { <pending> }', 'info');
-      result.then(v => jscAppend('Promise resolved: ' + (typeof v === 'string' ? v : (function(){ try { return JSON.stringify(v); } catch(e) { return String(v); } })()), 'log'))
+      result.then(v => jscAppend('Promise resolved: ' + jscFormatArg(v), 'log'))
             .catch(err => jscAppend('Promise rejected: ' + (err && err.stack ? err.stack : String(err)), 'error'));
     } else {
       try { jscAppend(JSON.stringify(result, null, 2), 'output'); }
@@ -8183,97 +8293,35 @@ setTimeout(() => document.querySelectorAll('.draggable-window').forEach(makeDrag
     }
   }
 
-  /* ------ Evaluate a JS expression in the currently-selected scope ------ */
+  /* ------ Evaluate a JS expression inside the standalone sandbox --------
+   * We first try to treat the input as an expression (so `1+1` prints `2`).
+   * If that syntax-errors, we run it as a statement block (so
+   * `let x = 5; x*x` works too — the last expression becomes the result
+   * via a small transform, and pure statements just execute).
+   * -------------------------------------------------------------------- */
   function jscEvalJS(src) {
-    if (jscScope === 'page') {
-      try { jscRenderResult((0, eval)(src)); }
-      catch(err) { jscAppend((err && err.stack) ? err.stack : String(err), 'error'); }
-      return;
+    const sw = jscEnsureSandbox();
+    if (!sw || !sw.eval) { jscAppend('Sandbox unavailable.', 'error'); return; }
+    // Fast path: treat the whole thing as an expression.
+    let result, ran = false;
+    try {
+      // Wrap in parens so object literals like `{a:1}` parse as expressions.
+      result = sw.eval('(' + src + '\n)');
+      ran = true;
+    } catch(err) {
+      // Fall through to statement mode
     }
-    if (jscScope === 'file') {
-      // Wrap the current file's contents + the user's expression in a Function
-      // so the file's declarations are visible to the expression on the last line.
-      let fileSrc = '';
+    if (!ran) {
       try {
-        if (typeof currentFile !== 'undefined' && currentFile && typeof files !== 'undefined' && files.hasOwnProperty(currentFile)) {
-          fileSrc = files[currentFile] || '';
-        } else if (typeof editor !== 'undefined' && editor && typeof editor.getValue === 'function') {
-          fileSrc = editor.getValue();
-        }
-      } catch(e) {}
-      // Strip <script> wrappers if it's an HTML file — extract inline JS.
-      const ext = (typeof currentFile === 'string' ? currentFile.toLowerCase().split('.').pop() : 'js');
-      if (['html','htm','shtml','shtm','xhtml'].includes(ext)) {
-        const scripts = [];
-        fileSrc.replace(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi, (_, body) => { scripts.push(body); return ''; });
-        fileSrc = scripts.join('\n;\n');
-      }
-      try {
-        // eslint-disable-next-line no-new-func
-        const runner = new Function(fileSrc + '\n;return (' + src + ');');
-        jscRenderResult(runner());
+        result = sw.eval(src);
+        ran = true;
       } catch(err) {
-        // If it was a statement not an expression, retry as a plain body.
-        try {
-          // eslint-disable-next-line no-new-func
-          new Function(fileSrc + '\n;' + src)();
-          jscAppend('(ok — statement)', 'info');
-        } catch(err2) {
-          jscAppend((err2 && err2.stack) ? err2.stack : String(err2), 'error');
-        }
-      }
-      return;
-    }
-    if (jscScope === 'preview') {
-      const iframe = document.getElementById('code-preview');
-      if (!iframe || !iframe.contentWindow) {
-        jscAppend('No preview iframe is open.', 'error');
+        jscAppend((err && err.stack) ? err.stack : String(err), 'error');
         return;
       }
-      // Try direct eval first (same-origin sandbox flag makes it possible for srcdoc)
-      let ok = false;
-      try {
-        const w = iframe.contentWindow;
-        if (w && w.eval) {
-          jscRenderResult(w.eval(src));
-          ok = true;
-        }
-      } catch(_) {}
-      if (!ok) {
-        // Fall back to postMessage-based bridge (works for cross-origin previews
-        // and for the localhost:// service-worker preview).
-        const id = 'q_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
-        pendingPreviewEvals.set(id, (result, kind) => {
-          if (kind === 'error') jscAppend(result, 'error');
-          else jscRenderResult(result);
-        });
-        try {
-          iframe.contentWindow.postMessage({ __jscBridge: 'eval', id: id, src: src }, '*');
-          setTimeout(() => {
-            if (pendingPreviewEvals.has(id)) {
-              pendingPreviewEvals.delete(id);
-              jscAppend('(preview eval timed out — the preview page must include the JS Insider bridge shim)', 'error');
-            }
-          }, 4000);
-        } catch(err) {
-          jscAppend('Preview eval failed: ' + err, 'error');
-        }
-      }
-      return;
     }
+    jscRenderResult(result);
   }
-
-  /* ---- Pending eval callbacks (Preview scope bridge) ------------------- */
-  const pendingPreviewEvals = new Map();
-  window.addEventListener('message', (e) => {
-    const d = e && e.data;
-    if (!d || typeof d !== 'object') return;
-    if (d.__jscBridge === 'eval-result' && d.id && pendingPreviewEvals.has(d.id)) {
-      const cb = pendingPreviewEvals.get(d.id);
-      pendingPreviewEvals.delete(d.id);
-      cb(d.result, d.kind);
-    }
-  });
 
   /* ----------------- BASH TERMINAL ------------------------------------- */
   // The terminal keeps its own cwd (a virtual path under the file system that
@@ -8684,13 +8732,10 @@ setTimeout(() => document.querySelectorAll('.draggable-window').forEach(makeDrag
     if (!jscWin) return;
     opts = opts || {};
     jscWin.classList.add('open');
-    patchConsoleOnce();
-    setLang(jscLang || 'js');
-    setScope(jscScope || 'page');
-    if (opts.scope) setScope(opts.scope);
-    if (opts.lang) setLang(opts.lang);
+    jscEnsureSandbox();
+    setLang(opts.lang || jscLang || 'js');
     if (jscBody && jscBody.childElementCount === 0) {
-      jscAppend('Developer Console ready.  JS tab evaluates in the selected scope; Bash tab runs shell commands (`help`).', 'info');
+      jscAppend('Developer Console ready.  JS tab: standalone sandbox — variables persist. Bash tab: type `help`.', 'info');
     }
     setTimeout(() => { if (jscInput) jscInput.focus(); }, 30);
   }
@@ -9011,14 +9056,981 @@ setTimeout(() => document.querySelectorAll('.draggable-window').forEach(makeDrag
     });
   }
 
+  /* =================================================================
+     CODE SNIPPETS — floating searchable library
+     ================================================================= */
+  const SNIPPETS = [
+    /* ============================ HTML ============================ */
+    { lang: 'html', category: 'Boilerplate', name: 'HTML5 boilerplate', desc: 'Minimal, valid HTML5 document skeleton with viewport + charset meta.',
+      code: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+
+</body>
+</html>` },
+    { lang: 'html', category: 'Boilerplate', name: 'Meta tags — SEO / social', desc: 'Common meta tags: description, keywords, OpenGraph, Twitter card.',
+      code: `<meta name="description" content="Page description here (150-160 chars).">
+<meta name="keywords" content="keyword1, keyword2, keyword3">
+<meta name="author" content="Your Name">
+<meta property="og:title" content="Title">
+<meta property="og:description" content="Description">
+<meta property="og:image" content="https://example.com/img.png">
+<meta property="og:url" content="https://example.com">
+<meta name="twitter:card" content="summary_large_image">` },
+    { lang: 'html', category: 'Boilerplate', name: 'Favicon links', desc: 'Multiple favicon sizes for browsers and mobile home-screen icons.',
+      code: `<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">` },
+    { lang: 'html', category: 'Forms', name: 'Contact form', desc: 'Basic contact form with name, email, message and submit button.',
+      code: `<form action="/submit" method="POST">
+  <label for="name">Name</label>
+  <input type="text" id="name" name="name" required>
+
+  <label for="email">Email</label>
+  <input type="email" id="email" name="email" required>
+
+  <label for="message">Message</label>
+  <textarea id="message" name="message" rows="4" required></textarea>
+
+  <button type="submit">Send</button>
+</form>` },
+    { lang: 'html', category: 'Forms', name: 'Login form', desc: 'Simple email + password login with remember-me checkbox.',
+      code: `<form action="/login" method="POST">
+  <input type="email" name="email" placeholder="Email" required>
+  <input type="password" name="password" placeholder="Password" required>
+  <label><input type="checkbox" name="remember"> Remember me</label>
+  <button type="submit">Log in</button>
+</form>` },
+    { lang: 'html', category: 'Forms', name: 'Select dropdown', desc: 'Select input with grouped options.',
+      code: `<select name="country">
+  <optgroup label="North America">
+    <option value="us">United States</option>
+    <option value="ca">Canada</option>
+  </optgroup>
+  <optgroup label="Europe">
+    <option value="uk">United Kingdom</option>
+    <option value="de">Germany</option>
+  </optgroup>
+</select>` },
+    { lang: 'html', category: 'Forms', name: 'Range slider with output', desc: 'Range input paired with a live-updated <output> element.',
+      code: `<input type="range" id="vol" min="0" max="100" value="50"
+       oninput="document.getElementById('vol-out').value = this.value">
+<output id="vol-out">50</output>` },
+    { lang: 'html', category: 'Media', name: 'Responsive image', desc: 'Picture element serving different image sources by viewport width.',
+      code: `<picture>
+  <source media="(min-width: 1024px)" srcset="large.jpg">
+  <source media="(min-width: 640px)"  srcset="medium.jpg">
+  <img src="small.jpg" alt="Description" loading="lazy">
+</picture>` },
+    { lang: 'html', category: 'Media', name: 'Video with fallback', desc: 'HTML5 video with multiple sources and captions track.',
+      code: `<video controls width="640" poster="cover.jpg">
+  <source src="movie.mp4" type="video/mp4">
+  <source src="movie.webm" type="video/webm">
+  <track kind="subtitles" src="captions.vtt" srclang="en" label="English">
+  Your browser does not support the video tag.
+</video>` },
+    { lang: 'html', category: 'Media', name: 'Audio player', desc: 'HTML5 audio element with multiple sources.',
+      code: `<audio controls>
+  <source src="song.mp3" type="audio/mpeg">
+  <source src="song.ogg" type="audio/ogg">
+  Your browser does not support audio.
+</audio>` },
+    { lang: 'html', category: 'Media', name: 'YouTube embed', desc: 'Responsive YouTube iframe embed.',
+      code: `<iframe width="560" height="315"
+  src="https://www.youtube.com/embed/VIDEO_ID"
+  title="YouTube video" frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowfullscreen></iframe>` },
+    { lang: 'html', category: 'Structure', name: 'Semantic layout', desc: 'HTML5 semantic tags for a typical page layout.',
+      code: `<header>
+  <h1>Site Title</h1>
+  <nav>
+    <a href="/">Home</a> | <a href="/about">About</a>
+  </nav>
+</header>
+<main>
+  <article>
+    <h2>Article Title</h2>
+    <p>Article content…</p>
+  </article>
+  <aside>Sidebar</aside>
+</main>
+<footer>&copy; 2025 Your Name</footer>` },
+    { lang: 'html', category: 'Structure', name: 'Table with header', desc: 'Simple data table with thead / tbody / tfoot.',
+      code: `<table>
+  <thead>
+    <tr><th>Name</th><th>Age</th><th>City</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Alice</td><td>30</td><td>NYC</td></tr>
+    <tr><td>Bob</td><td>25</td><td>LA</td></tr>
+  </tbody>
+</table>` },
+    { lang: 'html', category: 'Structure', name: 'Details / summary', desc: 'Native collapsible section — no JS required.',
+      code: `<details>
+  <summary>Click to expand</summary>
+  <p>Hidden content that appears when clicked.</p>
+</details>` },
+    { lang: 'html', category: 'Structure', name: 'Dialog element', desc: 'Native HTML5 modal dialog with open/close controls.',
+      code: `<dialog id="my-dialog">
+  <p>Modal content</p>
+  <button onclick="document.getElementById('my-dialog').close()">Close</button>
+</dialog>
+<button onclick="document.getElementById('my-dialog').showModal()">Open</button>` },
+    { lang: 'html', category: 'Structure', name: 'Ordered / unordered list', desc: 'Basic list markup.',
+      code: `<ul>
+  <li>First item</li>
+  <li>Second item</li>
+</ul>
+<ol>
+  <li>Step one</li>
+  <li>Step two</li>
+</ol>` },
+    { lang: 'html', category: 'Structure', name: 'Description list', desc: 'Term/description list for glossaries or key-value data.',
+      code: `<dl>
+  <dt>HTML</dt>
+  <dd>The markup language of the web.</dd>
+  <dt>CSS</dt>
+  <dd>The styling language of the web.</dd>
+</dl>` },
+    { lang: 'html', category: 'Structure', name: 'Iframe', desc: 'Embed another page inside the current document.',
+      code: `<iframe src="https://example.com" width="600" height="400"
+  sandbox="allow-scripts allow-same-origin"
+  loading="lazy" title="Embedded page"></iframe>` },
+
+    /* ============================ CSS ============================ */
+    { lang: 'css', category: 'Reset', name: 'Modern CSS reset', desc: 'A concise reset for margins, box-sizing, media defaults.',
+      code: `*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; padding: 0; }
+html, body { height: 100%; }
+body { line-height: 1.5; -webkit-font-smoothing: antialiased; }
+img, picture, video, canvas, svg { display: block; max-width: 100%; }
+input, button, textarea, select { font: inherit; }
+p, h1, h2, h3, h4, h5, h6 { overflow-wrap: break-word; }` },
+    { lang: 'css', category: 'Layout', name: 'Flexbox center', desc: 'Center content both horizontally and vertically using flexbox.',
+      code: `.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}` },
+    { lang: 'css', category: 'Layout', name: 'Grid auto-fit cards', desc: 'Responsive card grid that auto-fills columns of a minimum width.',
+      code: `.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}` },
+    { lang: 'css', category: 'Layout', name: 'Sticky footer', desc: 'Push the footer to the bottom of the viewport when content is short.',
+      code: `body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+main { flex: 1; }` },
+    { lang: 'css', category: 'Layout', name: 'Two-column layout', desc: 'Sidebar + main content, sidebar 240px, main flexible.',
+      code: `.layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 20px;
+}
+@media (max-width: 640px) {
+  .layout { grid-template-columns: 1fr; }
+}` },
+    { lang: 'css', category: 'Layout', name: 'Absolute center', desc: 'Center an element inside a positioned parent using transform.',
+      code: `.abs-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}` },
+    { lang: 'css', category: 'Effects', name: 'Linear gradient background', desc: 'Diagonal linear gradient — great for hero sections.',
+      code: `background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);` },
+    { lang: 'css', category: 'Effects', name: 'Radial gradient', desc: 'Circular gradient centered in the element.',
+      code: `background: radial-gradient(circle at center, #f093fb 0%, #f5576c 100%);` },
+    { lang: 'css', category: 'Effects', name: 'Conic gradient', desc: 'Sweeping conic gradient useful for pie charts / spinners.',
+      code: `background: conic-gradient(from 0deg, #ff5555, #ffaa00, #55ff55, #55aaff, #ff5555);` },
+    { lang: 'css', category: 'Effects', name: 'Multi-stop gradient', desc: 'Rainbow-style gradient with several color stops.',
+      code: `background: linear-gradient(90deg,
+  #ff5555 0%, #ffaa00 25%, #ffff55 50%,
+  #55ff55 75%, #55aaff 100%);` },
+    { lang: 'css', category: 'Effects', name: 'Gradient text', desc: 'Apply a gradient to text using background-clip.',
+      code: `.gradient-text {
+  background: linear-gradient(90deg, #f093fb, #f5576c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}` },
+    { lang: 'css', category: 'Effects', name: 'Box shadow (soft)', desc: 'Subtle soft shadow, great for cards.',
+      code: `box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);` },
+    { lang: 'css', category: 'Effects', name: 'Box shadow (elevated)', desc: 'Layered shadow for a stronger elevation feel.',
+      code: `box-shadow:
+  0 1px 2px rgba(0,0,0,0.06),
+  0 4px 12px rgba(0,0,0,0.10),
+  0 16px 32px rgba(0,0,0,0.14);` },
+    { lang: 'css', category: 'Effects', name: 'Glassmorphism', desc: 'Frosted-glass card using backdrop-filter and translucent bg.',
+      code: `.glass {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  border-radius: 12px;
+}` },
+    { lang: 'css', category: 'Effects', name: 'Neumorphism', desc: 'Soft embossed neumorphic button.',
+      code: `.neumorphic {
+  background: #e0e5ec;
+  border-radius: 12px;
+  box-shadow: 8px 8px 16px #a3b1c6, -8px -8px 16px #ffffff;
+}` },
+    { lang: 'css', category: 'Transitions', name: 'Basic transition', desc: 'Smooth transition on a single property with easing.',
+      code: `transition: background-color 0.3s ease;` },
+    { lang: 'css', category: 'Transitions', name: 'All-property transition', desc: 'Transition every changing property (use sparingly).',
+      code: `transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);` },
+    { lang: 'css', category: 'Transitions', name: 'Multiple transitions', desc: 'Different durations/timings per property.',
+      code: `transition:
+  background-color 0.3s ease,
+  transform 0.15s ease-out,
+  opacity 0.5s linear;` },
+    { lang: 'css', category: 'Transitions', name: 'Hover lift', desc: 'Card lifts on hover with shadow + translate.',
+      code: `.card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}` },
+    { lang: 'css', category: 'Animations', name: 'Spin animation', desc: 'Infinite 360° rotation — perfect for loading spinners.',
+      code: `@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.spinner { animation: spin 1s linear infinite; }` },
+    { lang: 'css', category: 'Animations', name: 'Fade in', desc: 'Smoothly fade an element in from transparent.',
+      code: `@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.fade-in { animation: fadeIn 0.5s ease-out forwards; }` },
+    { lang: 'css', category: 'Animations', name: 'Slide up', desc: 'Element slides up while fading in.',
+      code: `@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.slide-up { animation: slideUp 0.4s ease-out forwards; }` },
+    { lang: 'css', category: 'Animations', name: 'Pulse', desc: 'Gentle scale-pulse — call-to-action attention grabber.',
+      code: `@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.05); }
+}
+.pulse { animation: pulse 2s ease-in-out infinite; }` },
+    { lang: 'css', category: 'Animations', name: 'Bounce', desc: 'Playful bounce animation.',
+      code: `@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-20px); }
+}
+.bounce { animation: bounce 0.6s ease-in-out infinite; }` },
+    { lang: 'css', category: 'Animations', name: 'Shake', desc: 'Quick horizontal shake for error states.',
+      code: `@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-8px); }
+  75%      { transform: translateX(8px); }
+}
+.shake { animation: shake 0.4s ease-in-out; }` },
+    { lang: 'css', category: 'Animations', name: 'Typewriter', desc: 'Reveal text character-by-character with a blinking caret.',
+      code: `@keyframes type {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+@keyframes blink { 50% { border-color: transparent; } }
+.type {
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid;
+  animation: type 3s steps(40, end), blink 0.75s step-end infinite;
+}` },
+    { lang: 'css', category: 'Components', name: 'Button (solid)', desc: 'Filled button with hover state.',
+      code: `.btn {
+  padding: 10px 20px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn:hover { background: #2980b9; }` },
+    { lang: 'css', category: 'Components', name: 'Button (outline)', desc: 'Outline button that fills on hover.',
+      code: `.btn-outline {
+  padding: 10px 20px;
+  background: transparent;
+  color: #3498db;
+  border: 2px solid #3498db;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-outline:hover {
+  background: #3498db;
+  color: white;
+}` },
+    { lang: 'css', category: 'Components', name: 'Card', desc: 'Rounded card with shadow and padding.',
+      code: `.card {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}` },
+    { lang: 'css', category: 'Components', name: 'Tooltip (CSS only)', desc: 'Pure-CSS tooltip using data-tip attribute.',
+      code: `[data-tip] {
+  position: relative;
+}
+[data-tip]:hover::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+}` },
+    { lang: 'css', category: 'Components', name: 'Loading dots', desc: 'Three animated dots — classic loading indicator.',
+      code: `.dots span {
+  display: inline-block;
+  width: 8px; height: 8px;
+  margin: 0 2px;
+  background: currentColor;
+  border-radius: 50%;
+  animation: dot-bounce 1.4s infinite ease-in-out both;
+}
+.dots span:nth-child(1) { animation-delay: -0.32s; }
+.dots span:nth-child(2) { animation-delay: -0.16s; }
+@keyframes dot-bounce {
+  0%, 80%, 100% { transform: scale(0); }
+  40%           { transform: scale(1); }
+}` },
+    { lang: 'css', category: 'Components', name: 'Custom scrollbar', desc: 'Slim custom scrollbar (WebKit).',
+      code: `::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #f0f0f0; }
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover { background: #555; }` },
+    { lang: 'css', category: 'Text', name: 'Truncate with ellipsis', desc: 'Single-line ellipsis truncation.',
+      code: `.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}` },
+    { lang: 'css', category: 'Text', name: 'Multi-line clamp', desc: 'Truncate text to N lines with ellipsis.',
+      code: `.clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}` },
+    { lang: 'css', category: 'Utility', name: 'Visually hidden', desc: 'Hide from view but keep accessible to screen readers.',
+      code: `.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}` },
+    { lang: 'css', category: 'Utility', name: 'Aspect ratio box', desc: 'Maintain a fixed aspect ratio for the element.',
+      code: `.aspect-16-9 { aspect-ratio: 16 / 9; }
+.aspect-1-1  { aspect-ratio: 1 / 1;  }
+.aspect-4-3  { aspect-ratio: 4 / 3;  }` },
+    { lang: 'css', category: 'Utility', name: 'Media queries', desc: 'Common breakpoints for responsive design.',
+      code: `/* Mobile first */
+@media (min-width: 640px)  { /* sm  */ }
+@media (min-width: 768px)  { /* md  */ }
+@media (min-width: 1024px) { /* lg  */ }
+@media (min-width: 1280px) { /* xl  */ }
+@media (prefers-color-scheme: dark) { /* dark mode */ }
+@media (prefers-reduced-motion: reduce) { /* less motion */ }` },
+    { lang: 'css', category: 'Utility', name: 'CSS variables', desc: 'Define reusable theme values with custom properties.',
+      code: `:root {
+  --color-primary: #3498db;
+  --color-text: #2c3e50;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --radius: 8px;
+}
+.btn {
+  background: var(--color-primary);
+  color: var(--color-text);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius);
+}` },
+
+    /* ============================ JS ============================ */
+    { lang: 'js', category: 'Timers', name: 'setTimeout', desc: 'Run a function once after a delay (milliseconds).',
+      code: `setTimeout(() => {
+  console.log('Runs after 1 second');
+}, 1000);` },
+    { lang: 'js', category: 'Timers', name: 'setInterval', desc: 'Repeatedly run a function on a fixed interval.',
+      code: `const id = setInterval(() => {
+  console.log('Every 2 seconds');
+}, 2000);
+// Later, stop it:
+// clearInterval(id);` },
+    { lang: 'js', category: 'Timers', name: 'Debounce', desc: 'Delay function execution until N ms have passed without new calls.',
+      code: `function debounce(fn, delay = 300) {
+  let timer;
+  return function(...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+// Usage:
+const search = debounce(q => console.log('Searching:', q), 400);` },
+    { lang: 'js', category: 'Timers', name: 'Throttle', desc: 'Ensure a function runs at most once per interval.',
+      code: `function throttle(fn, limit = 200) {
+  let lastCall = 0;
+  return function(...args) {
+    const now = Date.now();
+    if (now - lastCall >= limit) {
+      lastCall = now;
+      fn.apply(this, args);
+    }
+  };
+}` },
+    { lang: 'js', category: 'Timers', name: 'sleep (async)', desc: 'Await-able delay for use inside async functions.',
+      code: `const sleep = ms => new Promise(res => setTimeout(res, ms));
+
+// Usage:
+async function demo() {
+  console.log('Start');
+  await sleep(1000);
+  console.log('One second later');
+}` },
+    { lang: 'js', category: 'Timers', name: 'requestAnimationFrame loop', desc: 'Smooth animation loop synced to display refresh rate.',
+      code: `let running = true;
+function tick(t) {
+  // update + draw here
+  if (running) requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+// To stop: running = false;` },
+    { lang: 'js', category: 'DOM', name: 'querySelector / All', desc: 'Select elements by CSS selector.',
+      code: `const el   = document.querySelector('.my-class');
+const list = document.querySelectorAll('div.item');
+list.forEach(el => console.log(el.textContent));` },
+    { lang: 'js', category: 'DOM', name: 'Add / remove class', desc: 'Toggle CSS classes on an element.',
+      code: `el.classList.add('active');
+el.classList.remove('hidden');
+el.classList.toggle('open');
+el.classList.contains('active'); // -> boolean` },
+    { lang: 'js', category: 'DOM', name: 'Create element', desc: 'Programmatically create and append an element.',
+      code: `const div = document.createElement('div');
+div.className = 'card';
+div.textContent = 'Hello';
+document.body.appendChild(div);` },
+    { lang: 'js', category: 'DOM', name: 'Event listener', desc: 'Attach event handler with options (once, passive, capture).',
+      code: `button.addEventListener('click', (e) => {
+  e.preventDefault();
+  console.log('Clicked!', e.target);
+}, { once: false, passive: false });` },
+    { lang: 'js', category: 'DOM', name: 'Event delegation', desc: 'Handle events on many children with a single parent listener.',
+      code: `document.getElementById('list').addEventListener('click', (e) => {
+  const li = e.target.closest('li');
+  if (!li) return;
+  console.log('Clicked item:', li.textContent);
+});` },
+    { lang: 'js', category: 'DOM', name: 'Get form data', desc: 'Read all form inputs as a plain object.',
+      code: `const form = document.querySelector('form');
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(form));
+  console.log(data);
+});` },
+    { lang: 'js', category: 'DOM', name: 'Copy to clipboard', desc: "Copy text to the user's clipboard.",
+      code: `async function copyToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    console.log('Copied!');
+  } catch (err) {
+    console.error('Copy failed:', err);
+  }
+}` },
+    { lang: 'js', category: 'DOM', name: 'Scroll to element', desc: 'Smoothly scroll an element into view.',
+      code: `document.getElementById('target').scrollIntoView({
+  behavior: 'smooth',
+  block: 'start'
+});` },
+    { lang: 'js', category: 'DOM', name: 'IntersectionObserver', desc: 'Detect when an element enters/leaves the viewport.',
+      code: `const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      // io.unobserve(e.target); // stop watching once seen
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.fade-target').forEach(el => io.observe(el));` },
+    { lang: 'js', category: 'DOM', name: 'MutationObserver', desc: 'React to DOM changes (child added, attribute changed, etc).',
+      code: `const mo = new MutationObserver((mutations) => {
+  mutations.forEach(m => console.log(m.type, m.target));
+});
+mo.observe(document.body, { childList: true, subtree: true, attributes: true });` },
+    { lang: 'js', category: 'Network', name: 'Fetch JSON (GET)', desc: 'Fetch and parse a JSON resource.',
+      code: `async function getData(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+getData('/api/users').then(console.log).catch(console.error);` },
+    { lang: 'js', category: 'Network', name: 'Fetch POST JSON', desc: 'Send a JSON payload via POST.',
+      code: `async function postData(url, payload) {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  return res.json();
+}` },
+    { lang: 'js', category: 'Network', name: 'Fetch with timeout', desc: 'Abort a fetch request after N milliseconds using AbortController.',
+      code: `async function fetchWithTimeout(url, ms = 5000) {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), ms);
+  try {
+    const res = await fetch(url, { signal: ctrl.signal });
+    return await res.json();
+  } finally {
+    clearTimeout(t);
+  }
+}` },
+    { lang: 'js', category: 'Network', name: 'Upload file (FormData)', desc: 'POST a file with FormData.',
+      code: `async function uploadFile(url, file) {
+  const fd = new FormData();
+  fd.append('file', file);
+  const res = await fetch(url, { method: 'POST', body: fd });
+  return res.json();
+}` },
+    { lang: 'js', category: 'Storage', name: 'localStorage read/write', desc: 'Persist small key/value data across page loads.',
+      code: `// Write
+localStorage.setItem('user', JSON.stringify({ name: 'Alice', age: 30 }));
+// Read
+const user = JSON.parse(localStorage.getItem('user') || 'null');
+// Delete
+localStorage.removeItem('user');
+// Clear all
+// localStorage.clear();` },
+    { lang: 'js', category: 'Storage', name: 'sessionStorage', desc: 'Like localStorage but cleared when the tab closes.',
+      code: `sessionStorage.setItem('token', 'abc123');
+const token = sessionStorage.getItem('token');
+sessionStorage.removeItem('token');` },
+    { lang: 'js', category: 'Storage', name: 'Cookies (basic)', desc: 'Set and read a cookie without a library.',
+      code: `// Set
+document.cookie = 'name=Alice; max-age=' + (60*60*24*7) + '; path=/';
+// Read all
+const cookies = Object.fromEntries(
+  document.cookie.split('; ').map(c => c.split('='))
+);
+console.log(cookies.name);` },
+    { lang: 'js', category: 'Arrays', name: 'Array — map / filter / reduce', desc: 'The core array-transformation trio.',
+      code: `const nums = [1, 2, 3, 4, 5];
+const doubled = nums.map(n => n * 2);          // [2,4,6,8,10]
+const evens   = nums.filter(n => n % 2 === 0); // [2,4]
+const sum     = nums.reduce((a, b) => a + b, 0); // 15` },
+    { lang: 'js', category: 'Arrays', name: 'Unique values', desc: 'Deduplicate an array using Set.',
+      code: `const unique = [...new Set([1, 2, 2, 3, 3, 3, 4])];
+// -> [1, 2, 3, 4]` },
+    { lang: 'js', category: 'Arrays', name: 'Group by key', desc: 'Group array items into an object keyed by a property.',
+      code: `function groupBy(arr, key) {
+  return arr.reduce((acc, item) => {
+    const k = typeof key === 'function' ? key(item) : item[key];
+    (acc[k] = acc[k] || []).push(item);
+    return acc;
+  }, {});
+}
+// groupBy([{t:'a',v:1},{t:'b',v:2},{t:'a',v:3}], 't')` },
+    { lang: 'js', category: 'Arrays', name: 'Shuffle', desc: 'Randomize array order using Fisher-Yates.',
+      code: `function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}` },
+    { lang: 'js', category: 'Arrays', name: 'Chunk into groups', desc: 'Split an array into fixed-size chunks.',
+      code: `function chunk(arr, size) {
+  const out = [];
+  for (let i = 0; i < arr.length; i += size) {
+    out.push(arr.slice(i, i + size));
+  }
+  return out;
+}
+// chunk([1,2,3,4,5], 2) -> [[1,2],[3,4],[5]]` },
+    { lang: 'js', category: 'Arrays', name: 'Flatten deep', desc: 'Recursively flatten nested arrays.',
+      code: `const flat = arr => arr.flat(Infinity);
+// [1, [2, [3, [4]]]] -> [1, 2, 3, 4]` },
+    { lang: 'js', category: 'Objects', name: 'Deep clone', desc: 'Clone an object deeply using structuredClone (modern).',
+      code: `const copy = structuredClone(original);
+// Older fallback:
+// const copy = JSON.parse(JSON.stringify(original));` },
+    { lang: 'js', category: 'Objects', name: 'Merge objects', desc: 'Combine multiple objects into one (later keys win).',
+      code: `const merged = { ...a, ...b, ...c };
+// Or:
+const merged2 = Object.assign({}, a, b, c);` },
+    { lang: 'js', category: 'Objects', name: 'Pick / omit keys', desc: 'Create a new object with only some keys.',
+      code: `const pick = (obj, keys) =>
+  keys.reduce((o, k) => (k in obj ? (o[k] = obj[k], o) : o), {});
+
+const omit = (obj, keys) => {
+  const o = { ...obj };
+  keys.forEach(k => delete o[k]);
+  return o;
+};` },
+    { lang: 'js', category: 'Strings', name: 'Format template', desc: 'Multiline template literal with interpolation.',
+      code: `const name = 'World';
+const msg = \`Hello, \${name}!
+Welcome to line 2.\`;` },
+    { lang: 'js', category: 'Strings', name: 'Title case', desc: 'Capitalize the first letter of each word.',
+      code: `function titleCase(str) {
+  return str.toLowerCase().replace(/\\b\\w/g, c => c.toUpperCase());
+}` },
+    { lang: 'js', category: 'Strings', name: 'Slugify', desc: 'Convert text to a URL-friendly slug.',
+      code: `function slugify(str) {
+  return str
+    .toLowerCase()
+    .trim()
+    .replace(/[^\\w\\s-]/g, '')
+    .replace(/[\\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+// slugify('  Hello, World!  ') -> 'hello-world'` },
+    { lang: 'js', category: 'Numbers', name: 'Random integer', desc: 'Random integer in [min, max] inclusive.',
+      code: `function randInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}` },
+    { lang: 'js', category: 'Numbers', name: 'Clamp', desc: 'Constrain a number between min and max.',
+      code: `const clamp = (n, min, max) => Math.min(Math.max(n, min), max);` },
+    { lang: 'js', category: 'Numbers', name: 'Format currency', desc: 'Format a number as a currency string.',
+      code: `const fmt = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD'
+});
+fmt.format(1234.5); // "$1,234.50"` },
+    { lang: 'js', category: 'Numbers', name: 'Format number', desc: 'Format a number with grouping / decimals.',
+      code: `new Intl.NumberFormat('en-US', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
+}).format(1234567.891); // "1,234,567.89"` },
+    { lang: 'js', category: 'Dates', name: 'Format date', desc: 'Format a Date using Intl.DateTimeFormat.',
+      code: `const d = new Date();
+new Intl.DateTimeFormat('en-US', {
+  year: 'numeric', month: 'long', day: 'numeric'
+}).format(d); // "November 5, 2025"` },
+    { lang: 'js', category: 'Dates', name: 'Relative time', desc: 'Human-friendly relative time ("2 hours ago").',
+      code: `function timeAgo(date) {
+  const s = Math.floor((Date.now() - +date) / 1000);
+  const units = [[60,'sec'],[60,'min'],[24,'hr'],[7,'day'],[4,'wk'],[12,'mo']];
+  let n = s, i = 0, name = 'sec';
+  for (const [step, label] of units) {
+    if (n < step) { name = label; break; }
+    n = Math.floor(n / step); name = label;
+  }
+  return \`\${n} \${name}\${n !== 1 ? 's' : ''} ago\`;
+}` },
+    { lang: 'js', category: 'Dates', name: 'Add days to date', desc: 'Add N days to a date and return a new Date.',
+      code: `function addDays(date, days) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + days);
+  return d;
+}` },
+    { lang: 'js', category: 'Async', name: 'Promise.all', desc: 'Run several promises in parallel; resolves when all resolve.',
+      code: `const [users, posts, tags] = await Promise.all([
+  fetch('/api/users').then(r => r.json()),
+  fetch('/api/posts').then(r => r.json()),
+  fetch('/api/tags').then(r => r.json())
+]);` },
+    { lang: 'js', category: 'Async', name: 'Promise.allSettled', desc: 'Wait for every promise regardless of rejection.',
+      code: `const results = await Promise.allSettled([p1, p2, p3]);
+results.forEach(r => {
+  if (r.status === 'fulfilled') console.log(r.value);
+  else console.error(r.reason);
+});` },
+    { lang: 'js', category: 'Async', name: 'Retry with backoff', desc: 'Retry an async function up to N times with exponential backoff.',
+      code: `async function retry(fn, tries = 3, base = 300) {
+  let err;
+  for (let i = 0; i < tries; i++) {
+    try { return await fn(); }
+    catch (e) {
+      err = e;
+      await new Promise(r => setTimeout(r, base * Math.pow(2, i)));
+    }
+  }
+  throw err;
+}` },
+    { lang: 'js', category: 'Utility', name: 'UUID v4 (random)', desc: 'Generate an RFC-4122 v4 UUID.',
+      code: `function uuidv4() {
+  if (crypto.randomUUID) return crypto.randomUUID();
+  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c/4).toString(16)
+  );
+}` },
+    { lang: 'js', category: 'Utility', name: 'Query string parse', desc: 'Read query params from the current URL.',
+      code: `const params = new URLSearchParams(location.search);
+const page = params.get('page');           // string or null
+const all  = Object.fromEntries(params);   // { key: value }` },
+    { lang: 'js', category: 'Utility', name: 'Download blob as file', desc: 'Trigger a file download from a Blob or string.',
+      code: `function download(filename, data, type = 'text/plain') {
+  const blob = data instanceof Blob ? data : new Blob([data], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+// download('hello.txt', 'Hello, world!');` },
+    { lang: 'js', category: 'Utility', name: 'Read file as text', desc: 'Read a File (from <input type=file>) as text.',
+      code: `function readAsText(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = rej;
+    r.readAsText(file);
+  });
+}` },
+    { lang: 'js', category: 'Utility', name: 'Detect device / OS', desc: 'Quick sniff of the user agent for OS / mobile.',
+      code: `const ua = navigator.userAgent;
+const isMobile = /Mobi|Android|iPhone/i.test(ua);
+const isMac    = /Mac/i.test(ua);
+const isWin    = /Windows/i.test(ua);
+const isIOS    = /iPad|iPhone|iPod/.test(ua);` },
+    { lang: 'js', category: 'Utility', name: 'Escape HTML', desc: 'Prevent XSS by escaping HTML special characters.',
+      code: `function escapeHTML(str) {
+  return String(str).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}` },
+    { lang: 'js', category: 'Utility', name: 'Class (with getter/setter)', desc: 'ES6 class with private field, getter, and setter.',
+      code: `class Counter {
+  #count = 0;
+  get value() { return this.#count; }
+  set value(v) { this.#count = Math.max(0, +v); }
+  increment() { this.#count++; return this; }
+  reset() { this.#count = 0; return this; }
+}
+const c = new Counter();
+c.increment().increment();
+console.log(c.value); // 2` },
+    { lang: 'js', category: 'Utility', name: 'Simple event emitter', desc: 'Tiny publish/subscribe pattern.',
+      code: `class EventBus {
+  constructor() { this.map = new Map(); }
+  on(evt, fn) {
+    if (!this.map.has(evt)) this.map.set(evt, new Set());
+    this.map.get(evt).add(fn);
+    return () => this.off(evt, fn);
+  }
+  off(evt, fn) { this.map.get(evt)?.delete(fn); }
+  emit(evt, ...args) { this.map.get(evt)?.forEach(fn => fn(...args)); }
+}` },
+  ];
+
+  const snipWin    = document.getElementById('snippets-window');
+  const snipHdr    = document.getElementById('snip-header');
+  const snipClose  = document.getElementById('snip-close-btn');
+  const snipBody   = document.getElementById('snip-body');
+  const snipSearch = document.getElementById('snip-search');
+  const snipSort   = document.getElementById('snip-sort');
+  const snipCount  = document.getElementById('snip-count');
+  const snipResize = document.getElementById('snip-resize');
+  const snipLangTabs = snipWin ? snipWin.querySelectorAll('.snip-lang-tab') : [];
+
+  let snipLangFilter = 'all';
+  let snipQuery = '';
+  let snipSortMode = 'cat';
+
+  function snipEscape(str) {
+    return String(str).replace(/[&<>]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[c]));
+  }
+
+  function snipRender() {
+    if (!snipBody) return;
+    const q = snipQuery.trim().toLowerCase();
+    let items = SNIPPETS.filter(s => {
+      if (snipLangFilter !== 'all' && s.lang !== snipLangFilter) return false;
+      if (!q) return true;
+      return (
+        s.name.toLowerCase().includes(q) ||
+        s.category.toLowerCase().includes(q) ||
+        s.desc.toLowerCase().includes(q) ||
+        s.lang.toLowerCase().includes(q) ||
+        s.code.toLowerCase().includes(q)
+      );
+    });
+    if (snipSortMode === 'az') items.sort((a, b) => a.name.localeCompare(b.name));
+    else if (snipSortMode === 'za') items.sort((a, b) => b.name.localeCompare(a.name));
+    else if (snipSortMode === 'lang') items.sort((a, b) => a.lang.localeCompare(b.lang) || a.name.localeCompare(b.name));
+    else items.sort((a, b) =>
+      a.lang.localeCompare(b.lang) ||
+      a.category.localeCompare(b.category) ||
+      a.name.localeCompare(b.name)
+    );
+
+    if (snipCount) snipCount.textContent = items.length + ' snippet' + (items.length === 1 ? '' : 's');
+    snipBody.innerHTML = '';
+    if (items.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'snip-empty';
+      empty.textContent = 'No snippets match your search.';
+      snipBody.appendChild(empty);
+      return;
+    }
+    items.forEach(s => {
+      const card = document.createElement('div');
+      card.className = 'snip-card';
+      card.innerHTML =
+        '<div class="snip-card-head">' +
+          '<span class="snip-lang-badge ' + s.lang + '">' + s.lang.toUpperCase() + '</span>' +
+          '<span class="snip-cat-badge">' + snipEscape(s.category) + '</span>' +
+          '<span class="snip-name"></span>' +
+          '<div class="snip-actions">' +
+            '<button class="snip-btn snip-copy-btn" type="button">Copy</button>' +
+            '<button class="snip-btn primary snip-insert-btn" type="button">Insert</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="snip-desc"></div>' +
+        '<pre class="snip-code"></pre>';
+      card.querySelector('.snip-name').textContent = s.name;
+      card.querySelector('.snip-desc').textContent = s.desc;
+      card.querySelector('.snip-code').textContent = s.code;
+      const copyBtn = card.querySelector('.snip-copy-btn');
+      const insBtn  = card.querySelector('.snip-insert-btn');
+      copyBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(s.code);
+          copyBtn.textContent = 'Copied!';
+          if (typeof showToast === 'function') showToast('Snippet copied to clipboard', 'success', 1600);
+          setTimeout(() => { copyBtn.textContent = 'Copy'; }, 1200);
+        } catch (err) {
+          // fallback: use a temporary textarea
+          const ta = document.createElement('textarea');
+          ta.value = s.code; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+          document.body.appendChild(ta); ta.select();
+          try { document.execCommand('copy'); copyBtn.textContent = 'Copied!'; }
+          catch(_) { copyBtn.textContent = 'Failed'; }
+          document.body.removeChild(ta);
+          setTimeout(() => { copyBtn.textContent = 'Copy'; }, 1200);
+        }
+      });
+      insBtn.addEventListener('click', () => {
+        try {
+          if (typeof editor === 'undefined' || !editor) {
+            if (typeof showToast === 'function') showToast('No file open to insert into', 'error');
+            return;
+          }
+          editor.session.insert(editor.getCursorPosition(), s.code);
+          editor.focus();
+          insBtn.textContent = 'Inserted!';
+          if (typeof showToast === 'function') showToast('Snippet inserted at cursor', 'success', 1600);
+          setTimeout(() => { insBtn.textContent = 'Insert'; }, 1200);
+        } catch(err) {
+          if (typeof showToast === 'function') showToast('Insert failed: ' + err, 'error');
+        }
+      });
+      snipBody.appendChild(card);
+    });
+  }
+
+  if (snipSearch) {
+    snipSearch.addEventListener('input', () => { snipQuery = snipSearch.value; snipRender(); });
+  }
+  if (snipSort) {
+    snipSort.addEventListener('change', () => { snipSortMode = snipSort.value; snipRender(); });
+  }
+  snipLangTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      snipLangTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      snipLangFilter = tab.dataset.lang;
+      snipRender();
+    });
+  });
+
+  function openCodeSnippets() {
+    if (!snipWin) return;
+    snipWin.classList.add('open');
+    snipRender();
+    setTimeout(() => { if (snipSearch) snipSearch.focus(); }, 30);
+  }
+  function closeCodeSnippets() { if (snipWin) snipWin.classList.remove('open'); }
+  if (snipClose) snipClose.addEventListener('click', closeCodeSnippets);
+  window.openCodeSnippets = openCodeSnippets;
+
+  /* Drag Code Snippets window by its header */
+  (function() {
+    if (!snipHdr || !snipWin) return;
+    let dragging = false, ox = 0, oy = 0;
+    snipHdr.addEventListener('mousedown', (e) => {
+      if (e.target.closest('button')) return;
+      dragging = true;
+      const r = snipWin.getBoundingClientRect();
+      ox = e.clientX - r.left;
+      oy = e.clientY - r.top;
+      document.body.style.userSelect = 'none';
+    });
+    document.addEventListener('mousemove', (e) => {
+      if (!dragging) return;
+      const w = snipWin.offsetWidth, h = snipWin.offsetHeight;
+      let nx = e.clientX - ox, ny = e.clientY - oy;
+      nx = Math.max(0, Math.min(window.innerWidth - w, nx));
+      ny = Math.max(0, Math.min(window.innerHeight - h, ny));
+      snipWin.style.left = nx + 'px';
+      snipWin.style.top  = ny + 'px';
+    });
+    document.addEventListener('mouseup', () => {
+      if (dragging) { dragging = false; document.body.style.userSelect = ''; }
+    });
+  })();
+
+  /* Resize Code Snippets window from bottom-right */
+  (function() {
+    if (!snipResize || !snipWin) return;
+    let resizing = false, sx = 0, sy = 0, sw = 0, sh = 0;
+    snipResize.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      resizing = true;
+      const r = snipWin.getBoundingClientRect();
+      sx = e.clientX; sy = e.clientY; sw = r.width; sh = r.height;
+      document.body.style.userSelect = 'none';
+    });
+    document.addEventListener('mousemove', (e) => {
+      if (!resizing) return;
+      const nw = Math.max(460, sw + (e.clientX - sx));
+      const nh = Math.max(340, sh + (e.clientY - sy));
+      snipWin.style.width  = nw + 'px';
+      snipWin.style.height = nh + 'px';
+    });
+    document.addEventListener('mouseup', () => {
+      if (resizing) { resizing = false; document.body.style.userSelect = ''; }
+    });
+  })();
+
   // Expose for debugging / re-entry from the JS console
   window.openJSConsole = openJSConsole;
   window.openNPMInstaller = openNPMInstaller;
 })();
 </script>
 <!-- (removed 4x duplicated Cloudflare beacon scripts for reliability) -->
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
+  
 </html>
